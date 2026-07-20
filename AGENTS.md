@@ -29,6 +29,12 @@
 - Before opening a PR, rerun `npm run lint` and `npm run typecheck`, summarize changes, link issues (e.g., `Closes #123`), and provide screenshots for UI updates.
 - Document any required environment variables or follow-up tasks directly in the PR description.
 
+## Deployment (GitHub + Vercel)
+- Pushing to `main` triggers an automatic production deployment on Vercel.
+- Creating a Pull Request triggers a Vercel Preview deployment with a unique URL for review.
+- All environment variables must be configured in the Vercel dashboard (Project Settings → Environment Variables); never rely on `.env.local` in production.
+- Vercel automatically runs `npm run build` during deployment; ensure `npm run build` passes locally before pushing.
+
 ## Security & Configuration Tips
 - Never commit secrets; store runtime credentials in `.env.local` and share securely.
 - Key env vars include `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`, `FIREBASE_STORAGE_BUCKET`, `NEXT_PUBLIC_CLOUD_FUNCTIONS_BASE_URL`, `NEXT_PUBLIC_FIREBASE_APP_CHECK_KEY`, and `NEXT_PUBLIC_RECAPTCHA_ENTERPRISE_KEY`.
