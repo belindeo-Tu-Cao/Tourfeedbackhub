@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { initializeFirebaseAdmin } from '@/firebase/admin';
-import { revalidatePath } from 'next/cache';
+import { getPayloadClient } from '@/lib/payload';
 
 const commentSchema = z.object({
   authorName: z.string().min(1, 'Name is required'),
@@ -9,54 +8,54 @@ const commentSchema = z.object({
   message: z.string().min(1, 'Message is required'),
 });
 
-export async function POST(request: Request, { params }: { params: { tourId: string } }) {
-  const tourId = params.tourId;
+export async function POST(request: Request, { params }: { params: Promise<{ tourId: string }> }) {
+  const { tourId } = await params;
 
   if (!tourId) {
     return NextResponse.json({ error: 'Missing tour id' }, { status: 400 });
   }
 
-  const admin = initializeFirebaseAdmin();
-  if (!admin) {
-    return NextResponse.json({ error: 'Firebase admin is not configured' }, { status: 500 });
-  }
-
-  const { firestore } = admin;
-
-  let payload: unknown;
+  let body: unknown;
   try {
-    payload = await request.json();
-  } catch (error) {
+    body = await request.json();
+  } catch {
     return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
   }
 
-  const parsed = commentSchema.safeParse(payload);
+  const parsed = commentSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues.map((issue) => issue.message).join(', ') }, { status: 400 });
+    return NextResponse.json(
+      { error: parsed.error.issues.map((issue) => issue.message).join(', ') },
+      { status: 400 }
+    );
   }
 
   const { authorName, rating, message } = parsed.data;
 
   try {
-    const tourSnapshot = await firestore.collection('tours').doc(tourId).get();
-    if (!tourSnapshot.exists) {
+    const payload = await getPayloadClient();
+
+    let tourName = '';
+    try {
+      const tour = await payload.findByID({ collection: 'tours', id: tourId, depth: 0 });
+      tourName = (tour as Record<string, any>)?.name ?? '';
+    } catch {
       return NextResponse.json({ error: 'Tour not found' }, { status: 404 });
     }
 
-    const tourData = tourSnapshot.data() ?? {};
-    const tourName = typeof tourData.name === 'string' ? tourData.name : tourData.title ?? '';
-
-    await firestore.collection('reviews').add({
-      authorDisplay: authorName,
-      country: '',
-      language: 'en',
-      rating,
-      message,
-      tourId,
-      tourName,
-      status: 'pending',
-      reviewType: 'finishedTour',
-      createdAt: new Date(),
+    await payload.create({
+      collection: 'reviews',
+      data: {
+        authorDisplay: authorName,
+        country: '',
+        language: 'en',
+        rating,
+        message,
+        tour: tourId,
+        tourName,
+        status: 'pending',
+        reviewType: 'finishedTour',
+      },
     });
 
     return NextResponse.json({ success: true, requiresApproval: true });

@@ -27,8 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { StarRating } from "@/components/star-rating";
 import { countries, languages } from "@/lib/data";
 import type { Tour } from "@/lib/types";
-import { useRecaptchaEnterprise } from "@/hooks/use-recaptcha-enterprise";
-import { submitFeedbackToCloudFunctions } from "@/lib/cloud-functions-client";
+import { submitFeedback } from "@/lib/actions";
 
 const STORAGE_KEY = "tourfeedbackhub-feedback-draft";
 const QUICK_INTENT_KEY = "tourfeedbackhub-feedback-intent";
@@ -116,9 +115,6 @@ function loadQuickIntent(): Partial<FeedbackFormValues> | null {
 
 export default function FeedbackForm({ tours }: FeedbackFormProps) {
   const { toast } = useToast();
-  const { isReady: isRecaptchaReady, execute, error: recaptchaError } = useRecaptchaEnterprise({
-    action: "feedback_submit",
-  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
@@ -146,15 +142,6 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
   }, [form]);
 
   const onSubmit = async (data: FeedbackFormValues) => {
-    if (!isRecaptchaReady) {
-      toast({
-        title: "Spam protection not ready",
-        description: "Please wait a moment and try again.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     let submissionToast: ReturnType<typeof toast> | undefined;
     try {
       setIsSubmitting(true);
@@ -163,29 +150,19 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
         description: "Please wait while we share your travel story.",
         duration: 60000,
       });
-      const recaptchaToken = await execute();
-      const photoFile = data.photo && data.photo.length > 0 ? (data.photo[0] as File) : null;
 
-      await submitFeedbackToCloudFunctions(
-        {
-          name: data.name.trim(),
-          country: data.country,
-          language: data.language,
-          rating: data.rating,
-          message: data.message.trim(),
-          tourId: data.tourId ? data.tourId : undefined,
-          recaptchaToken,
-          hasAttachment: Boolean(photoFile),
-          attachmentMetadata: photoFile
-            ? {
-                fileName: photoFile.name,
-                contentType: photoFile.type,
-                size: photoFile.size,
-              }
-            : null,
-        },
-        photoFile
-      );
+      const formData = new FormData();
+      formData.append("name", data.name.trim());
+      formData.append("country", data.country);
+      formData.append("language", data.language);
+      formData.append("rating", String(data.rating));
+      formData.append("message", data.message.trim());
+      if (data.tourId) formData.append("tourId", data.tourId);
+
+      const result = await submitFeedback(formData);
+      if (result?.errors) {
+        throw new Error(result.message ?? "Validation failed.");
+      }
 
       window.localStorage.removeItem(STORAGE_KEY);
       setSubmitted(true);
@@ -289,12 +266,6 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
-        {recaptchaError && (
-          <p className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {recaptchaError.message}
-          </p>
-        )}
-
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">Step {currentStep + 1} of {steps.length}</p>
@@ -506,7 +477,7 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
                 Next <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
-              <Button type="submit" size="lg" disabled={isSubmitting || !isRecaptchaReady} aria-busy={isSubmitting}>
+              <Button type="submit" size="lg" disabled={isSubmitting} aria-busy={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isSubmitting ? "Submitting..." : "Submit feedback"}
               </Button>

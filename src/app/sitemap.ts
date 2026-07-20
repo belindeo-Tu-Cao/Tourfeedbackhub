@@ -1,69 +1,24 @@
 import type {MetadataRoute} from 'next';
 import {getPublicContent} from '@/lib/content-service';
-import {getFirestore} from 'firebase-admin/firestore';
-import {initializeApp, getApps, cert} from 'firebase-admin/app';
-import type {Post} from '@/lib/types';
+import {getPayloadClient} from '@/lib/payload';
 
-function getAdminApp() {
-  if (getApps().length) {
-    return getApps()[0];
-  }
+type SitemapDoc = { slug: string; updatedAt: Date };
 
-  const serviceAccount = {
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-  };
-
-  return initializeApp({
-    credential: cert(serviceAccount),
-  });
-}
-
-async function getPosts(): Promise<Post[]> {
+async function getPostsByType(type: 'post' | 'page'): Promise<SitemapDoc[]> {
   try {
-    const adminApp = getAdminApp();
-    if (!adminApp) return [];
-
-    const db = getFirestore(adminApp);
-    const snapshot = await db.collection('posts')
-      .where('status', '==', 'published')
-      .where('type', '==', 'post')
-      .get();
-
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date(),
-      updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-      publishedAt: doc.data().publishedAt?.toDate() || null,
-    })) as Post[];
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: 'posts',
+      depth: 0,
+      limit: 1000,
+      where: { and: [{ type: { equals: type } }, { status: { equals: 'published' } }] },
+    });
+    return result.docs.map((doc: Record<string, any>) => ({
+      slug: typeof doc.slug === 'string' && doc.slug ? doc.slug : String(doc.id),
+      updatedAt: doc.updatedAt ? new Date(doc.updatedAt) : new Date(),
+    }));
   } catch (error) {
-    console.error('Error fetching posts for sitemap:', error);
-    return [];
-  }
-}
-
-async function getPages(): Promise<Post[]> {
-  try {
-    const adminApp = getAdminApp();
-    if (!adminApp) return [];
-
-    const db = getFirestore(adminApp);
-    const snapshot = await db.collection('posts')
-      .where('type', '==', 'page')
-      .where('status', '==', 'published')
-      .get();
-
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date(),
-      updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-      publishedAt: doc.data().publishedAt?.toDate() || null,
-    })) as Post[];
-  } catch (error) {
-    console.error('Error fetching pages for sitemap:', error);
+    console.error(`Error fetching ${type}s for sitemap:`, error);
     return [];
   }
 }
@@ -74,8 +29,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Get dynamic content
   const [publicContent, posts, pages] = await Promise.all([
     getPublicContent(),
-    getPosts(),
-    getPages(),
+    getPostsByType('post'),
+    getPostsByType('page'),
   ]);
 
   // Static pages with SEO priorities

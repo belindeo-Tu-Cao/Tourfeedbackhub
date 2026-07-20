@@ -1,0 +1,50 @@
+[
+  {
+    "id": "4GGdSQC8z7QdlMDxiAmC",
+    "name": "Hue Citadel",
+    "slug": "hue-citadel",
+    "description": null,
+    "count": 0,
+    "createdAt": "2025-10-21T10:58:40.843Z"
+  },
+  {
+    "id": "URSGNvmopdbHocXiuw3W",
+    "name": "Nguyen Dynasty",
+    "slug": "nguyen-dynasty",
+    "description": null,
+    "count": 0,
+    "createdAt": "2025-10-21T10:58:40.843Z"
+  },
+  {
+    "id": "YEarf3pVxHSYdyZMw2r6",
+    "name": "Imperial Architecture",
+    "slug": "imperial-architecture",
+    "description": null,
+    "count": 0,
+    "createdAt": "2025-10-21T10:58:40.843Z"
+  },
+  {
+    "id": "YKhSX0SZDV4emzGaV1ms",
+    "name": "Royal Tombs",
+    "slug": "royal-tombs",
+    "description": null,
+    "count": 0,
+    "createdAt": "2025-10-21T10:58:40.843Z"
+  },
+  {
+    "id": "aLvqqT2x5gi98HsP1gPd",
+    "name": "Vietnam History",
+    "slug": "vietnam-history",
+    "description": null,
+    "count": 0,
+    "createdAt": "2025-10-21T10:58:40.843Z"
+  },
+  {
+    "id": "oBjYYbJC9ej3XxvWDwVI",
+    "name": "UNESCO Heritage",
+    "slug": "unesco-heritage",
+    "description": null,
+    "count": 0,
+    "createdAt": "2025-10-21T10:58:40.843Z"
+  }
+]

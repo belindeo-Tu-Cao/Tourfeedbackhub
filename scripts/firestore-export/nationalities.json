@@ -1,0 +1,410 @@
+[
+  {
+    "id": "0PNxPkbKbSrtbSRgmmG6",
+    "name": "Argentinian",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.505Z"
+  },
+  {
+    "id": "2KMUSRIERoyW61x4oWgx",
+    "name": "Austrian",
+    "code": null,
+    "tier": "Good English",
+    "priority": 2,
+    "updatedAt": "2025-10-24T07:32:23.508Z"
+  },
+  {
+    "id": "3LV3SAN1VAD5yTmEf4hz",
+    "name": "Czech",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.509Z"
+  },
+  {
+    "id": "5mdpSyHDdtG0h4E8aSpA",
+    "name": "Indonesian",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.509Z"
+  },
+  {
+    "id": "9q19jXGxdqPpdDit4wmz",
+    "name": "Hong Konger",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.509Z"
+  },
+  {
+    "id": "BIVbG3GtrgTDwqIR5OSJ",
+    "name": "French",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.510Z"
+  },
+  {
+    "id": "BSMsLQV8vszL6neHfz3g",
+    "name": "Russian",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.510Z"
+  },
+  {
+    "id": "BSxBf3RmySkujyEEkXYc",
+    "name": "Portuguese",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.510Z"
+  },
+  {
+    "id": "CYfnoUREYHD3iEAzCvy9",
+    "name": "Macanese",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.510Z"
+  },
+  {
+    "id": "D3TLNO4zjXMS4LH9PBxd",
+    "name": "Hungarian",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.511Z"
+  },
+  {
+    "id": "FAIY3WlJIDhl4koVKhR9",
+    "name": "Danish",
+    "code": null,
+    "tier": "Good English",
+    "priority": 2,
+    "updatedAt": "2025-10-24T07:32:23.511Z"
+  },
+  {
+    "id": "HsUwi8VrzJk7ywCeupr0",
+    "name": "South African",
+    "code": null,
+    "tier": "English-speaking",
+    "priority": 1,
+    "updatedAt": "2025-10-24T07:32:23.511Z"
+  },
+  {
+    "id": "JCZCJrdaeoxT3tdjIR8k",
+    "name": "Laotian",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.512Z"
+  },
+  {
+    "id": "Jge8jQzOH3cwCGjvMgZk",
+    "name": "Pakistani",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.512Z"
+  },
+  {
+    "id": "KokLLQG3BAqnMdyrGhuG",
+    "name": "Cambodian",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.512Z"
+  },
+  {
+    "id": "LNnyHojYf80WR4WewwQK",
+    "name": "Greek",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.512Z"
+  },
+  {
+    "id": "O1rOWersIf6jmacPKZVA",
+    "name": "Dutch",
+    "code": null,
+    "tier": "Good English",
+    "priority": 2,
+    "updatedAt": "2025-10-24T07:32:23.512Z"
+  },
+  {
+    "id": "OaW5z5DCVZLr5VwSbUcH",
+    "name": "German",
+    "code": null,
+    "tier": "Good English",
+    "priority": 2,
+    "updatedAt": "2025-10-24T07:32:23.512Z"
+  },
+  {
+    "id": "PSv9khiOvYLfWeQFij1u",
+    "name": "Swedish",
+    "code": null,
+    "tier": "Good English",
+    "priority": 2,
+    "updatedAt": "2025-10-24T07:32:23.512Z"
+  },
+  {
+    "id": "Qh0i3cL9rntKLfbBKlYN",
+    "name": "Chinese",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.512Z"
+  },
+  {
+    "id": "REqdVhcMel74Qad2LS59",
+    "name": "Singaporean",
+    "code": null,
+    "tier": "English-speaking",
+    "priority": 1,
+    "updatedAt": "2025-10-24T07:32:23.512Z"
+  },
+  {
+    "id": "RR3Nyb40x4tnKoUBk9MG",
+    "name": "South Korean",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.512Z"
+  },
+  {
+    "id": "SkRDyZEFDBq4rGvay9Zq",
+    "name": "Indian",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.513Z"
+  },
+  {
+    "id": "TRbXS8olR1u38ADIRJvl",
+    "name": "Brazilian",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.513Z"
+  },
+  {
+    "id": "TSbDyq43gdH6lar6y1lR",
+    "name": "Thai",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.513Z"
+  },
+  {
+    "id": "UWzspNCWauMHpi54af4Y",
+    "name": "Emirati",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.513Z"
+  },
+  {
+    "id": "VTxWXQAeKN8OozWmcaQX",
+    "name": "Malaysian",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.513Z"
+  },
+  {
+    "id": "Vek64DX1QwAXxfyZXPx3",
+    "name": "American",
+    "code": null,
+    "tier": "English-speaking",
+    "priority": 1,
+    "updatedAt": "2025-10-24T07:32:23.513Z"
+  },
+  {
+    "id": "VrU07dMaMh0ftai7ctKl",
+    "name": "Norwegian",
+    "code": null,
+    "tier": "Good English",
+    "priority": 2,
+    "updatedAt": "2025-10-24T07:32:23.513Z"
+  },
+  {
+    "id": "XNoj1z9rGevIN7v9gbXa",
+    "name": "British",
+    "code": null,
+    "tier": "English-speaking",
+    "priority": 1,
+    "updatedAt": "2025-10-24T07:32:23.513Z"
+  },
+  {
+    "id": "XioySESzsWDvv9qQ6Eqn",
+    "name": "Filipino",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.513Z"
+  },
+  {
+    "id": "ZXQiThhf5qKfYigeR8Hk",
+    "name": "New Zealander",
+    "code": null,
+    "tier": "English-speaking",
+    "priority": 1,
+    "updatedAt": "2025-10-24T07:32:23.514Z"
+  },
+  {
+    "id": "be69RStC3qo6DeO4MD8B",
+    "name": "Italian",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.514Z"
+  },
+  {
+    "id": "bolRs0ZVN2orJjmCshaN",
+    "name": "Japanese",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.514Z"
+  },
+  {
+    "id": "cK0Qey3cbmgkBXe0r9RQ",
+    "name": "Finnish",
+    "code": null,
+    "tier": "Good English",
+    "priority": 2,
+    "updatedAt": "2025-10-24T07:32:23.514Z"
+  },
+  {
+    "id": "cdwQJK6qOaBHeBE0mWlT",
+    "name": "Turkish",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.514Z"
+  },
+  {
+    "id": "cmxrEZaIB9IzdFzeM1s6",
+    "name": "Spanish",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.514Z"
+  },
+  {
+    "id": "eNp6NcLFsLJ6CWmegICa",
+    "name": "Polish",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.514Z"
+  },
+  {
+    "id": "iph7LtsJLWILXoqsdx5f",
+    "name": "Bangladeshi",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.514Z"
+  },
+  {
+    "id": "je0Y5j3rE5wysTSGkdwd",
+    "name": "Canadian",
+    "code": null,
+    "tier": "English-speaking",
+    "priority": 1,
+    "updatedAt": "2025-10-24T07:32:23.514Z"
+  },
+  {
+    "id": "kCKtCfLyOXjRmt9dZufv",
+    "name": "Ukrainian",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.515Z"
+  },
+  {
+    "id": "mWxsrvyZRerOeh22c4aX",
+    "name": "Kazakh",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.515Z"
+  },
+  {
+    "id": "ocP7rowOA3vVvcsyIQMT",
+    "name": "Sri Lankan",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.515Z"
+  },
+  {
+    "id": "rGUgojUft2wcDq0ZtCai",
+    "name": "Israeli",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.515Z"
+  },
+  {
+    "id": "vyMzyya16MA63LKSAld7",
+    "name": "Vietnamese Overseas",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.515Z"
+  },
+  {
+    "id": "wyv4MqkdShm4FF90nUMk",
+    "name": "Saudi Arabian",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.515Z"
+  },
+  {
+    "id": "x3sz1xZBA33F6zp4mxHO",
+    "name": "Taiwanese",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.515Z"
+  },
+  {
+    "id": "zOISy5lQiKfVaEQfriRC",
+    "name": "Belgian",
+    "code": null,
+    "tier": "Good English",
+    "priority": 2,
+    "updatedAt": "2025-10-24T07:32:23.515Z"
+  },
+  {
+    "id": "zPtA51IR4EcUIN1qTgO7",
+    "name": "Swiss",
+    "code": null,
+    "tier": "Good English",
+    "priority": 2,
+    "updatedAt": "2025-10-24T07:32:23.515Z"
+  },
+  {
+    "id": "zQ7fNTXVFeWrucBIeIrj",
+    "name": "Nepalese",
+    "code": null,
+    "tier": "Other",
+    "priority": 3,
+    "updatedAt": "2025-10-24T07:32:23.516Z"
+  },
+  {
+    "id": "zoCwMiLqsoUQeGUZhSWL",
+    "name": "Australian",
+    "code": null,
+    "tier": "English-speaking",
+    "priority": 1,
+    "updatedAt": "2025-10-24T07:32:23.516Z"
+  }
+]

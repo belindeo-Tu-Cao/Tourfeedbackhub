@@ -28,10 +28,10 @@ export default function TourCard({ tour, ratingSummary }: TourCardProps) {
   const start = tour.startDate instanceof Date ? tour.startDate : new Date(tour.startDate);
   const end = tour.endDate instanceof Date ? tour.endDate : new Date(tour.endDate);
   const durationInDays = Math.max(1, Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1);
-  const formattedDates = `${start.toLocaleDateString(undefined, {
+  const formattedDates = `${start.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
-  })} – ${end.toLocaleDateString(undefined, {
+  })} – ${end.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
   })}`;

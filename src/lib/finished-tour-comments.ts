@@ -1,12 +1,9 @@
 import { cache } from "react";
-import { initializeFirebaseAdmin } from "@/firebase/admin";
+import { getPayloadClient } from "@/lib/payload";
 import type { FinishedTourComment } from "@/lib/types";
 
 function toDate(value: unknown): Date {
   if (value instanceof Date) return value;
-  if (value && typeof value === "object" && "toDate" in value && typeof (value as { toDate: () => Date }).toDate === "function") {
-    return (value as { toDate: () => Date }).toDate();
-  }
   if (typeof value === "number" || typeof value === "string") {
     const parsed = new Date(value);
     if (!Number.isNaN(parsed.getTime())) return parsed;
@@ -14,35 +11,44 @@ function toDate(value: unknown): Date {
   return new Date();
 }
 
-export const getFinishedTourComments = cache(async (tourId: string): Promise<FinishedTourComment[]> => {
-  const admin = initializeFirebaseAdmin();
-  if (!admin) return [];
-
-  try {
-    const snapshot = await admin.firestore
-      .collection("reviews")
-      .where("reviewType", "==", "finishedTour")
-      .get();
-
-    const approved = snapshot.docs
-      .map((doc) => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          tourId: data.tourId ?? tourId,
-          authorName: data.authorDisplay ?? data.name ?? "Anonymous",
-          rating: typeof data.rating === "number" ? data.rating : Number(data.rating) || 0,
-          message: data.message ?? "",
-          createdAt: toDate(data.createdAt ?? Date.now()),
-          status: data.status ?? "pending",
-        };
-      })
-      .filter((item) => item.tourId === tourId && item.status === "approved")
-      .map(({ status: _status, ...rest }) => rest as FinishedTourComment);
-
-    return approved.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  } catch (error) {
-    console.error("Failed to load finished tour comments", error);
-    return [];
+function relId(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "object" && value !== null && "id" in value) {
+    return String((value as { id: unknown }).id);
   }
-});
+  return String(value);
+}
+
+export const getFinishedTourComments = cache(
+  async (tourId: string): Promise<FinishedTourComment[]> => {
+    try {
+      const payload = await getPayloadClient();
+      const result = await payload.find({
+        collection: "reviews",
+        depth: 0,
+        limit: 200,
+        where: {
+          and: [
+            { reviewType: { equals: "finishedTour" } },
+            { status: { equals: "approved" } },
+            { tour: { equals: tourId } },
+          ],
+        },
+      });
+
+      return result.docs
+        .map((doc: Record<string, any>) => ({
+          id: String(doc.id),
+          tourId: doc.tour ? relId(doc.tour) : tourId,
+          authorName: doc.authorDisplay ?? "Anonymous",
+          rating: typeof doc.rating === "number" ? doc.rating : Number(doc.rating) || 0,
+          message: doc.message ?? "",
+          createdAt: toDate(doc.approvedAt ?? doc.createdAt ?? Date.now()),
+        }))
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    } catch (error) {
+      console.error("Failed to load finished tour comments", error);
+      return [];
+    }
+  }
+);

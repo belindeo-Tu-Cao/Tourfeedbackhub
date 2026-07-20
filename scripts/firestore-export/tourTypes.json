@@ -1,0 +1,31 @@
+[
+  {
+    "id": "0eyrxvm3dkL5VyF0Z8Pk",
+    "title": "Walking tour",
+    "description": ""
+  },
+  {
+    "id": "13G0OTmZj27hYNpP1dS7",
+    "description": "Food tour",
+    "title": "Food tour",
+    "order": 2
+  },
+  {
+    "id": "8TykiOyiLljuaVXNDi10",
+    "title": "Trekking Tour",
+    "description": ""
+  },
+  {
+    "id": "T3fnoC8QeBpTLAu3JewK",
+    "icon": "a",
+    "description": "Cycling Tours",
+    "title": "Cycling Tours",
+    "order": 1
+  },
+  {
+    "id": "x67RuxGWL8sHcAKSp7tw",
+    "description": "Culture & History",
+    "title": "Culture & History",
+    "order": 5
+  }
+]

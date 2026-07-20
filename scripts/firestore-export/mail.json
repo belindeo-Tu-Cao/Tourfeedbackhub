@@ -1,0 +1,56 @@
+[
+  {
+    "id": "0ADLKKQ7RV8YXii2MoQF",
+    "to": "huutu289@gmail.com",
+    "subject": "Welcome to Tour Insights Hub!",
+    "html": "\n          <h1>Welcome Tu Cao Hữu!</h1>\n          <p>Thank you for joining Tour Insights Hub. Your account has been created with the role of <strong>admin</strong>.</p>\n          <p>You can now:</p>\n          <ul>\n            <li>Create and manage content</li>\n            <li>Moderate comments</li>\n            <li>Manage users and settings</li>\n            <li>Update your profile</li>\n          </ul>\n          <p><a href=\"undefined/admin\">Go to Admin Panel</a></p>\n        ",
+    "text": "Welcome Tu Cao Hữu! Your account has been created.",
+    "status": "pending",
+    "createdAt": "2025-10-19T13:41:31.496Z"
+  },
+  {
+    "id": "G0SloBWkeePqqP4m2jgJ",
+    "to": "iposntmk@gmail.com",
+    "subject": "Welcome to Tour Insights Hub!",
+    "html": "\n          <h1>Welcome iposntmk@gmail.com!</h1>\n          <p>Thank you for joining Tour Insights Hub. Your account has been created with the role of <strong>admin</strong>.</p>\n          <p>You can now:</p>\n          <ul>\n            <li>Create and manage content</li>\n            <li>Moderate comments</li>\n            <li>Manage users and settings</li>\n            <li>Update your profile</li>\n          </ul>\n          <p><a href=\"undefined/admin\">Go to Admin Panel</a></p>\n        ",
+    "text": "Welcome iposntmk@gmail.com! Your account has been created.",
+    "status": "pending",
+    "createdAt": "2025-10-19T13:43:20.835Z"
+  },
+  {
+    "id": "ZbiDweUk2VjFAIeBvCAr",
+    "to": "iposntmk@gmail.com",
+    "subject": "Your post \"Ancient Town of Hoi An: A Timeless Cultural Jewel of Vietnam\" has been published!",
+    "html": "\n            <h2>Your post is now live!</h2>\n            <p>Your post \"<strong>Ancient Town of Hoi An: A Timeless Cultural Jewel of Vietnam</strong>\" has been successfully published.</p>\n            <p><a href=\"undefined/blog/ancient-town-of-hoi-an-a-timeless-cultural-jewel-of-vietnam\">View your post</a></p>\n            <p>Share it on social media and let your audience know!</p>\n          ",
+    "text": "Your post \"Ancient Town of Hoi An: A Timeless Cultural Jewel of Vietnam\" has been published! View it at undefined/blog/ancient-town-of-hoi-an-a-timeless-cultural-jewel-of-vietnam",
+    "status": "pending",
+    "createdAt": "2025-11-10T04:30:47.949Z"
+  },
+  {
+    "id": "buaheqE1ubLmWYeWK29Y",
+    "to": "huutu289@gmail.com",
+    "subject": "Your post \"The Imperial City of Huế – Vietnam’s Timeless Royal Legacy\" has been published!",
+    "html": "\n            <h2>Your post is now live!</h2>\n            <p>Your post \"<strong>The Imperial City of Huế – Vietnam’s Timeless Royal Legacy</strong>\" has been successfully published.</p>\n            <p><a href=\"undefined/blog/the-imperial-city-of-hu-vietnams-timeless-royal-legacy\">View your post</a></p>\n            <p>Share it on social media and let your audience know!</p>\n          ",
+    "text": "Your post \"The Imperial City of Huế – Vietnam’s Timeless Royal Legacy\" has been published! View it at undefined/blog/the-imperial-city-of-hu-vietnams-timeless-royal-legacy",
+    "status": "pending",
+    "createdAt": "2025-10-21T11:28:22.117Z"
+  },
+  {
+    "id": "r28F4KV7C1znsRepGNm8",
+    "to": "bac@gmail.com",
+    "subject": "Welcome to Tour Insights Hub!",
+    "html": "\n          <h1>Welcome bac@gmail.com!</h1>\n          <p>Thank you for joining Tour Insights Hub. Your account has been created with the role of <strong>admin</strong>.</p>\n          <p>You can now:</p>\n          <ul>\n            <li>Create and manage content</li>\n            <li>Moderate comments</li>\n            <li>Manage users and settings</li>\n            <li>Update your profile</li>\n          </ul>\n          <p><a href=\"undefined/admin\">Go to Admin Panel</a></p>\n        ",
+    "text": "Welcome bac@gmail.com! Your account has been created.",
+    "status": "pending",
+    "createdAt": "2025-10-19T11:57:06.341Z"
+  },
+  {
+    "id": "xqdAXe1gWoimnq8qr6sX",
+    "to": "iposntmk@gmail.com",
+    "subject": "Welcome to Tour Insights Hub!",
+    "html": "\n          <h1>Welcome Hà An!</h1>\n          <p>Thank you for joining Tour Insights Hub. Your account has been created with the role of <strong>admin</strong>.</p>\n          <p>You can now:</p>\n          <ul>\n            <li>Create and manage content</li>\n            <li>Moderate comments</li>\n            <li>Manage users and settings</li>\n            <li>Update your profile</li>\n          </ul>\n          <p><a href=\"undefined/admin\">Go to Admin Panel</a></p>\n        ",
+    "text": "Welcome Hà An! Your account has been created.",
+    "status": "pending",
+    "createdAt": "2025-10-19T13:41:31.602Z"
+  }
+]

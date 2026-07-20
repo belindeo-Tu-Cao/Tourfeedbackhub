@@ -1,0 +1,20 @@
+[
+  {
+    "id": "LCYy60al8KZ39mZMSa1XjNTZpMt1",
+    "createdAt": "2025-10-19T13:41:28.514Z",
+    "role": "admin",
+    "displayName": "Tu Cao Hữu",
+    "email": "huutu289@gmail.com",
+    "status": "active",
+    "updatedAt": "2025-10-21T10:53:28.789Z"
+  },
+  {
+    "id": "W6Hs2m9AGrfEjo1j4KHynqR2eUB3",
+    "email": "iposntmk@gmail.com",
+    "role": "admin",
+    "status": "active",
+    "createdAt": "2025-10-19T13:43:16.343Z",
+    "displayName": "Hà An",
+    "updatedAt": "2025-10-21T10:53:30.484Z"
+  }
+]

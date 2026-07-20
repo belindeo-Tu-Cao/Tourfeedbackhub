@@ -1,0 +1,174 @@
+[
+  {
+    "id": "footer-en",
+    "key": "footer",
+    "locale": "en",
+    "title": "Footer EN",
+    "published": false,
+    "updatedAt": "2025-10-15T05:07:06.019Z"
+  },
+  {
+    "id": "header-en",
+    "key": "header",
+    "locale": "en",
+    "title": "Header EN",
+    "published": true,
+    "updatedAt": "2025-11-01T11:01:50.828Z",
+    "_subcollections": {
+      "items": [
+        {
+          "id": "1oHUnq3482my4lm9mjHo",
+          "area": null,
+          "badge": null,
+          "icon": null,
+          "href": "/guides",
+          "label": "guides",
+          "visibleFor": [
+            "admin",
+            "guest",
+            "user"
+          ],
+          "type": "internal",
+          "parentId": null,
+          "group": null,
+          "order": 111,
+          "target": "_self",
+          "updatedAt": "2025-10-22T06:05:43.144Z"
+        },
+        {
+          "id": "2n23EOnbZHq9ekNAAe7f",
+          "type": "external",
+          "order": 61,
+          "parentId": null,
+          "icon": null,
+          "target": "_self",
+          "group": null,
+          "area": null,
+          "visibleFor": [
+            "guest",
+            "user",
+            "admin"
+          ],
+          "badge": null,
+          "href": "/about",
+          "label": "About",
+          "updatedAt": "2025-10-15T05:51:04.646Z"
+        },
+        {
+          "id": "6A5eU8mgpG6YQFB0mjQG",
+          "type": "external",
+          "order": 21,
+          "parentId": null,
+          "icon": null,
+          "target": "_self",
+          "group": null,
+          "area": null,
+          "visibleFor": [
+            "guest",
+            "user",
+            "admin"
+          ],
+          "badge": null,
+          "href": "/stories",
+          "label": "Stories",
+          "updatedAt": "2025-10-15T05:47:38.722Z"
+        },
+        {
+          "id": "B8WzGGrK24g6ORm0dIOl",
+          "type": "external",
+          "order": 11,
+          "parentId": null,
+          "icon": null,
+          "target": "_self",
+          "group": null,
+          "area": null,
+          "visibleFor": [
+            "guest",
+            "user",
+            "admin"
+          ],
+          "badge": null,
+          "href": "/",
+          "label": "Home",
+          "updatedAt": "2025-10-15T05:47:14.810Z"
+        },
+        {
+          "id": "HOcWBTogvwIczo50MBBX",
+          "type": "external",
+          "order": 71,
+          "parentId": null,
+          "icon": null,
+          "target": "_self",
+          "group": null,
+          "area": null,
+          "visibleFor": [
+            "guest",
+            "user",
+            "admin"
+          ],
+          "badge": null,
+          "href": "/contact",
+          "label": "Contact",
+          "updatedAt": "2025-10-15T05:51:19.504Z"
+        },
+        {
+          "id": "RLXXrSQu7Jaiqh0wq5Jd",
+          "area": null,
+          "badge": null,
+          "icon": null,
+          "href": "/blog",
+          "label": "Posts",
+          "visibleFor": [
+            "user",
+            "guest",
+            "admin"
+          ],
+          "type": "internal",
+          "parentId": null,
+          "group": null,
+          "order": 91,
+          "target": "_self",
+          "updatedAt": "2025-11-01T11:01:50.541Z"
+        },
+        {
+          "id": "mOhpHBg7qsF3dxbQzZz0",
+          "type": "external",
+          "order": 41,
+          "parentId": null,
+          "icon": null,
+          "target": "_self",
+          "group": null,
+          "area": null,
+          "visibleFor": [
+            "guest",
+            "user",
+            "admin"
+          ],
+          "badge": null,
+          "href": "/finished-tours",
+          "label": "Finished tours",
+          "updatedAt": "2025-10-22T05:32:09.785Z"
+        },
+        {
+          "id": "vrrA4QXxDfa3Vw9Lo9w2",
+          "type": "external",
+          "order": 31,
+          "parentId": null,
+          "icon": null,
+          "target": "_self",
+          "group": null,
+          "area": null,
+          "visibleFor": [
+            "guest",
+            "user",
+            "admin"
+          ],
+          "badge": null,
+          "href": "/reviews",
+          "label": "Reviews",
+          "updatedAt": "2025-10-15T05:47:59.065Z"
+        }
+      ]
+    }
+  }
+]

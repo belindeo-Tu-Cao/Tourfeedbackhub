@@ -55,7 +55,7 @@ export default function ReviewCarousel({ reviews }: ReviewCarouselProps) {
                 <Quote className="h-6 w-6 text-muted-foreground/40" />
                 <p className="text-sm leading-relaxed text-muted-foreground">“{review.message}”</p>
                 <p className="text-xs text-muted-foreground/80">
-                  {review.createdAt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                  {review.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
               </CardContent>
             </Card>

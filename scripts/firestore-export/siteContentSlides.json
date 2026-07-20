@@ -1,0 +1,40 @@
+[
+  {
+    "id": "cd8tggvYcOznDKSyaDeN",
+    "locale": "en",
+    "buttonLink": "/tours",
+    "imageUrl": "https://firebasestorage.googleapis.com/v0/b/tourfeedbackhub-474704.firebasestorage.app/o/slides%2Fen%2F1760532427986-IMG-20251011-WA0019.jpg?alt=media&token=8b359ad3-0a82-4613-9694-1534a3b57b8a",
+    "status": "published",
+    "active": true,
+    "startAt": null,
+    "endAt": null,
+    "updatedBy": "huutu289@gmail.com",
+    "order": 10,
+    "createdAt": "2025-10-15T12:47:19.617Z",
+    "buttonText": "Explore Hue Citadel",
+    "subtitle": "A masterpiece of Khai Dinh-era royal architecture",
+    "alt": "“Chuong Duc Gate, one of the four main entrances to Hue’s Imperial City, featuring intricate porcelain mosaics and elegant design.”",
+    "title": "Chương Đức Gate – Imperial City of Hue",
+    "overlayOpacity": 0.03,
+    "updatedAt": "2025-10-23T11:53:47.354Z"
+  },
+  {
+    "id": "euSaibktjlk10PbnQY4l",
+    "locale": "en",
+    "buttonLink": "/tours",
+    "status": "published",
+    "active": true,
+    "startAt": null,
+    "endAt": null,
+    "order": 10,
+    "createdAt": "2025-10-15T12:19:15.612Z",
+    "overlayOpacity": 0,
+    "updatedBy": "iposntmk@gmail.com",
+    "imageUrl": "https://firebasestorage.googleapis.com/v0/b/tourfeedbackhub-474704.firebasestorage.app/o/slides%2Fen%2F1763349642356-IMG_20251114_110049.jpg?alt=media&token=ac8353b4-50d8-414a-957c-783f508a0674",
+    "title": "Tu Duc Tomb in Hue",
+    "buttonText": "Tu Duc Tomb in Hue",
+    "subtitle": "Tu Duc Tomb in Hue",
+    "alt": "Tu Duc Tomb in Hue",
+    "updatedAt": "2025-11-17T03:22:42.942Z"
+  }
+]

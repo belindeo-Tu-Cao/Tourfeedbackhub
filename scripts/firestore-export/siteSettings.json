@@ -1,0 +1,78 @@
+[
+  {
+    "id": "default",
+    "copyright": "© 2025 Cao Hữu Tú. All rights reserved.",
+    "languages": [
+      "en",
+      "it"
+    ],
+    "accentColor": "#4682B4",
+    "values": [
+      "Authentic local partnerships",
+      "Sustainable travel choices",
+      "Tailored, small-group attention"
+    ],
+    "primaryColor": "#77B5FE",
+    "siteName": "Tour Insights Hub",
+    "heroMediaUrl": "https://picsum.photos/seed/1/1600/900",
+    "aboutTitle": "Guiding Boutique Adventures Across Vietnam",
+    "defaultLanguage": "en",
+    "heroCtaLabel": "Leave a Review",
+    "missionStatement": "Deliver deeply personal journeys that celebrate culture, comfort, and connection.",
+    "heroTitle": "Share Your Journey, Shape Ours",
+    "heroSubtitle": "Your honest reflections help us refine every itinerary and craft unforgettable moments for future travellers.",
+    "aboutDescription": "Cao Hữu Tú\nTour guide in Vietnam\n\nA freelance English-speaking tour guide with a deep passion for history and culture, Mr. Tú was born and raised in a beautiful and peaceful countryside village in Central Vietnam. Known for his enthusiasm and warm personality, he enjoys sharing the rich traditions and local stories of Vietnam with travelers from around the world.\n\nWhen not leading tours, he spends his free time playing table tennis and swimming. Mr. Tú especially loves organizing cycling and trekking tours, where guests can explore the natural beauty and authentic daily life of Vietnamese villages.",
+    "social": {
+      "whatsapp": "https://wa.me/+84829101188",
+      "youtube": "https://youtube.com",
+      "zalo": "https://zalo.me/0829101188",
+      "messenger": "https://m.me/tu.caohuu",
+      "tiktok": "https://www.tiktok.com",
+      "facebook": "https://www.facebook.com/tu.caohuu?locale=vi_VN",
+      "instagram": "https://www.instagram.com/tucaohuu/"
+    },
+    "contact": {
+      "address": "Hue, Viet Nam",
+      "mapEmbedUrl": "https://maps.google.com/?q=Hue+Vietnam",
+      "whatsapp": "+84829101188",
+      "phone": "+84829101188",
+      "email": "huutu289@gmail.com",
+      "messenger": "https://m.me/tu.caohuu",
+      "zalo": "https://zalo.me/0829101188"
+    },
+    "aboutImageUrl": "https://firebasestorage.googleapis.com/v0/b/tourfeedbackhub-474704.firebasestorage.app/o/media%2F1763007995791-ar7qz96xoh-TUcao.jpg?alt=media&token=d5e8c14c-2328-4ee9-a97d-be993086eec6",
+    "logoUrlDark": "https://firebasestorage.googleapis.com/v0/b/tourfeedbackhub-474704.firebasestorage.app/o/media%2F1763007995791-ar7qz96xoh-TUcao.jpg?alt=media&token=d5e8c14c-2328-4ee9-a97d-be993086eec6",
+    "logoUrlLight": "https://firebasestorage.googleapis.com/v0/b/tourfeedbackhub-474704.firebasestorage.app/o/media%2F1763007995791-ar7qz96xoh-TUcao.jpg?alt=media&token=d5e8c14c-2328-4ee9-a97d-be993086eec6"
+  },
+  {
+    "id": "public",
+    "languages": [
+      "en",
+      "it"
+    ],
+    "accentColor": "#4682B4",
+    "values": [
+      "Authentic local partnerships",
+      "Sustainable travel choices",
+      "Tailored, small-group attention"
+    ],
+    "primaryColor": "#77B5FE",
+    "heroMediaUrl": "https://picsum.photos/seed/1/1600/900",
+    "aboutTitle": "Guiding Boutique Adventures Across Vietnam",
+    "defaultLanguage": "en",
+    "heroCtaLabel": "Leave a Review",
+    "missionStatement": "Deliver deeply personal journeys that celebrate culture, comfort, and connection.",
+    "heroTitle": "Share Your Journey, Shape Ours",
+    "heroSubtitle": "Your honest reflections help us refine every itinerary and craft unforgettable moments for future travellers.",
+    "contact": {
+      "location": "Da Nang, Vietnam",
+      "phone": "+84829101188",
+      "email": "huutu289@gmail.com",
+      "whatsapp": "+84829101188",
+      "zalo": "+84829101188",
+      "facebook": "https://www.facebook.com/tu.caohuu?locale=vi_VN",
+      "instagram": "https://www.instagram.com/tucaohuu/"
+    },
+    "aboutDescription": "Cao Hữu Tú\nTour guide in Vietnam\n\nA freelance English-speaking tour guide with a deep passion for history and culture, Mr. Tú was born and raised in a beautiful and peaceful countryside village in Central Vietnam. Known for his enthusiasm and warm personality, he enjoys sharing the rich traditions and local stories of Vietnam with travelers from around the world.\n\nWhen not leading tours, he spends his free time playing table tennis and swimming. Mr. Tú especially loves organizing cycling and trekking tours, where guests can explore the natural beauty and authentic daily life of Vietnamese villages."
+  }
+]
