@@ -48,3 +48,6 @@ firebase-service-account.json
 .firebase/
 build.log
 recapcha key
+
+# Local source photos (uploaded to R2 media, not for repo)
+/photos/
