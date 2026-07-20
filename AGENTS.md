@@ -35,6 +35,7 @@
 - Document any required environment variables or follow-up tasks directly in the PR description.
 
 ## Deployment (GitHub + Vercel)
+- Do NOT run any deploy command locally — only push to GitHub.
 - Pushing to `main` triggers an automatic production deployment on Vercel.
 - Creating a Pull Request triggers a Vercel Preview deployment with a unique URL for review.
 - All environment variables must be configured in the Vercel dashboard (Project Settings → Environment Variables); never rely on `.env.local` in production.
