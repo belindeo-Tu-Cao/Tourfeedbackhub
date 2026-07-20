@@ -1,5 +1,10 @@
 # Repository Guidelines
 
+## Branch Policy
+- This repository uses only one branch: `main`.
+- Do NOT create any feature, hotfix, or staging branches — all work goes directly to `main`.
+- Commit early and often to `main`; Vercel auto-deploys every push.
+
 ## Project Structure & Module Organization
 - Next.js App Router bootstraps from `src/app/page.tsx`; keep route folders under `src/app`.
 - Place shared UI in `src/components`, custom hooks in `src/hooks`, reusable logic in `src/lib`, and feature helpers in `src/firebase` or `src/ai`.
