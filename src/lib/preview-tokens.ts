@@ -2,13 +2,13 @@
  * Preview token utilities for secure draft post access
  */
 
-import {SignJWT, jwtVerify} from 'jose';
+import {SignJWT, jwtVerify, type JWTPayload} from 'jose';
 
 const SECRET_KEY = process.env.PREVIEW_TOKEN_SECRET || 'change-me-in-production';
 const ALGORITHM = 'HS256';
 const TOKEN_EXPIRY = '1h'; // 1 hour
 
-interface PreviewTokenPayload {
+interface PreviewTokenPayload extends JWTPayload {
   postId: string;
   userId?: string;
   exp?: number;
@@ -20,7 +20,7 @@ interface PreviewTokenPayload {
 export async function generatePreviewToken(postId: string, userId?: string): Promise<string> {
   const secret = new TextEncoder().encode(SECRET_KEY);
 
-  const token = await new SignJWT({postId, userId} as PreviewTokenPayload)
+  const token = await new SignJWT({postId, userId})
     .setProtectedHeader({alg: ALGORITHM})
     .setIssuedAt()
     .setExpirationTime(TOKEN_EXPIRY)
@@ -37,6 +37,10 @@ export async function verifyPreviewToken(token: string): Promise<PreviewTokenPay
   try {
     const secret = new TextEncoder().encode(SECRET_KEY);
     const {payload} = await jwtVerify(token, secret);
+
+    if (typeof payload.postId !== 'string' || (payload.userId !== undefined && typeof payload.userId !== 'string')) {
+      return null;
+    }
 
     return payload as PreviewTokenPayload;
   } catch (error) {

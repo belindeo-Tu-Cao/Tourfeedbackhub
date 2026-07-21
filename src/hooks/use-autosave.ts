@@ -19,8 +19,8 @@ export function useAutosave<T>({
   onError,
 }: AutosaveOptions<T>) {
   const {toast} = useToast();
-  const timeoutRef = useRef<NodeJS.Timeout>();
-  const lastSavedDataRef = useRef<string>();
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const lastSavedDataRef = useRef<string | undefined>(undefined);
   const isSavingRef = useRef(false);
 
   const save = useCallback(async () => {

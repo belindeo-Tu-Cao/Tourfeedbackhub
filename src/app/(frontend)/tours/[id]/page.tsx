@@ -13,14 +13,15 @@ import { RelatedContentSection } from '@/components/related-content-section';
 import { TouristTripStructuredData } from '@/components/structured-data';
 
 interface TourPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({ params }: TourPageProps) {
+  const { id } = await params;
   const { tours } = await getPublicContent();
-  const tour = tours.find((item) => item.id === params.id && item.status === 'finished');
+  const tour = tours.find((item) => item.id === id && item.status === 'finished');
   if (!tour) return {};
 
   return {
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: TourPageProps) {
 }
 
 export default async function FinishedTourPage({ params }: TourPageProps) {
-  const { id } = params;
+  const { id } = await params;
   const { tours, tourTypes } = await getPublicContent();
   const tour = tours.find((item) => item.id === id && item.status === 'finished');
 

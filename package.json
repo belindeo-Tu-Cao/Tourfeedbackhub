@@ -16,6 +16,8 @@
     "payload": "payload",
     "payload:migrate": "payload migrate",
     "seed": "node --import ./src/payload/seed-loader.mjs src/payload/seed.ts",
+    "seed:destinations": "node --import ./src/payload/seed-loader.mjs src/payload/destinations-seed.ts",
+    "seed:destination-blogs": "node --import ./src/payload/seed-loader.mjs src/payload/destination-blog-seed.ts",
     "seed:photos": "node --import ./src/payload/seed-loader.mjs src/payload/photos-seed.ts",
     "seed:hue": "node --import ./src/payload/seed-loader.mjs src/payload/hue-post-seed.ts"
   },

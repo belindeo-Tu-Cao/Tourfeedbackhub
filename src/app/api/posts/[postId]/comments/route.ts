@@ -10,8 +10,9 @@ const commentSchema = z.object({
 
 export async function POST(request: Request, { params }: { params: Promise<{ postId: string }> }) {
   const { postId } = await params;
+  const postIdNumber = Number(postId);
 
-  if (!postId) {
+  if (!Number.isInteger(postIdNumber)) {
     return NextResponse.json({ error: 'Missing post id' }, { status: 400 });
   }
 
@@ -36,7 +37,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ pos
     const payload = await getPayloadClient();
 
     try {
-      await payload.findByID({ collection: 'posts', id: postId, depth: 0 });
+      await payload.findByID({ collection: 'posts', id: postIdNumber, depth: 0 });
     } catch {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
@@ -44,7 +45,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ pos
     await payload.create({
       collection: 'comments',
       data: {
-        post: postId,
+        post: postIdNumber,
         authorName,
         authorEmail,
         content,

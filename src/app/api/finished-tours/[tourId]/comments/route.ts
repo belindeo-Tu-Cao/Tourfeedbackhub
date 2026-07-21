@@ -10,8 +10,9 @@ const commentSchema = z.object({
 
 export async function POST(request: Request, { params }: { params: Promise<{ tourId: string }> }) {
   const { tourId } = await params;
+  const tourIdNumber = Number(tourId);
 
-  if (!tourId) {
+  if (!Number.isInteger(tourIdNumber)) {
     return NextResponse.json({ error: 'Missing tour id' }, { status: 400 });
   }
 
@@ -37,7 +38,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ tou
 
     let tourName = '';
     try {
-      const tour = await payload.findByID({ collection: 'tours', id: tourId, depth: 0 });
+      const tour = await payload.findByID({ collection: 'tours', id: tourIdNumber, depth: 0 });
       tourName = (tour as Record<string, any>)?.name ?? '';
     } catch {
       return NextResponse.json({ error: 'Tour not found' }, { status: 404 });
@@ -51,7 +52,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ tou
         language: 'en',
         rating,
         message,
-        tour: tourId,
+        tour: tourIdNumber,
         tourName,
         status: 'pending',
         reviewType: 'finishedTour',

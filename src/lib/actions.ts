@@ -34,12 +34,16 @@ export async function submitFeedback(formData: FormData) {
     }
 
     const { tourId, ...data } = validatedFields.data;
+    const tourIdNumber = tourId ? Number(tourId) : undefined;
+    if (tourId && !Number.isInteger(tourIdNumber)) {
+      return { message: 'The selected tour is invalid.' };
+    }
     const payload = await getPayloadClient();
     await payload.create({
       collection: 'feedback',
       data: {
         ...data,
-        ...(tourId ? { tour: tourId } : {}),
+        ...(tourIdNumber !== undefined ? { tour: tourIdNumber } : {}),
         status: 'pending',
         submittedAt: new Date().toISOString(),
       },
