@@ -581,25 +581,47 @@ async function seed() {
   // ---------------------------------------------------------------------------
   // 9. Navigation menus (header + footer)
   // ---------------------------------------------------------------------------
-  await ensure(
-    'navigation-menus',
-    { key: { equals: 'header' } },
-    {
-      key: 'header',
-      locale: 'en',
-      title: 'Main Navigation',
-      published: true,
-      items: [
-        { label: 'Home', href: '/', type: 'internal', order: 1, target: '_self' },
-        { label: 'Tours', href: '/tours', type: 'internal', order: 2, target: '_self' },
-        { label: 'Guides', href: '/guides', type: 'internal', order: 3, target: '_self', icon: 'Users' },
-        { label: 'Reviews', href: '/reviews', type: 'internal', order: 4, target: '_self' },
-        { label: 'Stories', href: '/stories', type: 'internal', order: 5, target: '_self' },
-        { label: 'Blog', href: '/blog', type: 'internal', order: 6, target: '_self' },
-        { label: 'Contact', href: '/contact', type: 'internal', order: 7, target: '_self' },
-      ],
-    },
-  )
+  // Always update header nav to include Guides menu
+  const headerNavItems = [
+    { label: 'Home', href: '/', type: 'internal' as const, order: 1, target: '_self' as const },
+    { label: 'Tours', href: '/tours', type: 'internal' as const, order: 2, target: '_self' as const },
+    { label: 'Guides', href: '/guides', type: 'internal' as const, order: 3, target: '_self' as const, icon: 'Users' },
+    { label: 'Reviews', href: '/reviews', type: 'internal' as const, order: 4, target: '_self' as const },
+    { label: 'Stories', href: '/stories', type: 'internal' as const, order: 5, target: '_self' as const },
+    { label: 'Blog', href: '/blog', type: 'internal' as const, order: 6, target: '_self' as const },
+    { label: 'Contact', href: '/contact', type: 'internal' as const, order: 7, target: '_self' as const },
+  ]
+
+  const existingHeaderNav = await payload.find({
+    collection: 'navigation-menus',
+    where: { key: { equals: 'header' } },
+    limit: 1,
+  })
+
+  if (existingHeaderNav.docs.length > 0) {
+    // Update existing
+    await payload.update({
+      collection: 'navigation-menus',
+      id: existingHeaderNav.docs[0].id,
+      data: {
+        items: headerNavItems,
+      },
+    })
+    log('header navigation updated with Guides menu')
+  } else {
+    // Create new
+    await payload.create({
+      collection: 'navigation-menus',
+      data: {
+        key: 'header',
+        locale: 'en',
+        title: 'Main Navigation',
+        published: true,
+        items: headerNavItems,
+      },
+    })
+    log('header navigation created with Guides menu')
+  }
   await ensure(
     'navigation-menus',
     { key: { equals: 'footer' } },
