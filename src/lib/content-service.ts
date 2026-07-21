@@ -1009,9 +1009,10 @@ export const getFaqs = cache(async (): Promise<Faq[]> => {
       depth: 0,
       limit: 200,
       sort: "order",
-      where: { and: [{ status: { equals: "published" } }, { relatedTo: { exists: false } }] },
+      where: { status: { equals: "published" } },
     });
-    return result.docs.map(mapFaq);
+    // Postgres adapter doesn't support `exists` on polymorphic relationship fields, so filter in JS instead.
+    return result.docs.filter((doc) => !doc.relatedTo).map(mapFaq);
   } catch (error) {
     console.warn("Error fetching faqs:", error);
     return [];
