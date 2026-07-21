@@ -62,20 +62,20 @@ export default async function AboutPage() {
 
       {/* Mission Section */}
       {siteSettings.missionStatement && (
-        <section className="py-12 md:py-16">
+        <section className="py-8 md:py-16">
           <div className="container mx-auto px-4">
             <div className="mx-auto max-w-4xl">
               <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background overflow-hidden">
-                <CardContent className="p-8 md:p-12">
-                  <div className="flex flex-col md:flex-row items-center gap-8">
+                <CardContent className="p-6 sm:p-8 md:p-12">
+                  <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8">
                     <div className="flex-shrink-0">
-                      <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                        <Heart className="h-8 w-8 text-primary" />
+                      <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                        <Heart className="h-7 w-7 sm:h-8 sm:w-8 text-primary" />
                       </div>
                     </div>
-                    <div>
-                      <h2 className="text-2xl md:text-3xl font-headline font-bold mb-4">Our Mission</h2>
-                      <p className="text-lg text-muted-foreground leading-relaxed">
+                    <div className="text-center md:text-left">
+                      <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-bold mb-3 md:mb-4">Our Mission</h2>
+                      <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
                         {siteSettings.missionStatement}
                       </p>
                     </div>
@@ -129,26 +129,26 @@ export default async function AboutPage() {
 
       {/* Values Section */}
       {siteSettings.values && siteSettings.values.length > 0 && (
-        <section className="py-12 md:py-16">
+        <section className="py-8 md:py-16">
           <div className="container mx-auto px-4">
             <div className="mx-auto max-w-5xl">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-headline font-bold">What We Stand For</h2>
-                <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+              <div className="text-center mb-8 md:mb-12">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold">What We Stand For</h2>
+                <p className="mt-3 md:mt-4 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
                   The principles that guide everything we do
                 </p>
               </div>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {siteSettings.values.map((value, index) => {
                   const icons = [Shield, Award, TrendingUp, Heart, Globe, Star];
                   const Icon = icons[index % icons.length];
                   return (
                     <Card key={index} className="border-border/60 bg-background/80 hover:shadow-lg transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                          <Icon className="h-5 w-5 text-primary" />
+                      <CardContent className="p-4 sm:p-6">
+                        <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg bg-primary/10 flex items-center justify-center mb-3 sm:mb-4">
+                          <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                         </div>
-                        <p className="text-muted-foreground leading-relaxed">{value}</p>
+                        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{value}</p>
                       </CardContent>
                     </Card>
                   );
@@ -160,40 +160,40 @@ export default async function AboutPage() {
       )}
 
       {/* How It Works Section */}
-      <section className="py-12 md:py-16 bg-muted/30">
+      <section className="py-8 md:py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-5xl">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-headline font-bold">How It Works</h2>
-              <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+            <div className="text-center mb-8 md:mb-12">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold">How It Works</h2>
+              <p className="mt-3 md:mt-4 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
                 Simple steps to an unforgettable experience
               </p>
             </div>
-            <div className="grid gap-8 md:grid-cols-3">
+            <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
               <div className="text-center">
-                <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <span className="text-2xl font-bold text-primary">1</span>
+                <div className="mx-auto h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <span className="text-xl sm:text-2xl font-bold text-primary">1</span>
                 </div>
-                <h3 className="text-xl font-headline font-semibold mb-2">Choose Your Guide</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-lg sm:text-xl font-headline font-semibold mb-2">Choose Your Guide</h3>
+                <p className="text-sm sm:text-base text-muted-foreground">
                   Browse our verified guides and find the perfect match for your adventure style.
                 </p>
               </div>
               <div className="text-center">
-                <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <span className="text-2xl font-bold text-primary">2</span>
+                <div className="mx-auto h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <span className="text-xl sm:text-2xl font-bold text-primary">2</span>
                 </div>
-                <h3 className="text-xl font-headline font-semibold mb-2">Book Your Tour</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-lg sm:text-xl font-headline font-semibold mb-2">Book Your Tour</h3>
+                <p className="text-sm sm:text-base text-muted-foreground">
                   Contact your chosen guide directly to plan your perfect journey.
                 </p>
               </div>
               <div className="text-center">
-                <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <span className="text-2xl font-bold text-primary">3</span>
+                <div className="mx-auto h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <span className="text-xl sm:text-2xl font-bold text-primary">3</span>
                 </div>
-                <h3 className="text-xl font-headline font-semibold mb-2">Share Your Story</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-lg sm:text-xl font-headline font-semibold mb-2">Share Your Story</h3>
+                <p className="text-sm sm:text-base text-muted-foreground">
                   After your tour, leave a review to help other travelers discover amazing guides.
                 </p>
               </div>
@@ -203,24 +203,24 @@ export default async function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-12 md:py-16">
+      <section className="py-8 md:py-16">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-4xl text-center">
-            <h2 className="text-3xl md:text-4xl font-headline font-bold mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold mb-3 md:mb-4">
               Ready to Explore?
             </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-muted-foreground mb-6 md:mb-8 max-w-2xl mx-auto">
               Discover Vietnam with our expert local guides. Every tour is a unique story waiting to be told.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="rounded-full">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+              <Button asChild size="lg" className="rounded-full w-full sm:w-auto">
                 <Link href="/guides">
                   <Users className="mr-2 h-5 w-5" />
                   Meet Our Guides
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="rounded-full">
+              <Button asChild size="lg" variant="outline" className="rounded-full w-full sm:w-auto">
                 <Link href="/tours">
                   <MapPin className="mr-2 h-5 w-5" />
                   Browse Tours
