@@ -89,6 +89,7 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
   const [selectedStyle, setSelectedStyle] = useState<string>('all');
   const [selectedDuration, setSelectedDuration] = useState<string>('all');
   const [selectedLocation, setSelectedLocation] = useState<string>('all');
+  const [selectedGuideLanguage, setSelectedGuideLanguage] = useState<string>('all');
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [activeTour, setActiveTour] = useState<ClientTourSummary | null>(null);
 
@@ -101,6 +102,16 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
         tour.provinces.forEach((province) => options.add(province));
       }
       options.add(normaliseLocationKey(tour.clientCity, tour.clientCountry));
+    });
+    return Array.from(options).sort();
+  }, [tours]);
+
+  const guideLanguageOptions = useMemo(() => {
+    const options = new Set<string>();
+    tours.forEach((tour) => {
+      if (tour.guideLanguages && tour.guideLanguages.length > 0) {
+        tour.guideLanguages.forEach((lang) => options.add(lang));
+      }
     });
     return Array.from(options).sort();
   }, [tours]);
@@ -137,6 +148,13 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
           }
         }
 
+        if (selectedGuideLanguage !== 'all') {
+          const matchesLanguage = tour.guideLanguages?.some((lang) => lang === selectedGuideLanguage);
+          if (!matchesLanguage) {
+            return false;
+          }
+        }
+
         if (dateRange?.from && dateRange?.to) {
           const from = dateRange.from;
           const to = dateRange.to;
@@ -148,7 +166,7 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
         return true;
       })
       .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
-  }, [tours, searchQuery, selectedStyle, selectedDuration, selectedLocation, dateRange]);
+  }, [tours, searchQuery, selectedStyle, selectedDuration, selectedLocation, selectedGuideLanguage, dateRange]);
 
   const activeTourTypes = useMemo(() => {
     if (!activeTour) return [];
@@ -162,6 +180,7 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
     setSelectedStyle('all');
     setSelectedDuration('all');
     setSelectedLocation('all');
+    setSelectedGuideLanguage('all');
     setDateRange(undefined);
   };
 
@@ -258,11 +277,31 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
                 </SelectContent>
               </Select>
             </div>
-            {dateRange?.from || searchQuery || selectedStyle !== 'all' || selectedDuration !== 'all' || selectedLocation !== 'all' ? (
+            {guideLanguageOptions.length > 0 && (
+              <div className="w-full md:w-48">
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Guide Language
+                </label>
+                <Select value={selectedGuideLanguage} onValueChange={setSelectedGuideLanguage}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All languages" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All languages</SelectItem>
+                    {guideLanguageOptions.map((lang) => (
+                      <SelectItem key={lang} value={lang}>
+                        {lang}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            {(dateRange?.from || searchQuery || selectedStyle !== 'all' || selectedDuration !== 'all' || selectedLocation !== 'all' || selectedGuideLanguage !== 'all') && (
               <Button variant="ghost" size="sm" className="mt-6 md:mt-8" onClick={resetFilters}>
                 <X className="mr-2 h-4 w-4" /> Clear filters
               </Button>
-            ) : null}
+            )}
           </div>
           <p className="mt-4 text-sm text-muted-foreground md:mt-8">
             Showing {filteredTours.length} of {tours.length} finished tours

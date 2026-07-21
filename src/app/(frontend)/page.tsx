@@ -164,9 +164,9 @@ export default async function Home() {
           <p className="mt-4 text-center max-w-2xl mx-auto text-muted-foreground">
             Each journey blends boutique stays, curated dining, and cultural immersion tailored to your pace.
           </p>
-          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {tourTypes.map((tourType) => (
-              <Card key={tourType.id} className="flex h-full flex-col border-border/60 bg-background/80 shadow-sm">
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {tourTypes.slice(0, 3).map((tourType) => (
+              <Card key={tourType.id} className="flex h-full flex-col border-border/60 bg-background/80 shadow-sm hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex items-center gap-3">
                     <Badge variant="outline" className="text-lg">
@@ -176,7 +176,7 @@ export default async function Home() {
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1">
-                  <p className="text-sm text-muted-foreground leading-relaxed">{tourType.description}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{tourType.description}</p>
                 </CardContent>
                 <CardFooter>
                   <Button asChild variant="ghost" className="px-0">
@@ -189,6 +189,16 @@ export default async function Home() {
               </Card>
             ))}
           </div>
+          {tourTypes.length > 3 && (
+            <div className="mt-8 text-center">
+              <Button asChild variant="outline">
+                <Link href="/tour-types" className="flex items-center gap-2">
+                  View all {tourTypes.length} tour styles
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
