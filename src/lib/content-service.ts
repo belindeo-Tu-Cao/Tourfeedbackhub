@@ -270,7 +270,7 @@ async function fetchSiteSettings(): Promise<SiteSettings> {
 async function fetchPublicContent(): Promise<PublicContent> {
   const payload = await getPayloadClient();
 
-  const [settings, tourTypes, tours, stories, reviews, slides, posts] = await Promise.all([
+  const [settings, tourTypes, tours, stories, reviews, slides, posts, guidesResult] = await Promise.all([
     fetchSiteSettings(),
     payload.find({ collection: "tour-types", limit: 100, depth: 0, sort: "order" }),
     payload.find({ collection: "tours", limit: 100, depth: 2, where: { status: { equals: "finished" } } }),
@@ -290,6 +290,7 @@ async function fetchPublicContent(): Promise<PublicContent> {
       where: { and: [{ type: { equals: "post" } }, { status: { equals: "published" } }] },
       sort: "-publishedAt",
     }),
+    payload.find({ collection: "guides", limit: 100, depth: 1, sort: "name" }),
   ]);
 
   const now = new Date();
@@ -306,6 +307,7 @@ async function fetchPublicContent(): Promise<PublicContent> {
     reviews: reviews.docs.map(mapReview),
     slides: mappedSlides,
     posts: posts.docs.map(mapPost),
+    guides: guidesResult.docs.map(mapGuide),
   };
 }
 
@@ -322,6 +324,7 @@ export const getPublicContent = cache(async (): Promise<PublicContent> => {
       reviews: [],
       slides: [],
       posts: [],
+      guides: [],
     };
   }
 });

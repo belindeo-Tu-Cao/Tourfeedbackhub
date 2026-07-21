@@ -1,80 +1,232 @@
 import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Link from 'next/link';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { getPublicContent } from '@/lib/content-service';
+import { WebSiteStructuredData } from '@/components/structured-data';
+import {
+  MapPin,
+  Users,
+  Star,
+  Shield,
+  Heart,
+  Globe,
+  Award,
+  TrendingUp,
+  ArrowRight,
+} from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'About Us',
+  description: 'Learn about Tour Insights Hub - connecting travelers with trusted local guides across Vietnam',
+};
 
 export default async function AboutPage() {
-  const { siteSettings, stories } = await getPublicContent();
-  const heroImage = siteSettings.heroMediaUrl;
+  const { siteSettings, guides, tours, reviews } = await getPublicContent();
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002';
+
+  // Compute stats
+  const totalGuides = guides?.length || 0;
+  const totalTours = tours?.length || 0;
+  const totalReviews = reviews?.length || 0;
+  const averageRating = totalReviews > 0
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
+    : 0;
 
   return (
-    <div>
-      <section className="relative w-full h-[30vh] md:h-[40vh] bg-secondary">
-        {heroImage && (
-          <Image src={heroImage} alt={siteSettings.heroTitle} fill className="object-cover" sizes="100vw" />
-        )}
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4">
-          <h1 className="text-4xl md:text-6xl font-headline font-bold">About Trang</h1>
-          <p className="mt-4 max-w-3xl text-lg md:text-xl text-primary-foreground/90 font-body">
-            Boutique tour designer crafting soulful journeys across Vietnam.
-          </p>
-        </div>
-      </section>
+    <div className="min-h-screen bg-background">
+      <WebSiteStructuredData
+        name="About Tour Insights Hub"
+        url={`${baseUrl}/about`}
+        description={siteSettings.aboutDescription}
+      />
 
-      <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4 grid gap-12 lg:grid-cols-[1.2fr_0.8fr]">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-headline font-bold">{siteSettings.aboutTitle}</h2>
-            <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-              {siteSettings.aboutDescription}
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary/20 via-primary/10 to-background py-16 md:py-24">
+        <div className="absolute inset-0 bg-[url('/asset/pattern.svg')] opacity-5" />
+        <div className="relative z-10 container mx-auto px-4">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="inline-flex items-center justify-center rounded-full border border-primary/30 bg-primary/10 px-4 py-1 text-xs uppercase tracking-[0.3em] text-primary">
+              Our story
+            </span>
+            <h1 className="mt-4 text-4xl md:text-5xl lg:text-6xl font-headline font-bold">
+              {siteSettings.aboutTitle || 'About Tour Insights Hub'}
+            </h1>
+            <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+              {siteSettings.aboutDescription || 'Connecting travelers with trusted local guides across Vietnam.'}
             </p>
-            {siteSettings.missionStatement && (
-              <Card className="mt-8 border-l-4 border-l-accent bg-secondary/50">
-                <CardHeader>
-                  <CardTitle className="text-xl font-headline">Our Mission</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground leading-relaxed">{siteSettings.missionStatement}</p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-          <div className="space-y-4">
-            <h3 className="text-2xl font-headline font-semibold">What travellers appreciate</h3>
-            {siteSettings.values?.map((value) => (
-              <Card key={value} className="bg-card/60">
-                <CardContent className="p-4 text-sm text-muted-foreground leading-relaxed">{value}</CardContent>
-              </Card>
-            ))}
           </div>
         </div>
       </section>
 
-      <section className="py-16 md:py-24 bg-secondary/40">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-headline font-bold text-center">Latest Stories</h2>
-          <p className="mt-4 text-center max-w-2xl mx-auto text-muted-foreground">
-            Field notes and behind-the-scenes glimpses from recent bespoke journeys.
-          </p>
-          <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {stories.map((story) => (
-              <Card key={story.id} className="overflow-hidden">
-                {story.coverImageUrl && (
-                  <div className="relative h-48 w-full">
-                    <Image src={story.coverImageUrl} alt={story.title} fill className="object-cover" sizes="(min-width:768px) 33vw, 100vw" />
+      {/* Mission Section */}
+      {siteSettings.missionStatement && (
+        <section className="py-12 md:py-16">
+          <div className="container mx-auto px-4">
+            <div className="mx-auto max-w-4xl">
+              <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background overflow-hidden">
+                <CardContent className="p-8 md:p-12">
+                  <div className="flex flex-col md:flex-row items-center gap-8">
+                    <div className="flex-shrink-0">
+                      <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                        <Heart className="h-8 w-8 text-primary" />
+                      </div>
+                    </div>
+                    <div>
+                      <h2 className="text-2xl md:text-3xl font-headline font-bold mb-4">Our Mission</h2>
+                      <p className="text-lg text-muted-foreground leading-relaxed">
+                        {siteSettings.missionStatement}
+                      </p>
+                    </div>
                   </div>
-                )}
-                <CardHeader>
-                  <CardTitle className="text-xl font-headline">{story.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{story.excerpt}</p>
-                  <p className="mt-4 text-xs uppercase tracking-wide text-muted-foreground">
-                    {story.publishedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </p>
                 </CardContent>
               </Card>
-            ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Stats Section */}
+      <section className="py-12 md:py-16 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-5xl">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+              <div className="text-center">
+                <div className="mx-auto h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                  <Users className="h-6 w-6 text-primary" />
+                </div>
+                <p className="text-3xl md:text-4xl font-bold text-primary">{totalGuides}</p>
+                <p className="text-sm text-muted-foreground mt-1">Expert Guides</p>
+              </div>
+              <div className="text-center">
+                <div className="mx-auto h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                  <MapPin className="h-6 w-6 text-primary" />
+                </div>
+                <p className="text-3xl md:text-4xl font-bold text-primary">{totalTours}</p>
+                <p className="text-sm text-muted-foreground mt-1">Tours Completed</p>
+              </div>
+              <div className="text-center">
+                <div className="mx-auto h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                  <Star className="h-6 w-6 text-primary" />
+                </div>
+                <p className="text-3xl md:text-4xl font-bold text-primary">
+                  {averageRating > 0 ? averageRating.toFixed(1) : '5.0'}
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">Average Rating</p>
+              </div>
+              <div className="text-center">
+                <div className="mx-auto h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                  <Globe className="h-6 w-6 text-primary" />
+                </div>
+                <p className="text-3xl md:text-4xl font-bold text-primary">50+</p>
+                <p className="text-sm text-muted-foreground mt-1">Countries Served</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Values Section */}
+      {siteSettings.values && siteSettings.values.length > 0 && (
+        <section className="py-12 md:py-16">
+          <div className="container mx-auto px-4">
+            <div className="mx-auto max-w-5xl">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-headline font-bold">What We Stand For</h2>
+                <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+                  The principles that guide everything we do
+                </p>
+              </div>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {siteSettings.values.map((value, index) => {
+                  const icons = [Shield, Award, TrendingUp, Heart, Globe, Star];
+                  const Icon = icons[index % icons.length];
+                  return (
+                    <Card key={index} className="border-border/60 bg-background/80 hover:shadow-lg transition-shadow">
+                      <CardContent className="p-6">
+                        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                          <Icon className="h-5 w-5 text-primary" />
+                        </div>
+                        <p className="text-muted-foreground leading-relaxed">{value}</p>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* How It Works Section */}
+      <section className="py-12 md:py-16 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-5xl">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-headline font-bold">How It Works</h2>
+              <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+                Simple steps to an unforgettable experience
+              </p>
+            </div>
+            <div className="grid gap-8 md:grid-cols-3">
+              <div className="text-center">
+                <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <span className="text-2xl font-bold text-primary">1</span>
+                </div>
+                <h3 className="text-xl font-headline font-semibold mb-2">Choose Your Guide</h3>
+                <p className="text-muted-foreground">
+                  Browse our verified guides and find the perfect match for your adventure style.
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <span className="text-2xl font-bold text-primary">2</span>
+                </div>
+                <h3 className="text-xl font-headline font-semibold mb-2">Book Your Tour</h3>
+                <p className="text-muted-foreground">
+                  Contact your chosen guide directly to plan your perfect journey.
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <span className="text-2xl font-bold text-primary">3</span>
+                </div>
+                <h3 className="text-xl font-headline font-semibold mb-2">Share Your Story</h3>
+                <p className="text-muted-foreground">
+                  After your tour, leave a review to help other travelers discover amazing guides.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-12 md:py-16">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-4xl text-center">
+            <h2 className="text-3xl md:text-4xl font-headline font-bold mb-4">
+              Ready to Explore?
+            </h2>
+            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Discover Vietnam with our expert local guides. Every tour is a unique story waiting to be told.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button asChild size="lg" className="rounded-full">
+                <Link href="/guides">
+                  <Users className="mr-2 h-5 w-5" />
+                  Meet Our Guides
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="rounded-full">
+                <Link href="/tours">
+                  <MapPin className="mr-2 h-5 w-5" />
+                  Browse Tours
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>

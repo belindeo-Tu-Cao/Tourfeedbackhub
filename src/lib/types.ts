@@ -196,6 +196,7 @@ export interface PublicContent {
   reviews: Review[];
   slides: HeroSlide[];
   posts: Post[];
+  guides: Guide[];
 }
 
 export type NavigationMenuKey = 'header' | 'footer';
