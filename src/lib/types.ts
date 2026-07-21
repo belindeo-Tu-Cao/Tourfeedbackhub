@@ -94,14 +94,37 @@ export interface Nationality {
   code?: string;
 }
 
+export interface GuideLanguageProficiency {
+  id: string;
+  name: string;
+  code?: string;
+  proficiency?: 'beginner' | 'intermediate' | 'advanced' | 'native';
+}
+
 export interface Guide {
   id: string;
   name: string;
+  photo?: string;
   phone?: string;
   email?: string;
+  bio?: string;
+  cardNumber?: string;
+  cardType?: 'international' | 'domestic';
+  cardIssuePlace?: string;
+  cardIssueDate?: string;
+  cardExpiryDate?: string;
+  experienceYears?: number;
+  languages?: GuideLanguageProficiency[];
   languageIds?: string[];
+  provinces?: string[];
   provinceIds?: string[];
+  nationalities?: string[];
   nationalityIds?: string[];
+  // Computed stats
+  totalTours?: number;
+  totalPax?: number;
+  averageRating?: number;
+  totalReviews?: number;
 }
 
 export interface ContactInfo {

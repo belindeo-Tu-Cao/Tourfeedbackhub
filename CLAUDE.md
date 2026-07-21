@@ -27,7 +27,7 @@ Push only clean, non-sensitive code.
 
 ## Project Overview
 
-Tour Insights Hub (TourFeedbackHub) is a Next.js 15 application for collecting and managing tour feedback. It allows anonymous users to submit reviews, which are then moderated by admins before being displayed publicly. The app integrates Firebase (Firestore + Auth), Genkit AI for feedback summarization, and uses ShadCN UI components with Tailwind CSS.
+Tour Insights Hub (TourFeedbackHub) is a Next.js 15 application for collecting and managing tour feedback. It allows anonymous users to submit reviews, which are then moderated by admins before being displayed publicly. The app integrates Firebase (Firestore + Auth) and uses ShadCN UI components with Tailwind CSS.
 
 ## Development Commands
 
@@ -36,12 +36,6 @@ Tour Insights Hub (TourFeedbackHub) is a Next.js 15 application for collecting a
 npm run dev              # Start Next.js dev server on port 9002 with Turbopack
 npm run build           # Production build (NODE_ENV=production)
 npm start               # Start production server
-```
-
-### AI/Genkit Development
-```bash
-npm run genkit:dev      # Start Genkit development server
-npm run genkit:watch    # Start Genkit with file watching
 ```
 
 ### Code Quality
@@ -60,7 +54,6 @@ npm run typecheck       # Run TypeScript type checking (tsc --noEmit)
 - **UI**: ShadCN UI + Tailwind CSS
 - **Icons**: Lucide React
 - **Backend**: Firebase (Firestore, Authentication, App Check)
-- **AI**: Genkit with Google AI (Gemini 2.5 Flash)
 - **Forms**: React Hook Form + Zod validation
 - **Date Formatting**: date-fns
 
@@ -85,12 +78,6 @@ src/
 │   ├── firestore/         # Custom Firestore hooks (useDoc, useCollection)
 │   ├── non-blocking-*.tsx # Async Firebase operations
 │   └── config.ts          # Firebase initialization
-├── ai/                    # Genkit AI flows
-│   ├── genkit.ts          # Genkit configuration (Gemini 2.5 Flash)
-│   ├── flows/             # AI flow definitions
-│   │   ├── summarize-feedback.ts      # Feedback summarization
-│   │   └── detect-feedback-language.ts # Language detection
-│   └── dev.ts             # Genkit dev server entry
 ├── lib/
 │   ├── actions.ts         # Server actions (submitFeedback, approveReview, etc.)
 │   ├── types.ts           # TypeScript interfaces (Tour, Review)
@@ -103,7 +90,7 @@ src/
 All collections have public read access but require App Check tokens for writes:
 
 - **`/feedback/{feedbackId}`**: User-submitted feedback
-  - Fields: name, country, language, rating, message, tourId?, photoUrl?, status (pending/approved/rejected), submittedAt, feedbackSummary?, detectedLanguage?
+  - Fields: name, country, language, rating, message, tourId?, photoUrl?, status (pending/approved/rejected), submittedAt
 
 - **`/tours/{tourId}`**: Tour information
   - Fields: id, name, typeId, description, teaser, imageUrl
@@ -135,13 +122,6 @@ All server actions are in `src/lib/actions.ts`:
 - `submitFeedback(formData)`: Validates and stores feedback with Zod schema
 - `approveReview(reviewId)`: Approves pending feedback
 - `rejectReview(reviewId)`: Rejects pending feedback
-- `summarizeReview(feedbackMessage)`: Calls Genkit AI flow for summarization
-
-### AI Flows (Genkit)
-
-AI configuration uses Google AI with Gemini 2.5 Flash model (`src/ai/genkit.ts`):
-- `summarizeFeedback`: Generates concise feedback summaries and detects language
-- Entry point for Genkit dev server: `src/ai/dev.ts`
 
 ### Security Model
 
@@ -171,7 +151,6 @@ Placeholder images are managed via `src/lib/placeholder-images.json`.
 Firebase configuration requires environment variables (not in repo, see `.env*` in `.gitignore`). Set up:
 - Firebase project credentials
 - App Check configuration
-- Genkit API keys for Google AI
 
 ## Known Issues / TODOs
 

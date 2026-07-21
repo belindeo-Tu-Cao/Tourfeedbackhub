@@ -6,11 +6,19 @@ import { cn } from "@/lib/utils";
 
 interface StarRatingProps {
   rating: number;
-  setRating: (rating: number) => void;
+  setRating?: (rating: number) => void;
+  readonly?: boolean;
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
-export function StarRating({ rating, setRating, className }: StarRatingProps) {
+const sizeClasses = {
+  sm: 'h-4 w-4',
+  md: 'h-6 w-6',
+  lg: 'h-8 w-8',
+};
+
+export function StarRating({ rating, setRating, readonly = false, size = 'lg', className }: StarRatingProps) {
   const [hoverRating, setHoverRating] = useState(0);
 
   return (
@@ -19,15 +27,17 @@ export function StarRating({ rating, setRating, className }: StarRatingProps) {
         <button
           type="button"
           key={star}
-          onClick={() => setRating(star)}
-          onMouseEnter={() => setHoverRating(star)}
-          onMouseLeave={() => setHoverRating(0)}
-          className="cursor-pointer"
+          onClick={() => !readonly && setRating?.(star)}
+          onMouseEnter={() => !readonly && setHoverRating(star)}
+          onMouseLeave={() => !readonly && setHoverRating(0)}
+          className={cn(!readonly && "cursor-pointer")}
+          disabled={readonly}
           aria-label={`Rate ${star} stars`}
         >
           <Star
             className={cn(
-              "h-8 w-8 transition-colors",
+              sizeClasses[size],
+              "transition-colors",
               (hoverRating || rating) >= star
                 ? "text-yellow-400 fill-yellow-400"
                 : "text-gray-300"

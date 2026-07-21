@@ -592,10 +592,11 @@ async function seed() {
       items: [
         { label: 'Home', href: '/', type: 'internal', order: 1, target: '_self' },
         { label: 'Tours', href: '/tours', type: 'internal', order: 2, target: '_self' },
-        { label: 'Reviews', href: '/reviews', type: 'internal', order: 3, target: '_self' },
-        { label: 'Stories', href: '/stories', type: 'internal', order: 4, target: '_self' },
-        { label: 'Blog', href: '/blog', type: 'internal', order: 5, target: '_self' },
-        { label: 'Contact', href: '/contact', type: 'internal', order: 6, target: '_self' },
+        { label: 'Guides', href: '/guides', type: 'internal', order: 3, target: '_self', icon: 'Users' },
+        { label: 'Reviews', href: '/reviews', type: 'internal', order: 4, target: '_self' },
+        { label: 'Stories', href: '/stories', type: 'internal', order: 5, target: '_self' },
+        { label: 'Blog', href: '/blog', type: 'internal', order: 6, target: '_self' },
+        { label: 'Contact', href: '/contact', type: 'internal', order: 7, target: '_self' },
       ],
     },
   )

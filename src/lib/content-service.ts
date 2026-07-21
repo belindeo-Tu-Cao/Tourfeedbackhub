@@ -12,6 +12,8 @@ import type {
   Post,
   PostStatus,
   PostType,
+  Guide,
+  GuideLanguageProficiency,
 } from "@/lib/types";
 
 type Doc = Record<string, any>;
@@ -330,5 +332,223 @@ export const getSiteSettings = cache(async () => {
   } catch (error) {
     console.warn("Falling back to local site settings", error);
     return fallbackSiteSettings;
+  }
+});
+
+// Guide Profile functions
+
+function mapGuideLanguage(item: Doc): GuideLanguageProficiency {
+  return {
+    id: id(item.id ?? item),
+    name: item.name ?? (typeof item === "string" ? item : ""),
+    code: item.code ?? undefined,
+    proficiency: item.proficiency ?? undefined,
+  };
+}
+
+function mapGuide(doc: Doc): Guide {
+  const languages = Array.isArray(doc.languages)
+    ? doc.languages.map((l: Doc) => mapGuideLanguage(l))
+    : [];
+  const provinces = relNames(doc.provinces);
+  const nationalities = relNames(doc.nationalities);
+
+  return {
+    id: id(doc.id),
+    name: doc.name ?? "Guide",
+    photo: mediaUrl(doc.photo),
+    phone: doc.phone ?? undefined,
+    email: doc.email ?? undefined,
+    bio: doc.bio ?? undefined,
+    cardNumber: doc.cardNumber ?? undefined,
+    cardType: doc.cardType ?? undefined,
+    cardIssuePlace: doc.cardIssuePlace ?? undefined,
+    cardIssueDate: doc.cardIssueDate ?? undefined,
+    cardExpiryDate: doc.cardExpiryDate ?? undefined,
+    experienceYears: typeof doc.experienceYears === "number" ? doc.experienceYears : undefined,
+    languages,
+    languageIds: relIds(doc.languages),
+    provinces,
+    provinceIds: relIds(doc.provinces),
+    nationalities,
+    nationalityIds: relIds(doc.nationalities),
+  };
+}
+
+async function fetchGuideById(guideId: string): Promise<Guide | null> {
+  const payload = await getPayloadClient();
+
+  try {
+    const guideDoc = await payload.findByID({
+      collection: "guides",
+      id: guideId,
+      depth: 2,
+    });
+
+    if (!guideDoc) return null;
+
+    const guide = mapGuide(guideDoc);
+
+    // Fetch tours for this guide
+    const toursResult = await payload.find({
+      collection: "tours",
+      depth: 1,
+      where: {
+        and: [
+          { guide: { equals: guideId } },
+          { status: { equals: "finished" } },
+        ],
+      },
+      sort: "-startDate",
+      limit: 100,
+    });
+
+    const tours = toursResult.docs.map(mapTour);
+
+    // Compute stats
+    guide.totalTours = tours.length;
+    guide.totalPax = tours.reduce((sum, tour) => sum + (tour.clientCount || 0), 0);
+
+    // Fetch reviews for this guide's tours
+    const tourIds = tours.map((t) => t.id);
+    if (tourIds.length > 0) {
+      const reviewsResult = await payload.find({
+        collection: "reviews",
+        depth: 0,
+        where: {
+          and: [
+            { tour: { in: tourIds } },
+            { status: { equals: "approved" } },
+          ],
+        },
+        limit: 100,
+      });
+
+      const reviews = reviewsResult.docs.map(mapReview);
+      guide.totalReviews = reviews.length;
+      guide.averageRating =
+        reviews.length > 0
+          ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+          : 0;
+    } else {
+      guide.totalReviews = 0;
+      guide.averageRating = 0;
+    }
+
+    return guide;
+  } catch (error) {
+    console.warn("Error fetching guide:", error);
+    return null;
+  }
+}
+
+async function fetchGuideTours(guideId: string): Promise<Tour[]> {
+  const payload = await getPayloadClient();
+
+  try {
+    const result = await payload.find({
+      collection: "tours",
+      depth: 1,
+      where: {
+        and: [
+          { guide: { equals: guideId } },
+          { status: { equals: "finished" } },
+        ],
+      },
+      sort: "-startDate",
+      limit: 100,
+    });
+
+    return result.docs.map(mapTour);
+  } catch (error) {
+    console.warn("Error fetching guide tours:", error);
+    return [];
+  }
+}
+
+async function fetchGuideReviews(guideId: string): Promise<Review[]> {
+  const payload = await getPayloadClient();
+
+  try {
+    // First get guide's tours
+    const toursResult = await payload.find({
+      collection: "tours",
+      depth: 0,
+      where: {
+        and: [
+          { guide: { equals: guideId } },
+          { status: { equals: "finished" } },
+        ],
+      },
+      limit: 100,
+    });
+
+    const tourIds = toursResult.docs.map((t) => id(t.id));
+
+    if (tourIds.length === 0) return [];
+
+    // Then get reviews for those tours
+    const reviewsResult = await payload.find({
+      collection: "reviews",
+      depth: 1,
+      where: {
+        and: [
+          { tour: { in: tourIds } },
+          { status: { equals: "approved" } },
+        ],
+      },
+      sort: "-approvedAt",
+      limit: 100,
+    });
+
+    return reviewsResult.docs.map(mapReview);
+  } catch (error) {
+    console.warn("Error fetching guide reviews:", error);
+    return [];
+  }
+}
+
+export const getGuideProfile = cache(async (guideId: string) => {
+  try {
+    return await fetchGuideById(guideId);
+  } catch (error) {
+    console.warn("Error fetching guide profile:", error);
+    return null;
+  }
+});
+
+export const getGuideTours = cache(async (guideId: string) => {
+  try {
+    return await fetchGuideTours(guideId);
+  } catch (error) {
+    console.warn("Error fetching guide tours:", error);
+    return [];
+  }
+});
+
+export const getGuideReviews = cache(async (guideId: string) => {
+  try {
+    return await fetchGuideReviews(guideId);
+  } catch (error) {
+    console.warn("Error fetching guide reviews:", error);
+    return [];
+  }
+});
+
+export const getAllGuides = cache(async (): Promise<Guide[]> => {
+  const payload = await getPayloadClient();
+
+  try {
+    const result = await payload.find({
+      collection: "guides",
+      depth: 1,
+      limit: 100,
+      sort: "name",
+    });
+
+    return result.docs.map(mapGuide);
+  } catch (error) {
+    console.warn("Error fetching guides:", error);
+    return [];
   }
 });

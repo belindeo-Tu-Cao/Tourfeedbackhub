@@ -6,7 +6,7 @@
 
 - 🎫 **Quản lý Tour**: Tạo, chỉnh sửa và quản lý thông tin các chuyến tour đã hoàn thành
 - 📸 **Upload Media**: Hỗ trợ upload hình ảnh (lên đến 10MB) và video (lên đến 100MB)
-- ⭐ **Thu thập đánh giá**: Cho phép khách hàng gửi đánh giá và phản hồi với AI tóm tắt
+- ⭐ **Thu thập đánh giá**: Cho phép khách hàng gửi đánh giá và phản hồi
 - 🔐 **Xác thực Admin**: Hệ thống đăng nhập với Custom Claims và Remember Me
 - 🖼️ **Hiển thị Media**: Tự động tạo URL công khai với token-based access control
 - 🛡️ **App Check**: Bảo vệ Cloud Functions và Firestore khỏi spam và lạm dụng
@@ -24,7 +24,6 @@ Dự án này được xây dựng với một bộ công nghệ full-stack Type
 *   **Tạo kiểu (Styling)**: [Tailwind CSS](https://tailwindcss.com/)
 *   **Biểu tượng (Icons)**: [Lucide React](https://lucide.dev/)
 *   **Backend & Cơ sở dữ liệu**: [Firebase](https://firebase.google.com/) (Firestore, Firebase Authentication)
-*   **Trí tuệ nhân tạo (AI)**: [Genkit](https://firebase.google.com/docs/genkit) (với Google AI/Gemini)
 *   **Quản lý biểu mẫu**: [React Hook Form](https://react-hook-form.com/) & [Zod](https://zod.dev/)
 *   **Định dạng ngày**: [date-fns](https://date-fns.org/)
 
@@ -190,14 +189,4 @@ firebase deploy --only firestore:rules
 firebase deploy --only storage
 ```
 
-## Genkit AI
 
-Dự án sử dụng Genkit với Google AI (Gemini 2.5 Flash) để:
-
-- Tóm tắt feedback của khách hàng
-- Phát hiện ngôn ngữ feedback
-
-```bash
-# Chạy Genkit dev server
-npm run genkit:dev
-```
