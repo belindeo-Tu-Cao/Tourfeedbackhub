@@ -84,20 +84,20 @@ export default function GuidesExplorer({ guides }: GuidesExplorerProps) {
   return (
     <div className="space-y-8">
       {/* Filters */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col gap-4">
+        <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search guides..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 w-full"
           />
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-            <SelectTrigger className="w-[180px]">
-              <Globe className="mr-2 h-4 w-4" />
+            <SelectTrigger className="w-full">
+              <Globe className="mr-2 h-4 w-4 flex-shrink-0" />
               <SelectValue placeholder="Language" />
             </SelectTrigger>
             <SelectContent>
@@ -111,9 +111,9 @@ export default function GuidesExplorer({ guides }: GuidesExplorerProps) {
           </Select>
 
           <Select value={selectedType} onValueChange={setSelectedType}>
-            <SelectTrigger className="w-[180px]">
-              <Filter className="mr-2 h-4 w-4" />
-              <SelectValue placeholder="Guide Type" />
+            <SelectTrigger className="w-full">
+              <Filter className="mr-2 h-4 w-4 flex-shrink-0" />
+              <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>

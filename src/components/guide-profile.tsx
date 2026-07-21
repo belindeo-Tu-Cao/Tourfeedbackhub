@@ -149,28 +149,28 @@ export default function GuideProfile({ guide, tours, reviews }: GuideProfileProp
               )}
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-3 gap-4 md:gap-6 max-w-lg">
-                <div className="rounded-2xl bg-background/80 p-4 text-center shadow-sm border border-border/60">
-                  <Briefcase className="mx-auto h-5 w-5 text-primary mb-2" />
-                  <p className="text-2xl font-bold">{guide.totalTours || tours.length}</p>
-                  <p className="text-xs text-muted-foreground">Tours</p>
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 max-w-lg">
+                <div className="rounded-xl sm:rounded-2xl bg-background/80 p-3 sm:p-4 text-center shadow-sm border border-border/60">
+                  <Briefcase className="mx-auto h-4 w-4 sm:h-5 sm:w-5 text-primary mb-1 sm:mb-2" />
+                  <p className="text-lg sm:text-2xl font-bold">{guide.totalTours || tours.length}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">Tours</p>
                 </div>
-                <div className="rounded-2xl bg-background/80 p-4 text-center shadow-sm border border-border/60">
-                  <Users className="mx-auto h-5 w-5 text-primary mb-2" />
-                  <p className="text-2xl font-bold">{totalPax}</p>
-                  <p className="text-xs text-muted-foreground">Pax Served</p>
+                <div className="rounded-xl sm:rounded-2xl bg-background/80 p-3 sm:p-4 text-center shadow-sm border border-border/60">
+                  <Users className="mx-auto h-4 w-4 sm:h-5 sm:w-5 text-primary mb-1 sm:mb-2" />
+                  <p className="text-lg sm:text-2xl font-bold">{totalPax}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">Pax Served</p>
                 </div>
-                <div className="rounded-2xl bg-background/80 p-4 text-center shadow-sm border border-border/60">
-                  <Star className="mx-auto h-5 w-5 text-primary mb-2" />
-                  <p className="text-2xl font-bold">
+                <div className="rounded-xl sm:rounded-2xl bg-background/80 p-3 sm:p-4 text-center shadow-sm border border-border/60">
+                  <Star className="mx-auto h-4 w-4 sm:h-5 sm:w-5 text-primary mb-1 sm:mb-2" />
+                  <p className="text-lg sm:text-2xl font-bold">
                     {averageRating > 0 ? averageRating.toFixed(1) : 'N/A'}
                   </p>
-                  <p className="text-xs text-muted-foreground">Rating</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">Rating</p>
                 </div>
               </div>
 
               {/* Contact Actions */}
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 {guide.phone && (
                   <Button asChild variant="default" className="rounded-full">
                     <a href={`tel:${guide.phone}`}>
@@ -319,42 +319,44 @@ export default function GuideProfile({ guide, tours, reviews }: GuideProfileProp
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {tours.slice(0, 8).map((tour, index) => (
                         <motion.div
                           key={tour.id}
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.3, delay: 0.1 * index }}
-                          className="group flex items-start justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 p-4 transition-colors hover:bg-muted/40"
+                          className="group rounded-xl border border-border/60 bg-muted/20 p-3 sm:p-4 transition-colors hover:bg-muted/40"
                         >
-                          <div className="space-y-2 flex-1">
-                            <h3 className="font-medium group-hover:text-primary transition-colors">
-                              {tour.name}
-                            </h3>
-                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <Calendar className="h-3.5 w-3.5" />
-                                {format(tour.startDate, 'MMM yyyy')}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Users className="h-3.5 w-3.5" />
-                                {tour.clientCount} pax
-                              </span>
-                              {tour.provinces && tour.provinces.length > 0 && (
+                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                            <div className="space-y-1.5 flex-1 min-w-0">
+                              <h3 className="font-medium group-hover:text-primary transition-colors truncate">
+                                {tour.name}
+                              </h3>
+                              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-muted-foreground">
                                 <span className="flex items-center gap-1">
-                                  <MapPin className="h-3.5 w-3.5" />
-                                  {tour.provinces.slice(0, 2).join(', ')}
+                                  <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                                  {format(tour.startDate, 'MMM yyyy')}
                                 </span>
-                              )}
+                                <span className="flex items-center gap-1">
+                                  <Users className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                                  {tour.clientCount} pax
+                                </span>
+                                {tour.provinces && tour.provinces.length > 0 && (
+                                  <span className="flex items-center gap-1">
+                                    <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                                    {tour.provinces.slice(0, 2).join(', ')}
+                                  </span>
+                                )}
+                              </div>
                             </div>
+                            <Badge
+                              variant={tour.status === 'finished' ? 'default' : 'secondary'}
+                              className="self-start text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1"
+                            >
+                              {tour.status === 'finished' ? 'Completed' : 'For Sale'}
+                            </Badge>
                           </div>
-                          <Badge
-                            variant={tour.status === 'finished' ? 'default' : 'secondary'}
-                            className="flex-shrink-0"
-                          >
-                            {tour.status === 'finished' ? 'Completed' : 'For Sale'}
-                          </Badge>
                         </motion.div>
                       ))}
                       {tours.length > 8 && (

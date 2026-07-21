@@ -44,20 +44,18 @@ export default async function GuidesPage() {
             </p>
 
             {/* Stats */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4 md:gap-8">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 sm:gap-8 md:gap-12">
               <div className="flex flex-col items-center">
-                <span className="text-3xl md:text-4xl font-bold text-primary">{totalGuides}</span>
-                <span className="text-sm text-muted-foreground">Expert Guides</span>
+                <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">{totalGuides}</span>
+                <span className="text-xs sm:text-sm text-muted-foreground">Expert Guides</span>
               </div>
-              <div className="h-12 w-px bg-border hidden md:block" />
               <div className="flex flex-col items-center">
-                <span className="text-3xl md:text-4xl font-bold text-primary">{internationalGuides}</span>
-                <span className="text-sm text-muted-foreground">International</span>
+                <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">{internationalGuides}</span>
+                <span className="text-xs sm:text-sm text-muted-foreground">International</span>
               </div>
-              <div className="h-12 w-px bg-border hidden md:block" />
               <div className="flex flex-col items-center">
-                <span className="text-3xl md:text-4xl font-bold text-primary">{allLanguages.length}</span>
-                <span className="text-sm text-muted-foreground">Languages</span>
+                <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">{allLanguages.length}</span>
+                <span className="text-xs sm:text-sm text-muted-foreground">Languages</span>
               </div>
             </div>
           </div>
