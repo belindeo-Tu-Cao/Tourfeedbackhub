@@ -23,13 +23,16 @@ import {
   ChevronRight,
   Quote,
 } from 'lucide-react';
-import type { Guide, Tour, Review } from '@/lib/types';
+import { RelatedContentSection } from '@/components/related-content-section';
+import { PersonStructuredData } from '@/components/structured-data';
+import type { Guide, Tour, Review, RelatedItemSummary } from '@/lib/types';
 import { format } from 'date-fns';
 
 interface GuideProfileProps {
   guide: Guide;
   tours: Tour[];
   reviews: Review[];
+  relatedPosts?: RelatedItemSummary[];
 }
 
 const proficiencyLabels: Record<string, string> = {
@@ -46,7 +49,7 @@ const proficiencyColors: Record<string, string> = {
   native: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
 };
 
-export default function GuideProfile({ guide, tours, reviews }: GuideProfileProps) {
+export default function GuideProfile({ guide, tours, reviews, relatedPosts }: GuideProfileProps) {
   const totalPax = tours.reduce((sum, tour) => sum + (tour.clientCount || 0), 0);
   const averageRating =
     reviews.length > 0
@@ -63,8 +66,16 @@ export default function GuideProfile({ guide, tours, reviews }: GuideProfileProp
     new Set(tours.flatMap((t) => t.clientNationalities || []).filter(Boolean))
   );
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
+
   return (
     <div className="min-h-screen bg-background">
+      <PersonStructuredData
+        name={guide.name}
+        image={guide.photo}
+        url={`${baseUrl}/guide/${guide.id}`}
+        knowsLanguage={guide.languages?.map((l) => l.name).filter(Boolean)}
+      />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary/20 via-primary/10 to-background">
         <div className="absolute inset-0 bg-[url('/asset/pattern.svg')] opacity-5" />
@@ -235,6 +246,35 @@ export default function GuideProfile({ guide, tours, reviews }: GuideProfileProp
                             </span>
                           )}
                         </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* Specializations */}
+            {guide.tourTypes && guide.tourTypes.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.35 }}
+              >
+                <Card className="border-border/60 bg-background/80">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 font-headline text-xl">
+                      <Award className="h-5 w-5 text-primary" />
+                      Specializes In
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {guide.tourTypes.map((type) => (
+                        <Link key={type.id} href={type.href}>
+                          <Badge variant="secondary" className="text-sm py-1.5 px-3 hover:bg-secondary/80">
+                            {type.title}
+                          </Badge>
+                        </Link>
                       ))}
                     </div>
                   </CardContent>
@@ -477,6 +517,8 @@ export default function GuideProfile({ guide, tours, reviews }: GuideProfileProp
                 </Card>
               </motion.div>
             )}
+
+            <RelatedContentSection title="Featured in" items={relatedPosts} />
           </div>
         </div>
       </section>

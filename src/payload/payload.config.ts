@@ -17,6 +17,8 @@ import { Guides, Tours, TourComments } from './collections/Tours'
 import { Feedback, Reviews } from './collections/Feedback'
 import { Languages, Nationalities, Provinces, TourTypes } from './collections/MasterData'
 import { Stories, Slides, NavigationMenus, Mail, SiteSettings, ThemeSettings } from './collections/SiteConfig'
+import { Destinations } from './collections/Destinations'
+import { FAQs } from './collections/FAQs'
 
 export default buildConfig({
   admin: {
@@ -42,6 +44,8 @@ export default buildConfig({
     Provinces,
     TourTypes,
     Stories,
+    Destinations,
+    FAQs,
     Slides,
     NavigationMenus,
     SiteSettings,

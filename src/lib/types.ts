@@ -1,5 +1,18 @@
+export type RelatedItemType = 'post' | 'story' | 'tour' | 'guide' | 'tourType' | 'destination';
+
+export interface RelatedItemSummary {
+  id: string;
+  type: RelatedItemType;
+  title: string;
+  href: string;
+  slug?: string;
+  imageUrl?: string;
+  excerpt?: string;
+}
+
 export interface TourType {
   id: string;
+  slug: string;
   title: string;
   description: string;
   icon?: string;
@@ -24,22 +37,37 @@ export interface Tour {
   photoUrls: string[];
   videoUrls: string[];
   tourTypeIds?: string[];
-  guideId?: string;
-  guideName: string;
+  guideIds?: string[];
+  guides?: RelatedItemSummary[];
   guideLanguages: string[];
   guideLanguageIds?: string[];
   status: 'finished' | 'for_sale';
+  relatedPostIds?: string[];
+  relatedPosts?: RelatedItemSummary[];
+  relatedStoryIds?: string[];
+  relatedStories?: RelatedItemSummary[];
+  reviews?: Review[];
 }
 
 export interface Story {
   id: string;
+  slug: string;
   title: string;
   excerpt: string;
+  content?: string;
   coverImageUrl: string;
   publishedAt: Date;
   readTimeMinutes?: number;
   tags?: string[];
   category?: string;
+  relatedGuideIds?: string[];
+  relatedGuides?: RelatedItemSummary[];
+  relatedTourTypeIds?: string[];
+  relatedTourTypes?: RelatedItemSummary[];
+  relatedTourIds?: string[];
+  relatedTours?: RelatedItemSummary[];
+  relatedPostIds?: string[];
+  relatedPosts?: RelatedItemSummary[];
 }
 
 export interface Review {
@@ -120,6 +148,9 @@ export interface Guide {
   provinceIds?: string[];
   nationalities?: string[];
   nationalityIds?: string[];
+  tourTypeIds?: string[];
+  tourTypes?: RelatedItemSummary[];
+  relatedPosts?: RelatedItemSummary[];
   // Computed stats
   totalTours?: number;
   totalPax?: number;
@@ -315,6 +346,16 @@ export interface Post {
   parentId?: string | null;
   locale?: string; // Language code: en, vi, etc.
   versions?: PostRevision[]; // Version history (keep last 3)
+  relatedPostIds?: string[];
+  relatedPosts?: RelatedItemSummary[];
+  relatedStoryIds?: string[];
+  relatedStories?: RelatedItemSummary[];
+  relatedGuideIds?: string[];
+  relatedGuides?: RelatedItemSummary[];
+  relatedTourTypeIds?: string[];
+  relatedTourTypes?: RelatedItemSummary[];
+  relatedTourIds?: string[];
+  relatedTours?: RelatedItemSummary[];
 }
 
 export interface PostRevision {
@@ -402,6 +443,43 @@ export interface Widget {
   content?: any;
   settings?: Record<string, any>;
   order: number;
+}
+
+export interface MustSeeDoEatItem {
+  title: string;
+  description?: string;
+  imageUrl?: string;
+}
+
+export interface Destination {
+  id: string;
+  name: string;
+  slug: string;
+  summary?: string;
+  description?: string;
+  heroImageUrl?: string;
+  order?: number;
+  tours: RelatedItemSummary[];
+  tourTypes: RelatedItemSummary[];
+  guides: RelatedItemSummary[];
+  posts: RelatedItemSummary[];
+  stories: RelatedItemSummary[];
+  mustSee: MustSeeDoEatItem[];
+  mustDo: MustSeeDoEatItem[];
+  mustEat: MustSeeDoEatItem[];
+  seo?: SEOMetadata;
+}
+
+export type FaqRelatedToType = 'tours' | 'tour-types' | 'destinations' | 'guides';
+
+export interface Faq {
+  id: string;
+  question: string;
+  answer: string;
+  category?: string;
+  order?: number;
+  relatedToType?: FaqRelatedToType;
+  relatedToId?: string;
 }
 
 export interface AnalyticsData {

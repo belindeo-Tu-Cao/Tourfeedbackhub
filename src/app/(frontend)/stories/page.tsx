@@ -5,6 +5,7 @@ export default async function StoriesPage() {
   const { stories } = await getPublicContent();
   const serialisedStories = stories.map((story) => ({
     id: story.id,
+    slug: story.slug,
     title: story.title,
     excerpt: story.excerpt,
     coverImageUrl: story.coverImageUrl,

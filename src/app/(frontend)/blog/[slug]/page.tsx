@@ -5,13 +5,20 @@ import { format } from 'date-fns';
 import { RichText } from '@payloadcms/richtext-lexical/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Calendar, User, Eye, Clock, Share2, ArrowLeft, BookOpen, Tag } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { BreadcrumbStructuredData } from '@/components/structured-data';
-import { getBlogPost, getBlogPosts } from '@/lib/blog';
+import { getBlogPost } from '@/lib/blog';
 import { mediaUrl } from '@/lib/payload';
+import {
+  getRelatedPostsFor,
+  getRelatedTours,
+  getPostComments,
+  toRelatedItemSummaries,
+} from '@/lib/content-service';
+import { RelatedContentSection } from '@/components/related-content-section';
+import { PostCommentForm } from '@/components/blog/post-comment-form';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,16 +59,17 @@ export default async function BlogPostPage({
   const wordCount = contentText.split(/\s+/).length;
   const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
-  // Get related posts (same category)
-  let relatedPosts: Array<Record<string, any>> = [];
-  try {
-    const allPosts = await getBlogPosts();
-    relatedPosts = allPosts
-      .filter((rp: any) => rp.slug !== slug && rp.status === 'published')
-      .slice(0, 3);
-  } catch {
-    // Ignore errors
-  }
+  const postId = String(p.id);
+  const categoryIds = categories.map((c) => String(c.id));
+  const explicitRelatedPosts = toRelatedItemSummaries(p.relatedPosts, 'post');
+  const relatedStories = toRelatedItemSummaries(p.relatedStories, 'story');
+  const relatedGuides = toRelatedItemSummaries(p.relatedGuides, 'guide');
+
+  const [relatedPosts, relatedTours, comments] = await Promise.all([
+    getRelatedPostsFor(postId, categoryIds, explicitRelatedPosts),
+    getRelatedTours('relatedPosts', postId),
+    getPostComments(postId),
+  ]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -235,58 +243,43 @@ export default async function BlogPostPage({
         </div>
       </section>
 
-      {/* Related Posts */}
-      {relatedPosts.length > 0 && (
-        <section className="py-12 md:py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-2xl md:text-3xl font-headline font-bold text-center mb-8">
-                More Travel Stories
-              </h2>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {relatedPosts.map((rp: any) => {
-                  const rpImageUrl = mediaUrl(rp.featuredImage);
-                  return (
-                    <Link key={rp.id} href={`/blog/${rp.slug}`} className="group">
-                      <Card className="h-full overflow-hidden border-border/60 bg-background/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                        <div className="relative h-48 bg-muted">
-                          {rpImageUrl ? (
-                            <Image
-                              src={rpImageUrl}
-                              alt={rp.title}
-                              fill
-                              className="object-cover transition-transform duration-500 group-hover:scale-105"
-                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
-                              <BookOpen className="h-10 w-10 text-primary/30" />
-                            </div>
-                          )}
-                        </div>
-                        <CardContent className="p-5">
-                          <h3 className="font-headline font-semibold text-lg mb-2 group-hover:text-primary transition-colors line-clamp-2">
-                            {rp.title}
-                          </h3>
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {rp.excerpt}
-                          </p>
-                          <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
-                            <Calendar className="h-3 w-3" />
-                            <time>
-                              {rp.publishedAt ? format(new Date(rp.publishedAt), 'MMM d, yyyy') : ''}
-                            </time>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  );
-                })}
-              </div>
+      {/* Comments */}
+      <section className="py-8 md:py-12">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-headline font-bold mb-6">
+              Comments {comments.length > 0 ? `(${comments.length})` : ''}
+            </h2>
+            <div className="mb-8 space-y-4">
+              {comments.map((comment) => (
+                <div key={comment.id} className="rounded-lg border bg-card/50 p-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-semibold text-foreground">{comment.authorName}</span>
+                    <span className="text-muted-foreground">{comment.createdAt.toLocaleDateString()}</span>
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{comment.content}</p>
+                </div>
+              ))}
+              {comments.length === 0 && (
+                <p className="text-sm text-muted-foreground">No comments yet. Be the first to share your thoughts.</p>
+              )}
             </div>
+            <PostCommentForm postId={postId} />
           </div>
-        </section>
-      )}
+        </div>
+      </section>
+
+      {/* Related content */}
+      <section className="py-12 md:py-16 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <RelatedContentSection title="More travel stories" items={relatedPosts} />
+            <RelatedContentSection title="Related stories" items={relatedStories} />
+            <RelatedContentSection title="Related guides" items={relatedGuides} />
+            <RelatedContentSection title="Related tours" items={relatedTours} />
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

@@ -158,12 +158,12 @@ async function seed() {
   log(`provinces ready (${provinceDefs.length})`)
 
   const tourTypeDefs = [
-    { title: 'Cultural', description: 'Temples, heritage sites, and local traditions.', icon: 'landmark', order: 1 },
-    { title: 'Adventure', description: 'Trekking, kayaking, and off-the-beaten-path routes.', icon: 'mountain', order: 2 },
-    { title: 'Food & Culinary', description: 'Street food tours and cooking classes.', icon: 'utensils', order: 3 },
-    { title: 'Nature', description: 'National parks, caves, and scenic landscapes.', icon: 'trees', order: 4 },
-    { title: 'City', description: 'Guided walks through historic city centers.', icon: 'building', order: 5 },
-    { title: 'Beach', description: 'Coastal escapes and island hopping.', icon: 'waves', order: 6 },
+    { title: 'Cultural', slug: 'cultural', description: 'Temples, heritage sites, and local traditions.', icon: 'landmark', order: 1 },
+    { title: 'Adventure', slug: 'adventure', description: 'Trekking, kayaking, and off-the-beaten-path routes.', icon: 'mountain', order: 2 },
+    { title: 'Food & Culinary', slug: 'food-culinary', description: 'Street food tours and cooking classes.', icon: 'utensils', order: 3 },
+    { title: 'Nature', slug: 'nature', description: 'National parks, caves, and scenic landscapes.', icon: 'trees', order: 4 },
+    { title: 'City', slug: 'city', description: 'Guided walks through historic city centers.', icon: 'building', order: 5 },
+    { title: 'Beach', slug: 'beach', description: 'Coastal escapes and island hopping.', icon: 'waves', order: 6 },
   ]
   const tourTypes: Record<string, string | number> = {}
   for (const t of tourTypeDefs) {
@@ -183,6 +183,7 @@ async function seed() {
       languages: [languages.en, languages.vi, languages.fr],
       provinces: [provinces['Hanoi'], provinces['Ninh Binh']],
       nationalities: [nationalities.US, nationalities.FR],
+      tourTypes: [tourTypes['Food & Culinary'], tourTypes['Nature'], tourTypes['Adventure']],
     },
     {
       name: 'Minh Tran',
@@ -191,6 +192,7 @@ async function seed() {
       languages: [languages.en, languages.vi, languages.ja],
       provinces: [provinces['Da Nang'], provinces['Quang Nam']],
       nationalities: [nationalities.JP, nationalities.AU],
+      tourTypes: [tourTypes['Cultural'], tourTypes['City']],
     },
     {
       name: 'Hoa Pham',
@@ -199,6 +201,7 @@ async function seed() {
       languages: [languages.en, languages.vi, languages.de],
       provinces: [provinces['Ho Chi Minh City']],
       nationalities: [nationalities.DE, nationalities.GB],
+      tourTypes: [tourTypes['Cultural'], tourTypes['City']],
     },
     {
       name: 'Tu Cao',
@@ -210,6 +213,7 @@ async function seed() {
       experienceYears: 6,
       languages: [languages.en],
       provinces: [provinces['Thua Thien Hue']],
+      tourTypes: [tourTypes['Cultural'], tourTypes['Nature']],
     },
   ]
   const guides: Record<string, string | number> = {}
@@ -233,8 +237,7 @@ async function seed() {
       clientCount: 4,
       clientCountry: 'United States',
       clientCity: 'Boston',
-      guide: guides['Linh Nguyen'],
-      guideName: 'Linh Nguyen',
+      guides: [guides['Linh Nguyen'], guides['Tu Cao']],
       status: 'finished',
       showFeedbackForm: true,
       provinces: [provinces['Hanoi']],
@@ -252,8 +255,7 @@ async function seed() {
       clientCount: 2,
       clientCountry: 'Japan',
       clientCity: 'Osaka',
-      guide: guides['Minh Tran'],
-      guideName: 'Minh Tran',
+      guides: [guides['Minh Tran']],
       status: 'finished',
       showFeedbackForm: true,
       provinces: [provinces['Quang Nam'], provinces['Da Nang']],
@@ -271,8 +273,7 @@ async function seed() {
       clientCount: 6,
       clientCountry: 'France',
       clientCity: 'Lyon',
-      guide: guides['Linh Nguyen'],
-      guideName: 'Linh Nguyen',
+      guides: [guides['Linh Nguyen']],
       status: 'finished',
       showFeedbackForm: true,
       provinces: [provinces['Ninh Binh']],
@@ -290,8 +291,7 @@ async function seed() {
       clientCount: 3,
       clientCountry: 'Germany',
       clientCity: 'Munich',
-      guide: guides['Hoa Pham'],
-      guideName: 'Hoa Pham',
+      guides: [guides['Hoa Pham']],
       status: 'for_sale',
       showFeedbackForm: true,
       provinces: [provinces['Ho Chi Minh City']],
@@ -491,6 +491,8 @@ async function seed() {
       tags: [tags['vietnam'], tags['street-food']],
       publishedAt: new Date('2026-05-20').toISOString(),
       locale: 'en',
+      relatedGuides: [guides['Linh Nguyen']],
+      relatedTourTypes: [tourTypes['Food & Culinary']],
     },
     {
       type: 'post',
@@ -504,6 +506,8 @@ async function seed() {
       tags: [tags['vietnam'], tags['culture']],
       publishedAt: new Date('2026-06-10').toISOString(),
       locale: 'en',
+      relatedGuides: [guides['Minh Tran']],
+      relatedTourTypes: [tourTypes['Cultural']],
     },
     {
       type: 'page',
@@ -527,10 +531,14 @@ async function seed() {
       tags: [tags['vietnam'], tags['quang-tri'], tags['history'], tags['war-history']],
       publishedAt: new Date('2026-07-21').toISOString(),
       locale: 'en',
+      relatedGuides: [guides['Tu Cao']],
+      relatedTourTypes: [tourTypes['Cultural']],
     },
   ]
+  const posts: Record<string, string | number> = {}
   for (const p of postDefs) {
-    await ensure('posts', { slug: { equals: p.slug } }, p)
+    const doc = await ensure('posts', { slug: { equals: p.slug } }, p)
+    posts[p.slug] = doc.id
   }
   log(`posts ready (${postDefs.length})`)
 
@@ -540,23 +548,33 @@ async function seed() {
   const storyDefs = [
     {
       title: 'How a Rainy Day Became the Best Tour Ever',
+      slug: 'rainy-day-best-tour-ever',
       excerpt: 'A traveler shares how flexibility turned a soggy afternoon into magic.',
+      content: richText('The forecast said rain all day, but our guide Linh had other plans. Instead of cancelling, we rerouted through Trang An\'s covered pagodas and finished with hot ginger tea overlooking the karsts...'),
       publishedAt: new Date('2026-04-25').toISOString(),
       readTimeMinutes: 4,
       category: 'Traveler Stories',
       tags: [{ tag: 'ninh-binh' }, { tag: 'nature' }],
+      relatedGuides: [guides['Linh Nguyen']],
+      relatedTourTypes: [tourTypes['Nature'], tourTypes['Adventure']],
     },
     {
       title: 'Meet Linh: Hanoi’s Street Food Whisperer',
+      slug: 'meet-linh-hanoi-street-food-whisperer',
       excerpt: 'The story behind one of our most-loved local guides.',
+      content: richText('Linh Nguyen has led food walks through Hanoi\'s Old Quarter for over five years, and can tell you the story behind every bowl of pho on the block...'),
       publishedAt: new Date('2026-05-30').toISOString(),
       readTimeMinutes: 6,
       category: 'Guide Spotlight',
       tags: [{ tag: 'hanoi' }, { tag: 'food' }],
+      relatedGuides: [guides['Linh Nguyen']],
+      relatedTourTypes: [tourTypes['Food & Culinary']],
     },
   ]
+  const stories: Record<string, string | number> = {}
   for (const s of storyDefs) {
-    await ensure('stories', { title: { equals: s.title } }, s)
+    const doc = await ensure('stories', { title: { equals: s.title } }, s)
+    stories[s.title] = doc.id
   }
   log(`stories ready (${storyDefs.length})`)
 
@@ -601,11 +619,13 @@ async function seed() {
   const headerNavItems = [
     { label: 'Home', href: '/', type: 'internal' as const, order: 1, target: '_self' as const },
     { label: 'Tours', href: '/tours', type: 'internal' as const, order: 2, target: '_self' as const },
-    { label: 'Guides', href: '/guides', type: 'internal' as const, order: 3, target: '_self' as const, icon: 'Users' },
-    { label: 'Reviews', href: '/reviews', type: 'internal' as const, order: 4, target: '_self' as const },
-    { label: 'Stories', href: '/stories', type: 'internal' as const, order: 5, target: '_self' as const },
-    { label: 'Blog', href: '/blog', type: 'internal' as const, order: 6, target: '_self' as const },
-    { label: 'Contact', href: '/contact', type: 'internal' as const, order: 7, target: '_self' as const },
+    { label: 'Destinations', href: '/destinations', type: 'internal' as const, order: 3, target: '_self' as const, icon: 'MapPin' },
+    { label: 'Guides', href: '/guides', type: 'internal' as const, order: 4, target: '_self' as const, icon: 'Users' },
+    { label: 'Reviews', href: '/reviews', type: 'internal' as const, order: 5, target: '_self' as const },
+    { label: 'Stories', href: '/stories', type: 'internal' as const, order: 6, target: '_self' as const },
+    { label: 'Blog', href: '/blog', type: 'internal' as const, order: 7, target: '_self' as const },
+    { label: 'FAQ', href: '/faq', type: 'internal' as const, order: 8, target: '_self' as const },
+    { label: 'Contact', href: '/contact', type: 'internal' as const, order: 9, target: '_self' as const },
   ]
 
   const existingHeaderNav = await payload.find({
@@ -750,6 +770,174 @@ async function seed() {
     })
   }
   log('media attached to tours, slides, posts, stories, settings')
+
+  // ---------------------------------------------------------------------------
+  // 12. Cross-content relations (tours ↔ posts/stories, post ↔ post)
+  // ---------------------------------------------------------------------------
+  await payload.update({
+    collection: 'tours',
+    id: tours['HAN-001'],
+    data: {
+      relatedPosts: [posts['top-10-street-foods-hanoi']],
+      relatedStories: [stories['Meet Linh: Hanoi’s Street Food Whisperer']],
+    } as never,
+  })
+  await payload.update({
+    collection: 'tours',
+    id: tours['DAD-002'],
+    data: { relatedPosts: [posts['first-timers-guide-hoi-an']] } as never,
+  })
+  await payload.update({
+    collection: 'tours',
+    id: tours['NBH-003'],
+    data: { relatedStories: [stories['How a Rainy Day Became the Best Tour Ever']] } as never,
+  })
+  await payload.update({
+    collection: 'posts',
+    id: posts['top-10-street-foods-hanoi'],
+    data: {
+      relatedPosts: [posts['first-timers-guide-hoi-an']],
+      relatedStories: [stories['Meet Linh: Hanoi’s Street Food Whisperer']],
+    } as never,
+  })
+  await payload.update({
+    collection: 'posts',
+    id: posts['first-timers-guide-hoi-an'],
+    data: { relatedPosts: [posts['top-10-street-foods-hanoi']] } as never,
+  })
+  log('cross-content relations wired (tours ↔ posts/stories, post ↔ post)')
+
+  // ---------------------------------------------------------------------------
+  // 13. Destinations
+  // ---------------------------------------------------------------------------
+  const destinationDefs = [
+    {
+      name: 'Hanoi',
+      slug: 'hanoi',
+      summary: 'Vietnam\'s capital — a maze of Old Quarter streets, French colonial architecture, and legendary street food.',
+      description: richText('Hanoi rewards travelers who wander: hidden temples, egg coffee shops, and centuries-old trade streets sit around every corner of the Old Quarter.'),
+      province: provinces['Hanoi'],
+      order: 1,
+      status: 'published',
+      tours: [tours['HAN-001']],
+      tourTypes: [tourTypes['Food & Culinary'], tourTypes['City']],
+      guides: [guides['Linh Nguyen']],
+      posts: [posts['top-10-street-foods-hanoi']],
+      stories: [stories['Meet Linh: Hanoi’s Street Food Whisperer']],
+      mustSee: [
+        { title: 'Hoan Kiem Lake', description: 'The historic heart of Hanoi, ringed by legend and morning tai chi.' },
+        { title: 'Temple of Literature', description: 'Vietnam\'s first national university, dating to 1070.' },
+      ],
+      mustDo: [
+        { title: 'Walk the 36 Streets', description: 'Each street once specialized in a single trade — silk, silver, tin.' },
+      ],
+      mustEat: [
+        { title: 'Bun Cha', description: 'Grilled pork with rice noodles, made famous by Anthony Bourdain and Obama.' },
+        { title: 'Egg Coffee', description: 'A whipped egg-yolk custard layered over strong Vietnamese coffee.' },
+      ],
+    },
+    {
+      name: 'Hoi An',
+      slug: 'hoi-an',
+      summary: 'A UNESCO-listed ancient trading port known for lantern-lit nights and custom tailoring.',
+      description: richText('Hoi An\'s Ancient Town has preserved its 15th-19th century trading-port character, best experienced on foot after sunset when lanterns light the riverside.'),
+      province: provinces['Quang Nam'],
+      order: 2,
+      status: 'published',
+      tours: [tours['DAD-002']],
+      tourTypes: [tourTypes['Cultural'], tourTypes['City']],
+      guides: [guides['Minh Tran']],
+      posts: [posts['first-timers-guide-hoi-an']],
+      stories: [],
+      mustSee: [
+        { title: 'Japanese Covered Bridge', description: 'A 16th-century bridge linking the Japanese and Chinese quarters.' },
+      ],
+      mustDo: [
+        { title: 'Get a custom outfit tailored', description: 'Same-day tailoring is a Hoi An specialty.' },
+        { title: 'Release a lantern on the Thu Bon River', description: 'A nightly ritual best done at dusk.' },
+      ],
+      mustEat: [
+        { title: 'Cao Lau', description: 'A noodle dish unique to Hoi An, made with water from a specific local well.' },
+      ],
+    },
+    {
+      name: 'Ninh Binh',
+      slug: 'ninh-binh',
+      summary: 'Limestone karsts, rice paddies, and boat rides through caves — often called "Halong Bay on land."',
+      description: richText('Ninh Binh\'s Trang An and Tam Coc waterways wind between towering limestone peaks, best explored by traditional rowboat.'),
+      province: provinces['Ninh Binh'],
+      order: 3,
+      status: 'published',
+      tours: [tours['NBH-003']],
+      tourTypes: [tourTypes['Nature'], tourTypes['Adventure']],
+      guides: [guides['Linh Nguyen']],
+      posts: [],
+      stories: [stories['How a Rainy Day Became the Best Tour Ever']],
+      mustSee: [
+        { title: 'Trang An Landscape Complex', description: 'A UNESCO World Heritage site of karst peaks and grottoes.' },
+      ],
+      mustDo: [
+        { title: 'Row a sampan through Trang An\'s caves', description: 'Local rowers navigate low cave passages by hand.' },
+        { title: 'Climb Mua Cave viewpoint', description: 'Roughly 500 steps to a panoramic view of the rice paddies below.' },
+      ],
+      mustEat: [
+        { title: 'Com Chay (goat rice)', description: 'Ninh Binh\'s signature dish, paired with sticky rice.' },
+      ],
+    },
+  ]
+  const destinations: Record<string, string | number> = {}
+  for (const d of destinationDefs) {
+    const doc = await ensure('destinations', { slug: { equals: d.slug } }, d)
+    destinations[d.slug] = doc.id
+  }
+  log(`destinations ready (${destinationDefs.length})`)
+
+  // ---------------------------------------------------------------------------
+  // 14. FAQs
+  // ---------------------------------------------------------------------------
+  const faqDefs: Array<Record<string, unknown>> = [
+    {
+      question: 'How do I book a tour?',
+      answer: richText('Browse the Tours page, pick a tour that fits your travel dates, and reach out via the feedback or contact form to request availability.'),
+      category: 'Booking',
+      order: 1,
+      status: 'published',
+    },
+    {
+      question: 'Are your tour guides licensed?',
+      answer: richText('Yes — every guide profile on this site shows their official tour-guide license number, type, and issuing authority.'),
+      category: 'Guides',
+      order: 2,
+      status: 'published',
+    },
+    {
+      question: 'Can I leave feedback after my tour?',
+      answer: richText('Yes, use the Feedback page to submit a review. Submissions are moderated before appearing publicly.'),
+      category: 'Reviews',
+      order: 3,
+      status: 'published',
+    },
+    {
+      question: 'What languages does Linh Nguyen speak?',
+      answer: richText('Linh Nguyen guides in English, Vietnamese, and French.'),
+      category: 'Guides',
+      order: 4,
+      status: 'published',
+      relatedTo: { relationTo: 'guides', value: guides['Linh Nguyen'] },
+    },
+    {
+      question: 'What is the best time of year to visit Ninh Binh?',
+      answer: richText('October to December offers golden rice paddies and cooler weather, ideal for boat rides through Trang An.'),
+      category: 'Destinations',
+      order: 5,
+      status: 'published',
+      relatedTo: { relationTo: 'destinations', value: destinations['ninh-binh'] },
+    },
+  ]
+  for (const f of faqDefs) {
+    await ensure('faqs', { question: { equals: f.question } }, f)
+  }
+  log(`faqs ready (${faqDefs.length})`)
 
   log('✅ Seed complete')
   process.exit(0)

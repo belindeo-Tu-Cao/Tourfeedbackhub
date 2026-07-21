@@ -1,13 +1,16 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CalendarRange, MapPin, Users, Star } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { getPublicContent } from '@/lib/content-service';
+import { getPublicContent, getTourReviews } from '@/lib/content-service';
 import { getFinishedTourComments } from '@/lib/finished-tour-comments';
 import type { FinishedTourComment } from '@/lib/types';
 import { FinishedTourCommentForm } from '@/components/finished-tour/comment-form';
 import { MediaCarousel } from '@/components/finished-tour/media-carousel';
+import { RelatedContentSection } from '@/components/related-content-section';
+import { TouristTripStructuredData } from '@/components/structured-data';
 
 interface TourPageProps {
   params: {
@@ -35,7 +38,10 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
     notFound();
   }
 
-  const comments = await getFinishedTourComments(tour.id);
+  const [comments, reviews] = await Promise.all([
+    getFinishedTourComments(tour.id),
+    getTourReviews(tour.id),
+  ]);
   const ratingAggregate = comments.reduce(
     (acc, current) => {
       return {
@@ -48,7 +54,6 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
   const averageRating = ratingAggregate.count > 0 ? ratingAggregate.total / ratingAggregate.count : null;
   const start = tour.startDate instanceof Date ? tour.startDate : new Date(tour.startDate);
   const end = tour.endDate instanceof Date ? tour.endDate : new Date(tour.endDate);
-  const tourTypeMap = new Map(tourTypes.map((type) => [type.id, type.title]));
 
   const formattedDateRange = `${start.toLocaleDateString('en-US', {
     month: 'long',
@@ -62,8 +67,18 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
 
   const galleryPhotos = tour.photoUrls;
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
+
   return (
     <div className="pb-20 bg-gradient-to-b from-background via-background/80 to-muted/40">
+      <TouristTripStructuredData
+        name={tour.name}
+        description={tour.summary}
+        image={tour.photoUrls[0]}
+        url={`${baseUrl}/tours/${tour.id}`}
+        itinerary={tour.itinerary}
+        provider={process.env.NEXT_PUBLIC_SITE_NAME || 'Tour Insights Hub'}
+      />
       <section className="relative flex flex-col overflow-hidden bg-background md:flex-row">
         <div className="relative h-[22rem] w-full overflow-hidden md:h-[26rem] md:flex-1">
           {tour.photoUrls[0] && (
@@ -130,11 +145,16 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
                     <h3 className="font-semibold text-foreground/80 text-sm">Tour styles</h3>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {tour.tourTypeIds?.length ? (
-                        tour.tourTypeIds.map((typeId) => (
-                          <Badge key={typeId} variant="secondary">
-                            {tourTypeMap.get(typeId) ?? 'Experience'}
-                          </Badge>
-                        ))
+                        tour.tourTypeIds.map((typeId) => {
+                          const type = tourTypes.find((t) => t.id === typeId);
+                          return (
+                            <Link key={typeId} href={`/tour-types/${type?.slug ?? typeId}`}>
+                              <Badge variant="secondary" className="hover:bg-secondary/80">
+                                {type?.title ?? 'Experience'}
+                              </Badge>
+                            </Link>
+                          );
+                        })
                       ) : (
                         <span className="text-muted-foreground">Curated private journey</span>
                       )}
@@ -143,8 +163,20 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-semibold text-foreground/80 text-sm">Lead guide</h3>
-                    <p className="text-foreground">{tour.guideName}</p>
+                    <h3 className="font-semibold text-foreground/80 text-sm">
+                      {tour.guides && tour.guides.length > 1 ? 'Led by' : 'Lead guide'}
+                    </h3>
+                    {tour.guides?.length ? (
+                      <div className="flex flex-col gap-1">
+                        {tour.guides.map((guide) => (
+                          <Link key={guide.id} href={guide.href} className="text-foreground hover:text-primary hover:underline">
+                            {guide.title}
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">Not assigned</p>
+                    )}
                     {tour.guideLanguages?.length ? (
                       <p className="text-sm text-muted-foreground">
                         Languages: {tour.guideLanguages.join(', ')}
@@ -205,6 +237,31 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
                 </div>
               </CardContent>
             </Card>
+
+            {reviews.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl font-headline">Traveller reviews</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {reviews.map((review) => (
+                    <div key={review.id} className="rounded-lg border bg-card/50 p-4">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-semibold text-foreground">{review.authorDisplay}</span>
+                        <span className="flex items-center gap-1 text-muted-foreground">
+                          <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                          {review.rating.toFixed(1)}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{review.message}</p>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
+            <RelatedContentSection title="Related stories" items={tour.relatedStories} />
+            <RelatedContentSection title="Related posts" items={tour.relatedPosts} />
           </div>
 
           <aside className="space-y-6">

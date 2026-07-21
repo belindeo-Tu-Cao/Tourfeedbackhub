@@ -15,8 +15,18 @@ export const Stories: CollectionConfig = {
       required: true,
     },
     {
+      name: 'slug',
+      type: 'text',
+      required: true,
+      unique: true,
+    },
+    {
       name: 'excerpt',
       type: 'textarea',
+    },
+    {
+      name: 'content',
+      type: 'richText',
     },
     {
       name: 'coverImage',
@@ -44,6 +54,18 @@ export const Stories: CollectionConfig = {
     {
       name: 'category',
       type: 'text',
+    },
+    {
+      name: 'relatedGuides',
+      type: 'relationship',
+      relationTo: 'guides',
+      hasMany: true,
+    },
+    {
+      name: 'relatedTourTypes',
+      type: 'relationship',
+      relationTo: 'tour-types',
+      hasMany: true,
     },
   ],
 }

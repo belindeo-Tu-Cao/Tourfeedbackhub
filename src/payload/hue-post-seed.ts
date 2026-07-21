@@ -148,7 +148,13 @@ async function run() {
     },
   }
 
-  // --- 5. Create / update post ---
+  // --- 5. Related guide + tour type (idempotent lookups, non-fatal if absent) ---
+  const tuCaoRes = await payload.find({ collection: 'guides', where: { name: { equals: 'Tu Cao' } }, limit: 1, depth: 0 })
+  const culturalRes = await payload.find({ collection: 'tour-types', where: { title: { equals: 'Cultural' } }, limit: 1, depth: 0 })
+  const relatedGuides = tuCaoRes.docs[0] ? [(tuCaoRes.docs[0] as { id: string | number }).id] : []
+  const relatedTourTypes = culturalRes.docs[0] ? [(culturalRes.docs[0] as { id: string | number }).id] : []
+
+  // --- 6. Create / update post ---
   const slug = 'hue-imperial-city-guide'
   const postData = {
     type: 'post',
@@ -164,6 +170,8 @@ async function run() {
     featuredImage: media.noonGate,
     publishedAt: new Date('2026-07-20').toISOString(),
     locale: 'en',
+    relatedGuides,
+    relatedTourTypes,
   }
 
   const existingPost = await payload.find({ collection: 'posts', where: { slug: { equals: slug } }, limit: 1, depth: 0 })

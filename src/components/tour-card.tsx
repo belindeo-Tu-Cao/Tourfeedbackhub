@@ -85,7 +85,7 @@ export default function TourCard({ tour, ratingSummary }: TourCardProps) {
           </div>
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            <span>{tour.clientCount} travellers ・ Guide {tour.guideName}</span>
+            <span>{tour.clientCount} travellers ・ Guide {tour.guides?.map((g) => g.title).join(', ') || 'TBD'}</span>
           </div>
           {tour.guideLanguages?.length ? (
             <div className="flex items-center gap-2">

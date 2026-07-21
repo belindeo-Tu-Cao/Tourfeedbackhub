@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 
 interface ClientStory {
   id: string;
+  slug: string;
   title: string;
   excerpt: string;
   coverImageUrl: string;
@@ -247,7 +248,7 @@ export default function StoriesExplorer({ stories }: StoriesExplorerProps) {
                 </CardContent>
                 <CardFooter className="p-6 pt-0">
                   <Button asChild variant="outline" className="w-full">
-                    <Link href="/stories">Read the story</Link>
+                    <Link href={`/stories/${story.slug}`}>Read the story</Link>
                   </Button>
                 </CardFooter>
               </Card>

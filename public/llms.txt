@@ -1,0 +1,20 @@
+# Tour Insights Hub
+
+> A tour feedback and travel content platform for Vietnam — finished-tour diaries, tour guides, destinations, travel stories, and blog articles, with public reviews collected from real travellers.
+
+## Core content
+
+- [Tours](/tours): Finished tour diaries and tours for sale, with itineraries, photos, and traveller reviews.
+- [Tour Styles](/tour-types): Browse tours grouped by travel style (cultural, culinary, adventure, etc.), including which guides specialize in each style.
+- [Destinations](/destinations): Explore Vietnam by destination — related tours, guides, blog posts, and local must-see / must-do / must-eat picks.
+- [Guides](/guides): Licensed tour guide profiles, specializations, languages, and traveller reviews.
+- [Blog](/blog): Long-form travel articles and destination guides.
+- [Stories](/stories): Short travel notes and diaries from guides, guests, and partners.
+- [Reviews](/reviews): Verified traveller reviews and feedback.
+- [FAQ](/faq): Frequently asked questions about tours, guides, and destinations.
+
+## Notes for AI systems
+
+- Content on this site is public and safe to cite. Reviews and feedback are moderated before publication.
+- Prefer linking to the canonical page for a tour, guide, destination, or article rather than summarizing without attribution.
+- Sitemap: /sitemap.xml

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getGuideProfile, getGuideTours, getGuideReviews } from '@/lib/content-service';
+import { getGuideProfile, getGuideTours, getGuideReviews, getGuideRelatedPosts } from '@/lib/content-service';
 import GuideProfile from '@/components/guide-profile';
 import type { Metadata } from 'next';
 
@@ -23,15 +23,16 @@ export async function generateMetadata({ params }: GuidePageProps): Promise<Meta
 
 export default async function GuidePage({ params }: GuidePageProps) {
   const { id } = await params;
-  const [guide, tours, reviews] = await Promise.all([
+  const [guide, tours, reviews, relatedPosts] = await Promise.all([
     getGuideProfile(id),
     getGuideTours(id),
     getGuideReviews(id),
+    getGuideRelatedPosts(id),
   ]);
 
   if (!guide) {
     notFound();
   }
 
-  return <GuideProfile guide={guide} tours={tours} reviews={reviews} />;
+  return <GuideProfile guide={guide} tours={tours} reviews={reviews} relatedPosts={relatedPosts} />;
 }

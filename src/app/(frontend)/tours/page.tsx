@@ -37,7 +37,7 @@ export default async function ToursPage() {
       photoUrl: tour.photoUrls?.[0] ?? null,
       tourTypeIds: tour.tourTypeIds ?? [],
       provinces: tour.provinces ?? [],
-      guideName: tour.guideName,
+      guideName: tour.guides?.map((g) => g.title).join(', ') || 'TBD',
       guideLanguages: tour.guideLanguages ?? [],
       itinerary: tour.itinerary,
       rating: rating && rating.count > 0

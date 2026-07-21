@@ -4,7 +4,7 @@
  */
 
 import Script from 'next/script';
-import type {Post, Category, Tag} from '@/lib/types';
+import type {Post, Category, Tag, Faq} from '@/lib/types';
 
 interface ArticleStructuredDataProps {
   post: Post;
@@ -173,6 +173,136 @@ export function OrganizationStructuredData({
   return (
     <Script
       id="organization-structured-data"
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{__html: JSON.stringify(structuredData)}}
+    />
+  );
+}
+
+interface FAQPageStructuredDataProps {
+  faqs: Faq[];
+}
+
+export function FAQPageStructuredData({faqs}: FAQPageStructuredDataProps) {
+  if (!faqs || faqs.length === 0) return null;
+
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+
+  return (
+    <Script
+      id="faq-structured-data"
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{__html: JSON.stringify(structuredData)}}
+    />
+  );
+}
+
+interface TouristTripStructuredDataProps {
+  name: string;
+  description: string;
+  image?: string;
+  url: string;
+  itinerary?: string;
+  provider?: string;
+}
+
+export function TouristTripStructuredData({
+  name,
+  description,
+  image,
+  url,
+  itinerary,
+  provider,
+}: TouristTripStructuredDataProps) {
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'TouristTrip',
+    name,
+    description,
+    ...(image && {image}),
+    url,
+    ...(itinerary && {itinerary}),
+    ...(provider && {
+      provider: {
+        '@type': 'Organization',
+        name: provider,
+      },
+    }),
+  };
+
+  return (
+    <Script
+      id="touristtrip-structured-data"
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{__html: JSON.stringify(structuredData)}}
+    />
+  );
+}
+
+interface TouristDestinationStructuredDataProps {
+  name: string;
+  description?: string;
+  image?: string;
+  url: string;
+}
+
+export function TouristDestinationStructuredData({
+  name,
+  description,
+  image,
+  url,
+}: TouristDestinationStructuredDataProps) {
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'TouristDestination',
+    name,
+    ...(description && {description}),
+    ...(image && {image}),
+    url,
+  };
+
+  return (
+    <Script
+      id="touristdestination-structured-data"
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{__html: JSON.stringify(structuredData)}}
+    />
+  );
+}
+
+interface PersonStructuredDataProps {
+  name: string;
+  jobTitle?: string;
+  image?: string;
+  url: string;
+  knowsLanguage?: string[];
+}
+
+export function PersonStructuredData({name, jobTitle = 'Tour Guide', image, url, knowsLanguage}: PersonStructuredDataProps) {
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name,
+    jobTitle,
+    ...(image && {image}),
+    url,
+    ...(knowsLanguage && knowsLanguage.length > 0 && {knowsLanguage}),
+  };
+
+  return (
+    <Script
+      id="person-structured-data"
       type="application/ld+json"
       dangerouslySetInnerHTML={{__html: JSON.stringify(structuredData)}}
     />

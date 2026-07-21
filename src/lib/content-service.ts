@@ -14,6 +14,13 @@ import type {
   PostType,
   Guide,
   GuideLanguageProficiency,
+  RelatedItemSummary,
+  RelatedItemType,
+  Destination,
+  MustSeeDoEatItem,
+  Faq,
+  FaqRelatedToType,
+  Comment,
 } from "@/lib/types";
 
 type Doc = Record<string, any>;
@@ -118,11 +125,99 @@ function mapSiteSettings(data: Doc | undefined): SiteSettings {
 function mapTourType(doc: Doc): TourType {
   return {
     id: id(doc.id),
+    slug: typeof doc.slug === "string" && doc.slug ? doc.slug : id(doc.id),
     title: doc.title ?? "Tour Type",
     description: doc.description ?? "",
     icon: doc.icon ?? undefined,
     order: typeof doc.order === "number" ? doc.order : undefined,
   };
+}
+
+export function toRelatedItemSummary(doc: unknown, type: RelatedItemType): RelatedItemSummary | null {
+  if (!doc || typeof doc !== "object") return null;
+  const d = doc as Doc;
+  const itemId = id(d.id ?? d);
+  if (!itemId) return null;
+
+  switch (type) {
+    case "post": {
+      const slug = typeof d.slug === "string" && d.slug ? d.slug : itemId;
+      return {
+        id: itemId,
+        type,
+        title: d.title ?? "Post",
+        slug,
+        href: `/blog/${slug}`,
+        imageUrl: mediaUrl(d.featuredImage) || undefined,
+        excerpt: typeof d.excerpt === "string" ? d.excerpt : undefined,
+      };
+    }
+    case "story": {
+      const slug = typeof d.slug === "string" && d.slug ? d.slug : itemId;
+      return {
+        id: itemId,
+        type,
+        title: d.title ?? "Story",
+        slug,
+        href: `/stories/${slug}`,
+        imageUrl: mediaUrl(d.coverImage) || undefined,
+        excerpt: typeof d.excerpt === "string" ? d.excerpt : undefined,
+      };
+    }
+    case "tour": {
+      const firstPhoto = Array.isArray(d.photos) ? d.photos[0]?.photo : undefined;
+      return {
+        id: itemId,
+        type,
+        title: d.name ?? "Tour",
+        href: `/tours/${itemId}`,
+        imageUrl: mediaUrl(firstPhoto) || undefined,
+        excerpt: typeof d.summary === "string" ? d.summary : undefined,
+      };
+    }
+    case "guide": {
+      return {
+        id: itemId,
+        type,
+        title: d.name ?? "Guide",
+        href: `/guide/${itemId}`,
+        imageUrl: mediaUrl(d.photo) || undefined,
+        excerpt: typeof d.bio === "string" ? d.bio : undefined,
+      };
+    }
+    case "tourType": {
+      const slug = typeof d.slug === "string" && d.slug ? d.slug : itemId;
+      return {
+        id: itemId,
+        type,
+        title: d.title ?? "Tour Type",
+        slug,
+        href: `/tour-types/${slug}`,
+        excerpt: typeof d.description === "string" ? d.description : undefined,
+      };
+    }
+    case "destination": {
+      const slug = typeof d.slug === "string" && d.slug ? d.slug : itemId;
+      return {
+        id: itemId,
+        type,
+        title: d.name ?? "Destination",
+        slug,
+        href: `/destinations/${slug}`,
+        imageUrl: mediaUrl(d.heroImage) || undefined,
+        excerpt: typeof d.summary === "string" ? d.summary : undefined,
+      };
+    }
+    default:
+      return null;
+  }
+}
+
+export function toRelatedItemSummaries(value: unknown, type: RelatedItemType): RelatedItemSummary[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => toRelatedItemSummary(item, type))
+    .filter((item): item is RelatedItemSummary => item !== null);
 }
 
 function mapTour(doc: Doc): Tour {
@@ -151,24 +246,34 @@ function mapTour(doc: Doc): Tour {
     photoUrls,
     videoUrls,
     tourTypeIds: relIds(doc.tourTypes),
-    guideId: doc.guide ? id(doc.guide) : undefined,
-    guideName: doc.guideName ?? (typeof doc.guide === "object" ? doc.guide?.name : "") ?? "",
+    guideIds: relIds(doc.guides),
+    guides: toRelatedItemSummaries(doc.guides, "guide"),
     guideLanguages: relNames(doc.guideLanguages),
     guideLanguageIds: relIds(doc.guideLanguages),
     status: doc.status === "for_sale" ? "for_sale" : "finished",
+    relatedPostIds: relIds(doc.relatedPosts),
+    relatedPosts: toRelatedItemSummaries(doc.relatedPosts, "post"),
+    relatedStoryIds: relIds(doc.relatedStories),
+    relatedStories: toRelatedItemSummaries(doc.relatedStories, "story"),
   };
 }
 
 function mapStory(doc: Doc): Story {
   return {
     id: id(doc.id),
+    slug: typeof doc.slug === "string" && doc.slug ? doc.slug : id(doc.id),
     title: doc.title ?? "Story",
     excerpt: doc.excerpt ?? "",
+    content: doc.content ? lexicalToText(doc.content) : undefined,
     coverImageUrl: mediaUrl(doc.coverImage),
     publishedAt: toDate(doc.publishedAt ?? doc.createdAt),
     readTimeMinutes: typeof doc.readTimeMinutes === "number" ? doc.readTimeMinutes : undefined,
     tags: Array.isArray(doc.tags) ? doc.tags.map((t: Doc) => t?.tag).filter(Boolean) : undefined,
     category: typeof doc.category === "string" ? doc.category : undefined,
+    relatedGuideIds: relIds(doc.relatedGuides),
+    relatedGuides: toRelatedItemSummaries(doc.relatedGuides, "guide"),
+    relatedTourTypeIds: relIds(doc.relatedTourTypes),
+    relatedTourTypes: toRelatedItemSummaries(doc.relatedTourTypes, "tourType"),
   };
 }
 
@@ -225,6 +330,14 @@ function mapPost(doc: Doc): Post {
     allowComments: doc.allowComments !== false,
     seo: typeof doc.seo === "object" ? doc.seo : undefined,
     locale: typeof doc.locale === "string" ? doc.locale : undefined,
+    relatedPostIds: relIds(doc.relatedPosts),
+    relatedPosts: toRelatedItemSummaries(doc.relatedPosts, "post"),
+    relatedStoryIds: relIds(doc.relatedStories),
+    relatedStories: toRelatedItemSummaries(doc.relatedStories, "story"),
+    relatedGuideIds: relIds(doc.relatedGuides),
+    relatedGuides: toRelatedItemSummaries(doc.relatedGuides, "guide"),
+    relatedTourTypeIds: relIds(doc.relatedTourTypes),
+    relatedTourTypes: toRelatedItemSummaries(doc.relatedTourTypes, "tourType"),
   };
 }
 
@@ -375,6 +488,8 @@ function mapGuide(doc: Doc): Guide {
     provinceIds: relIds(doc.provinces),
     nationalities,
     nationalityIds: relIds(doc.nationalities),
+    tourTypeIds: relIds(doc.tourTypes),
+    tourTypes: toRelatedItemSummaries(doc.tourTypes, "tourType"),
   };
 }
 
@@ -398,7 +513,7 @@ async function fetchGuideById(guideId: string): Promise<Guide | null> {
       depth: 1,
       where: {
         and: [
-          { guide: { equals: guideId } },
+          { guides: { equals: guideId } },
           { status: { equals: "finished" } },
         ],
       },
@@ -454,7 +569,7 @@ async function fetchGuideTours(guideId: string): Promise<Tour[]> {
       depth: 1,
       where: {
         and: [
-          { guide: { equals: guideId } },
+          { guides: { equals: guideId } },
           { status: { equals: "finished" } },
         ],
       },
@@ -479,7 +594,7 @@ async function fetchGuideReviews(guideId: string): Promise<Review[]> {
       depth: 0,
       where: {
         and: [
-          { guide: { equals: guideId } },
+          { guides: { equals: guideId } },
           { status: { equals: "finished" } },
         ],
       },
@@ -552,6 +667,376 @@ export const getAllGuides = cache(async (): Promise<Guide[]> => {
     return result.docs.map(mapGuide);
   } catch (error) {
     console.warn("Error fetching guides:", error);
+    return [];
+  }
+});
+
+export const getGuideRelatedPosts = cache(async (guideId: string): Promise<RelatedItemSummary[]> => {
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "posts",
+      depth: 1,
+      limit: 20,
+      where: {
+        and: [
+          { relatedGuides: { equals: guideId } },
+          { status: { equals: "published" } },
+        ],
+      },
+      sort: "-publishedAt",
+    });
+    return toRelatedItemSummaries(result.docs, "post");
+  } catch (error) {
+    console.warn("Error fetching guide related posts:", error);
+    return [];
+  }
+});
+
+export const getTourReviews = cache(async (tourId: string): Promise<Review[]> => {
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "reviews",
+      depth: 0,
+      limit: 100,
+      where: {
+        and: [
+          { tour: { equals: tourId } },
+          { status: { equals: "approved" } },
+        ],
+      },
+      sort: "-approvedAt",
+    });
+    return result.docs.map(mapReview);
+  } catch (error) {
+    console.warn("Error fetching tour reviews:", error);
+    return [];
+  }
+});
+
+/** Tours whose `relatedPosts`/`relatedStories` reference this content item (reverse lookup). */
+export const getRelatedTours = cache(
+  async (field: "relatedPosts" | "relatedStories", targetId: string): Promise<RelatedItemSummary[]> => {
+    try {
+      const payload = await getPayloadClient();
+      const result = await payload.find({
+        collection: "tours",
+        depth: 1,
+        limit: 20,
+        where: { [field]: { equals: targetId } },
+      });
+      return toRelatedItemSummaries(result.docs, "tour");
+    } catch (error) {
+      console.warn(`Error fetching tours related via ${field}:`, error);
+      return [];
+    }
+  }
+);
+
+/** Posts whose `relatedStories`/`relatedGuides`/`relatedTourTypes` reference this content item (reverse lookup). */
+export const getRelatedPostsByField = cache(
+  async (
+    field: "relatedStories" | "relatedGuides" | "relatedTourTypes",
+    targetId: string
+  ): Promise<RelatedItemSummary[]> => {
+    try {
+      const payload = await getPayloadClient();
+      const result = await payload.find({
+        collection: "posts",
+        depth: 1,
+        limit: 20,
+        where: {
+          and: [
+            { [field]: { equals: targetId } },
+            { status: { equals: "published" } },
+          ],
+        },
+      });
+      return toRelatedItemSummaries(result.docs, "post");
+    } catch (error) {
+      console.warn(`Error fetching posts related via ${field}:`, error);
+      return [];
+    }
+  }
+);
+
+export const getTourTypeBySlug = cache(async (slug: string): Promise<TourType | null> => {
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "tour-types",
+      depth: 0,
+      limit: 1,
+      where: { slug: { equals: slug } },
+    });
+    const doc = result.docs[0];
+    return doc ? mapTourType(doc) : null;
+  } catch (error) {
+    console.warn("Error fetching tour type:", error);
+    return null;
+  }
+});
+
+export const getToursForTourType = cache(async (tourTypeId: string): Promise<RelatedItemSummary[]> => {
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "tours",
+      depth: 1,
+      limit: 50,
+      where: { and: [{ tourTypes: { equals: tourTypeId } }, { status: { equals: "finished" } }] },
+    });
+    return toRelatedItemSummaries(result.docs, "tour");
+  } catch (error) {
+    console.warn("Error fetching tours for tour type:", error);
+    return [];
+  }
+});
+
+export const getGuidesForTourType = cache(async (tourTypeId: string): Promise<RelatedItemSummary[]> => {
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "guides",
+      depth: 1,
+      limit: 50,
+      where: { tourTypes: { equals: tourTypeId } },
+    });
+    return toRelatedItemSummaries(result.docs, "guide");
+  } catch (error) {
+    console.warn("Error fetching guides for tour type:", error);
+    return [];
+  }
+});
+
+export const getStoriesByField = cache(
+  async (field: "relatedTourTypes" | "relatedGuides", targetId: string): Promise<RelatedItemSummary[]> => {
+    try {
+      const payload = await getPayloadClient();
+      const result = await payload.find({
+        collection: "stories",
+        depth: 1,
+        limit: 20,
+        where: { [field]: { equals: targetId } },
+      });
+      return toRelatedItemSummaries(result.docs, "story");
+    } catch (error) {
+      console.warn(`Error fetching stories related via ${field}:`, error);
+      return [];
+    }
+  }
+);
+
+export const getStoryBySlug = cache(async (slug: string): Promise<Story | null> => {
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "stories",
+      depth: 1,
+      limit: 1,
+      where: { slug: { equals: slug } },
+    });
+    const doc = result.docs[0];
+    return doc ? mapStory(doc) : null;
+  } catch (error) {
+    console.warn("Error fetching story:", error);
+    return null;
+  }
+});
+
+/** Posts's own `relatedPosts` if curated, otherwise falls back to same-category posts. */
+export async function getRelatedPostsFor(
+  postId: string,
+  categoryIds: string[],
+  explicit: RelatedItemSummary[]
+): Promise<RelatedItemSummary[]> {
+  if (explicit.length > 0) return explicit;
+  try {
+    const payload = await getPayloadClient();
+    const conditions: Doc[] = [
+      { id: { not_equals: postId } },
+      { type: { equals: "post" } },
+      { status: { equals: "published" } },
+    ];
+    if (categoryIds.length > 0) {
+      conditions.push({ categories: { in: categoryIds } });
+    }
+    const result = await payload.find({
+      collection: "posts",
+      depth: 1,
+      limit: 3,
+      where: { and: conditions },
+      sort: "-publishedAt",
+    });
+    return toRelatedItemSummaries(result.docs, "post");
+  } catch (error) {
+    console.warn("Error fetching related posts:", error);
+    return [];
+  }
+}
+
+function mapComment(doc: Doc): Comment {
+  return {
+    id: id(doc.id),
+    postId: doc.post ? id(doc.post) : "",
+    postType: "post",
+    authorName: doc.authorName ?? "Anonymous",
+    authorEmail: doc.authorEmail ?? "",
+    authorUrl: typeof doc.authorUrl === "string" ? doc.authorUrl : undefined,
+    content: doc.content ?? "",
+    status: doc.status ?? "pending",
+    parentId: doc.parent ? id(doc.parent) : null,
+    userId: doc.user ? id(doc.user) : undefined,
+    createdAt: toDate(doc.createdAt),
+    updatedAt: doc.updatedAt ? toDate(doc.updatedAt) : undefined,
+  };
+}
+
+export const getPostComments = cache(async (postId: string): Promise<Comment[]> => {
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "comments",
+      depth: 0,
+      limit: 200,
+      where: {
+        and: [
+          { post: { equals: postId } },
+          { status: { equals: "approved" } },
+        ],
+      },
+      sort: "createdAt",
+    });
+    return result.docs.map(mapComment);
+  } catch (error) {
+    console.warn("Error fetching post comments:", error);
+    return [];
+  }
+});
+
+function mapMustItems(value: unknown): MustSeeDoEatItem[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item: Doc) => ({
+      title: item?.title ?? "",
+      description: typeof item?.description === "string" ? item.description : undefined,
+      imageUrl: mediaUrl(item?.image) || undefined,
+    }))
+    .filter((item) => item.title);
+}
+
+function mapDestination(doc: Doc): Destination {
+  return {
+    id: id(doc.id),
+    name: doc.name ?? "Destination",
+    slug: typeof doc.slug === "string" && doc.slug ? doc.slug : id(doc.id),
+    summary: typeof doc.summary === "string" ? doc.summary : undefined,
+    description: doc.description ? lexicalToText(doc.description) : undefined,
+    heroImageUrl: mediaUrl(doc.heroImage) || undefined,
+    order: typeof doc.order === "number" ? doc.order : undefined,
+    tours: toRelatedItemSummaries(doc.tours, "tour"),
+    tourTypes: toRelatedItemSummaries(doc.tourTypes, "tourType"),
+    guides: toRelatedItemSummaries(doc.guides, "guide"),
+    posts: toRelatedItemSummaries(doc.posts, "post"),
+    stories: toRelatedItemSummaries(doc.stories, "story"),
+    mustSee: mapMustItems(doc.mustSee),
+    mustDo: mapMustItems(doc.mustDo),
+    mustEat: mapMustItems(doc.mustEat),
+    seo: typeof doc.seo === "object" ? doc.seo : undefined,
+  };
+}
+
+export const getDestinations = cache(async (): Promise<Destination[]> => {
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "destinations",
+      depth: 1,
+      limit: 100,
+      sort: "order",
+      where: { status: { equals: "published" } },
+    });
+    return result.docs.map(mapDestination);
+  } catch (error) {
+    console.warn("Error fetching destinations:", error);
+    return [];
+  }
+});
+
+export const getDestination = cache(async (slug: string): Promise<Destination | null> => {
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "destinations",
+      depth: 2,
+      limit: 1,
+      where: { and: [{ slug: { equals: slug } }, { status: { equals: "published" } }] },
+    });
+    const doc = result.docs[0];
+    return doc ? mapDestination(doc) : null;
+  } catch (error) {
+    console.warn("Error fetching destination:", error);
+    return null;
+  }
+});
+
+function mapFaq(doc: Doc): Faq {
+  const relatedTo = doc.relatedTo;
+  let relatedToType: FaqRelatedToType | undefined;
+  let relatedToId: string | undefined;
+  if (relatedTo && typeof relatedTo === "object" && "relationTo" in relatedTo) {
+    relatedToType = relatedTo.relationTo as FaqRelatedToType;
+    relatedToId = id(relatedTo.value);
+  }
+  return {
+    id: id(doc.id),
+    question: doc.question ?? "",
+    answer: lexicalToText(doc.answer),
+    category: typeof doc.category === "string" ? doc.category : undefined,
+    order: typeof doc.order === "number" ? doc.order : undefined,
+    relatedToType,
+    relatedToId,
+  };
+}
+
+/** General/site-wide FAQs (no `relatedTo` target set). */
+export const getFaqs = cache(async (): Promise<Faq[]> => {
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "faqs",
+      depth: 0,
+      limit: 200,
+      sort: "order",
+      where: { and: [{ status: { equals: "published" } }, { relatedTo: { exists: false } }] },
+    });
+    return result.docs.map(mapFaq);
+  } catch (error) {
+    console.warn("Error fetching faqs:", error);
+    return [];
+  }
+});
+
+export const getFaqsFor = cache(async (relationTo: FaqRelatedToType, targetId: string): Promise<Faq[]> => {
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "faqs",
+      depth: 0,
+      limit: 100,
+      sort: "order",
+      where: {
+        and: [
+          { status: { equals: "published" } },
+          { "relatedTo.relationTo": { equals: relationTo } },
+          { "relatedTo.value": { equals: targetId } },
+        ],
+      },
+    });
+    return result.docs.map(mapFaq);
+  } catch (error) {
+    console.warn("Error fetching faqs for relation:", error);
     return [];
   }
 });

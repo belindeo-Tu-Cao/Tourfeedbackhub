@@ -83,6 +83,8 @@ export interface Config {
     provinces: Province;
     'tour-types': TourType;
     stories: Story;
+    destinations: Destination;
+    faqs: Faq;
     slides: Slide;
     'navigation-menus': NavigationMenu;
     'site-settings': SiteSetting;
@@ -111,6 +113,8 @@ export interface Config {
     provinces: ProvincesSelect<false> | ProvincesSelect<true>;
     'tour-types': TourTypesSelect<false> | TourTypesSelect<true>;
     stories: StoriesSelect<false> | StoriesSelect<true>;
+    destinations: DestinationsSelect<false> | DestinationsSelect<true>;
+    faqs: FaqsSelect<false> | FaqsSelect<true>;
     slides: SlidesSelect<false> | SlidesSelect<true>;
     'navigation-menus': NavigationMenusSelect<false> | NavigationMenusSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
@@ -269,6 +273,10 @@ export interface Post {
     | number
     | boolean
     | null;
+  relatedPosts?: (number | Post)[] | null;
+  relatedStories?: (number | Story)[] | null;
+  relatedGuides?: (number | Guide)[] | null;
+  relatedTourTypes?: (number | TourType)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -302,56 +310,40 @@ export interface Tag {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "comments".
+ * via the `definition` "stories".
  */
-export interface Comment {
+export interface Story {
   id: number;
-  post: number | Post;
-  authorName: string;
-  authorEmail: string;
-  authorUrl?: string | null;
-  content: string;
-  status?: ('pending' | 'approved' | 'spam' | 'trash') | null;
-  parent?: (number | null) | Comment;
-  user?: (number | null) | User;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tours".
- */
-export interface Tour {
-  id: number;
-  code?: string | null;
-  name: string;
-  summary?: string | null;
-  itinerary?: string | null;
-  startDate?: string | null;
-  endDate?: string | null;
-  clientCount?: number | null;
-  clientCountry?: string | null;
-  clientCity?: string | null;
-  guide?: (number | null) | Guide;
-  guideName?: string | null;
-  status?: ('finished' | 'for_sale') | null;
-  showFeedbackForm?: boolean | null;
-  photos?:
+  title: string;
+  slug: string;
+  excerpt?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  coverImage?: (number | null) | Media;
+  publishedAt?: string | null;
+  readTimeMinutes?: number | null;
+  tags?:
     | {
-        photo?: (number | null) | Media;
+        tag?: string | null;
         id?: string | null;
       }[]
     | null;
-  videos?:
-    | {
-        url?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  provinces?: (number | Province)[] | null;
-  tourTypes?: (number | TourType)[] | null;
-  clientNationalities?: (number | Nationality)[] | null;
-  guideLanguages?: (number | Language)[] | null;
+  category?: string | null;
+  relatedGuides?: (number | Guide)[] | null;
+  relatedTourTypes?: (number | TourType)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -375,6 +367,7 @@ export interface Guide {
   languages?: (number | Language)[] | null;
   provinces?: (number | Province)[] | null;
   nationalities?: (number | Nationality)[] | null;
+  tourTypes?: (number | TourType)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -418,9 +411,66 @@ export interface Nationality {
 export interface TourType {
   id: number;
   title: string;
+  slug: string;
   description?: string | null;
   icon?: string | null;
   order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "comments".
+ */
+export interface Comment {
+  id: number;
+  post: number | Post;
+  authorName: string;
+  authorEmail: string;
+  authorUrl?: string | null;
+  content: string;
+  status?: ('pending' | 'approved' | 'spam' | 'trash') | null;
+  parent?: (number | null) | Comment;
+  user?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tours".
+ */
+export interface Tour {
+  id: number;
+  code?: string | null;
+  name: string;
+  summary?: string | null;
+  itinerary?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  clientCount?: number | null;
+  clientCountry?: string | null;
+  clientCity?: string | null;
+  guides?: (number | Guide)[] | null;
+  status?: ('finished' | 'for_sale') | null;
+  showFeedbackForm?: boolean | null;
+  photos?:
+    | {
+        photo?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  videos?:
+    | {
+        url?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  provinces?: (number | Province)[] | null;
+  tourTypes?: (number | TourType)[] | null;
+  clientNationalities?: (number | Nationality)[] | null;
+  guideLanguages?: (number | Language)[] | null;
+  relatedPosts?: (number | Post)[] | null;
+  relatedStories?: (number | Story)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -497,22 +547,115 @@ export interface Review {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "stories".
+ * via the `definition` "destinations".
  */
-export interface Story {
+export interface Destination {
   id: number;
-  title: string;
-  excerpt?: string | null;
-  coverImage?: (number | null) | Media;
-  publishedAt?: string | null;
-  readTimeMinutes?: number | null;
-  tags?:
+  name: string;
+  slug: string;
+  summary?: string | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  heroImage?: (number | null) | Media;
+  province?: (number | null) | Province;
+  order?: number | null;
+  status?: ('draft' | 'published') | null;
+  tours?: (number | Tour)[] | null;
+  tourTypes?: (number | TourType)[] | null;
+  guides?: (number | Guide)[] | null;
+  posts?: (number | Post)[] | null;
+  stories?: (number | Story)[] | null;
+  mustSee?:
     | {
-        tag?: string | null;
+        title?: string | null;
+        description?: string | null;
+        image?: (number | null) | Media;
         id?: string | null;
       }[]
     | null;
+  mustDo?:
+    | {
+        title?: string | null;
+        description?: string | null;
+        image?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  mustEat?:
+    | {
+        title?: string | null;
+        description?: string | null;
+        image?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  seo?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs".
+ */
+export interface Faq {
+  id: number;
+  question: string;
+  answer: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  relatedTo?:
+    | ({
+        relationTo: 'tours';
+        value: number | Tour;
+      } | null)
+    | ({
+        relationTo: 'tour-types';
+        value: number | TourType;
+      } | null)
+    | ({
+        relationTo: 'destinations';
+        value: number | Destination;
+      } | null)
+    | ({
+        relationTo: 'guides';
+        value: number | Guide;
+      } | null);
   category?: string | null;
+  order?: number | null;
+  status?: ('draft' | 'published') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -758,6 +901,14 @@ export interface PayloadLockedDocument {
         value: number | Story;
       } | null)
     | ({
+        relationTo: 'destinations';
+        value: number | Destination;
+      } | null)
+    | ({
+        relationTo: 'faqs';
+        value: number | Faq;
+      } | null)
+    | ({
         relationTo: 'slides';
         value: number | Slide;
       } | null)
@@ -876,6 +1027,10 @@ export interface PostsSelect<T extends boolean = true> {
   commentCount?: T;
   allowComments?: T;
   seo?: T;
+  relatedPosts?: T;
+  relatedStories?: T;
+  relatedGuides?: T;
+  relatedTourTypes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -957,8 +1112,7 @@ export interface ToursSelect<T extends boolean = true> {
   clientCount?: T;
   clientCountry?: T;
   clientCity?: T;
-  guide?: T;
-  guideName?: T;
+  guides?: T;
   status?: T;
   showFeedbackForm?: T;
   photos?:
@@ -977,6 +1131,8 @@ export interface ToursSelect<T extends boolean = true> {
   tourTypes?: T;
   clientNationalities?: T;
   guideLanguages?: T;
+  relatedPosts?: T;
+  relatedStories?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1067,6 +1223,7 @@ export interface GuidesSelect<T extends boolean = true> {
   languages?: T;
   provinces?: T;
   nationalities?: T;
+  tourTypes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1106,6 +1263,7 @@ export interface ProvincesSelect<T extends boolean = true> {
  */
 export interface TourTypesSelect<T extends boolean = true> {
   title?: T;
+  slug?: T;
   description?: T;
   icon?: T;
   order?: T;
@@ -1118,7 +1276,9 @@ export interface TourTypesSelect<T extends boolean = true> {
  */
 export interface StoriesSelect<T extends boolean = true> {
   title?: T;
+  slug?: T;
   excerpt?: T;
+  content?: T;
   coverImage?: T;
   publishedAt?: T;
   readTimeMinutes?: T;
@@ -1129,6 +1289,68 @@ export interface StoriesSelect<T extends boolean = true> {
         id?: T;
       };
   category?: T;
+  relatedGuides?: T;
+  relatedTourTypes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "destinations_select".
+ */
+export interface DestinationsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  summary?: T;
+  description?: T;
+  heroImage?: T;
+  province?: T;
+  order?: T;
+  status?: T;
+  tours?: T;
+  tourTypes?: T;
+  guides?: T;
+  posts?: T;
+  stories?: T;
+  mustSee?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        id?: T;
+      };
+  mustDo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        id?: T;
+      };
+  mustEat?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        id?: T;
+      };
+  seo?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs_select".
+ */
+export interface FaqsSelect<T extends boolean = true> {
+  question?: T;
+  answer?: T;
+  relatedTo?: T;
+  category?: T;
+  order?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }

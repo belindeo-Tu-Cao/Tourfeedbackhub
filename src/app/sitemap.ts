@@ -1,5 +1,5 @@
 import type {MetadataRoute} from 'next';
-import {getPublicContent} from '@/lib/content-service';
+import {getPublicContent, getDestinations, getAllGuides} from '@/lib/content-service';
 import {getPayloadClient} from '@/lib/payload';
 
 type SitemapDoc = { slug: string; updatedAt: Date };
@@ -27,10 +27,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://example.com';
 
   // Get dynamic content
-  const [publicContent, posts, pages] = await Promise.all([
+  const [publicContent, posts, pages, destinations, guides] = await Promise.all([
     getPublicContent(),
     getPostsByType('post'),
     getPostsByType('page'),
+    getDestinations(),
+    getAllGuides(),
   ]);
 
   // Static pages with SEO priorities
@@ -39,8 +41,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     {url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8},
     {url: `${baseUrl}/tour-types`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7},
     {url: `${baseUrl}/tours`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9},
+    {url: `${baseUrl}/destinations`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8},
+    {url: `${baseUrl}/guides`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7},
     {url: `${baseUrl}/stories`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8},
     {url: `${baseUrl}/reviews`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9},
+    {url: `${baseUrl}/faq`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6},
     {url: `${baseUrl}/feedback`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7},
     {url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6},
   ];
@@ -71,11 +76,44 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Stories
   const storyEntries: MetadataRoute.Sitemap = publicContent.stories.map((story) => ({
-    url: `${baseUrl}/stories/${story.id}`,
+    url: `${baseUrl}/stories/${story.slug}`,
     lastModified: story.publishedAt,
     changeFrequency: 'monthly',
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...postEntries, ...pageEntries, ...tourEntries, ...storyEntries];
+  // Tour types
+  const tourTypeEntries: MetadataRoute.Sitemap = publicContent.tourTypes.map((type) => ({
+    url: `${baseUrl}/tour-types/${type.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly',
+    priority: 0.6,
+  }));
+
+  // Guides
+  const guideEntries: MetadataRoute.Sitemap = guides.map((guide) => ({
+    url: `${baseUrl}/guide/${guide.id}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly',
+    priority: 0.6,
+  }));
+
+  // Destinations
+  const destinationEntries: MetadataRoute.Sitemap = destinations.map((destination) => ({
+    url: `${baseUrl}/destinations/${destination.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.7,
+  }));
+
+  return [
+    ...staticRoutes,
+    ...postEntries,
+    ...pageEntries,
+    ...tourEntries,
+    ...storyEntries,
+    ...tourTypeEntries,
+    ...guideEntries,
+    ...destinationEntries,
+  ];
 }

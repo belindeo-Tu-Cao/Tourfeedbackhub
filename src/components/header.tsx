@@ -53,11 +53,14 @@ const CORE_NAV_ITEMS: NavigationMenuEntry[] = [
   { id: 'core-home', label: 'Home', href: '/', type: 'internal', order: 1 },
   { id: 'core-tours', label: 'Tours', href: '/tours', type: 'internal', order: 2 },
   { id: 'core-tour-styles', label: 'Tour Styles', href: '/tour-types', type: 'internal', order: 3 },
-  { id: 'core-diaries', label: 'Diaries', href: '/finished-tours', type: 'internal', order: 4 },
-  { id: 'core-stories', label: 'Stories', href: '/stories', type: 'internal', order: 5 },
-  { id: 'core-blog', label: 'Blog', href: '/blog', type: 'internal', order: 6 },
-  { id: 'core-reviews', label: 'Reviews', href: '/reviews', type: 'internal', order: 7 },
-  { id: 'core-feedback', label: 'Feedback', href: '/feedback', type: 'internal', order: 8 },
+  { id: 'core-destinations', label: 'Destinations', href: '/destinations', type: 'internal', order: 4 },
+  { id: 'core-guides', label: 'Guides', href: '/guides', type: 'internal', order: 5 },
+  { id: 'core-diaries', label: 'Diaries', href: '/finished-tours', type: 'internal', order: 6 },
+  { id: 'core-stories', label: 'Stories', href: '/stories', type: 'internal', order: 7 },
+  { id: 'core-blog', label: 'Blog', href: '/blog', type: 'internal', order: 8 },
+  { id: 'core-reviews', label: 'Reviews', href: '/reviews', type: 'internal', order: 9 },
+  { id: 'core-faq', label: 'FAQ', href: '/faq', type: 'internal', order: 10 },
+  { id: 'core-feedback', label: 'Feedback', href: '/feedback', type: 'internal', order: 11 },
 ];
 
 function resolveIcon(name?: string): IconComponent | undefined {

@@ -81,6 +81,12 @@ export const Guides: CollectionConfig = {
       relationTo: 'nationalities',
       hasMany: true,
     },
+    {
+      name: 'tourTypes',
+      type: 'relationship',
+      relationTo: 'tour-types',
+      hasMany: true,
+    },
   ],
 }
 
@@ -132,13 +138,10 @@ export const Tours: CollectionConfig = {
       type: 'text',
     },
     {
-      name: 'guide',
+      name: 'guides',
       type: 'relationship',
       relationTo: 'guides',
-    },
-    {
-      name: 'guideName',
-      type: 'text',
+      hasMany: true,
     },
     {
       name: 'status',
@@ -197,6 +200,18 @@ export const Tours: CollectionConfig = {
       name: 'guideLanguages',
       type: 'relationship',
       relationTo: 'languages',
+      hasMany: true,
+    },
+    {
+      name: 'relatedPosts',
+      type: 'relationship',
+      relationTo: 'posts',
+      hasMany: true,
+    },
+    {
+      name: 'relatedStories',
+      type: 'relationship',
+      relationTo: 'stories',
       hasMany: true,
     },
   ],

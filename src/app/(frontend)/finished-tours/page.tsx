@@ -44,7 +44,7 @@ export default async function FinishedToursPage() {
                       {tour.startDate.toLocaleDateString()} – {tour.endDate.toLocaleDateString()}
                     </Badge>
                     <Badge variant="outline">{tour.clientCount} guests</Badge>
-                    <Badge variant="secondary">Guide {tour.guideName}</Badge>
+                    <Badge variant="secondary">Guide {tour.guides?.map((g) => g.title).join(', ') || 'TBD'}</Badge>
                     {tour.tourTypeIds?.map((typeId) => (
                       <Badge key={typeId} variant="outline">
                         {tourTypeMap.get(typeId) ?? 'Experience'}
@@ -70,7 +70,7 @@ export default async function FinishedToursPage() {
                     <h3 className="text-sm font-semibold text-foreground/80">Guide feedback</h3>
                     <p className="text-sm text-muted-foreground">
                       {tour.guideLanguages?.length
-                        ? `Guide ${tour.guideName} leads in ${tour.guideLanguages.join(', ')}. Travellers rate the guide after each journey — open the diary to read their comments.`
+                        ? `Guide ${tour.guides?.map((g) => g.title).join(', ') || 'TBD'} leads in ${tour.guideLanguages.join(', ')}. Travellers rate the guide after each journey — open the diary to read their comments.`
                         : 'Travellers rate the guide after each journey — open the diary to read their comments.'}
                     </p>
                   </div>

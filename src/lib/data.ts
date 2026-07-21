@@ -109,6 +109,7 @@ export const heroSlides: HeroSlide[] = [
 export const tourTypes: TourType[] = [
   {
     id: "boutique",
+    slug: "boutique",
     title: "Boutique Experiences",
     description: "Handpicked accommodations and intimate itineraries with refined touches throughout.",
     icon: "hotel",
@@ -116,6 +117,7 @@ export const tourTypes: TourType[] = [
   },
   {
     id: "culinary",
+    slug: "culinary",
     title: "Culinary Journeys",
     description: "Explore vibrant markets, master local dishes, and dine with trusted hosts.",
     icon: "utensils",
@@ -123,6 +125,7 @@ export const tourTypes: TourType[] = [
   },
   {
     id: "heritage",
+    slug: "heritage",
     title: "Heritage Trails",
     description: "Walk through UNESCO sites and untold stories guided by local historians.",
     icon: "landmark",
@@ -149,7 +152,6 @@ export const tours: Tour[] = [
     photoUrls: ["https://picsum.photos/seed/2/1600/900", "https://picsum.photos/seed/22/1200/800"],
     videoUrls: ["https://samplelib.com/lib/preview/mp4/sample-5s.mp4"],
     tourTypeIds: ["boutique", "heritage"],
-    guideName: "Trang Nguyen",
     guideLanguages: ["English"],
     status: "finished",
   },
@@ -171,7 +173,6 @@ export const tours: Tour[] = [
     photoUrls: ["https://picsum.photos/seed/3/1600/900", "https://picsum.photos/seed/33/1200/800"],
     videoUrls: [],
     tourTypeIds: ["culinary", "boutique"],
-    guideName: "Minh Tran",
     guideLanguages: ["Spanish", "English"],
     status: "finished",
   },
@@ -193,7 +194,6 @@ export const tours: Tour[] = [
     photoUrls: ["https://picsum.photos/seed/4/1600/900"],
     videoUrls: ["https://samplelib.com/lib/preview/mp4/sample-10s.mp4"],
     tourTypeIds: ["heritage"],
-    guideName: "Lan Pham",
     guideLanguages: ["Japanese", "English"],
     status: "finished",
   },
@@ -202,6 +202,7 @@ export const tours: Tour[] = [
 export const stories: Story[] = [
   {
     id: "story-1",
+    slug: "how-we-curate-bespoke-wellness-retreats",
     title: "How We Curate Bespoke Wellness Retreats",
     excerpt:
       "Behind every misty sunrise session is a network of wellness experts, naturalists, and boutique hosts working in harmony.",
@@ -211,6 +212,7 @@ export const stories: Story[] = [
   },
   {
     id: "story-2",
+    slug: "five-dishes-you-can-only-taste-with-our-hosts",
     title: "Five Dishes You Can Only Taste with Our Hosts",
     excerpt:
       "From royal banquets to fishermen's dawn harvests, explore the flavours travellers rave about after every trip.",
@@ -220,6 +222,7 @@ export const stories: Story[] = [
   },
   {
     id: "story-3",
+    slug: "sustainable-partnerships-along-the-coast",
     title: "Sustainable Partnerships Along The Coast",
     excerpt:
       "We team up with local communities to ensure each experience directly supports preservation and livelihoods.",
@@ -327,9 +330,12 @@ const headerMenuFlatItems: NavigationMenuItem[] = [
     order: 30,
     parentId: "header-tours",
   },
+  { id: "header-destinations", label: "Destinations", href: "/destinations", type: "internal", order: 25, parentId: null },
+  { id: "header-guides", label: "Guides", href: "/guides", type: "internal", order: 27, parentId: null },
   { id: "header-diaries", label: "Diaries", href: "/finished-tours", type: "internal", order: 30, parentId: null },
   { id: "header-stories", label: "Stories", href: "/stories", type: "internal", order: 40, parentId: null },
   { id: "header-reviews", label: "Reviews", href: "/reviews", type: "internal", order: 50, parentId: null },
+  { id: "header-faq", label: "FAQ", href: "/faq", type: "internal", order: 55, parentId: null },
   { id: "header-about", label: "About", href: "/about", type: "internal", order: 60, parentId: null },
   { id: "header-contact", label: "Contact", href: "/contact", type: "internal", order: 70, parentId: null },
   {
@@ -347,9 +353,12 @@ const headerMenuFlatItems: NavigationMenuItem[] = [
 const footerMenuFlatItems: NavigationMenuItem[] = [
   { id: "footer-links-about", area: "links", label: "About", href: "/about", type: "internal", order: 10, parentId: null },
   { id: "footer-links-tours", area: "links", label: "Tours", href: "/tours", type: "internal", order: 20, parentId: null },
+  { id: "footer-links-destinations", area: "links", label: "Destinations", href: "/destinations", type: "internal", order: 25, parentId: null },
+  { id: "footer-links-guides", area: "links", label: "Guides", href: "/guides", type: "internal", order: 27, parentId: null },
   { id: "footer-links-diaries", area: "links", label: "Diaries", href: "/finished-tours", type: "internal", order: 30, parentId: null },
   { id: "footer-links-stories", area: "links", label: "Stories", href: "/stories", type: "internal", order: 40, parentId: null },
   { id: "footer-links-reviews", area: "links", label: "Reviews", href: "/reviews", type: "internal", order: 50, parentId: null },
+  { id: "footer-links-faq", area: "links", label: "FAQ", href: "/faq", type: "internal", order: 55, parentId: null },
   { id: "footer-legal-privacy", area: "legal", label: "Privacy Policy", href: "/privacy", type: "internal", order: 10, parentId: null },
   { id: "footer-legal-terms", area: "legal", label: "Terms of Service", href: "/terms", type: "internal", order: 20, parentId: null },
   {

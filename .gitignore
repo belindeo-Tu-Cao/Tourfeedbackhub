@@ -50,3 +50,6 @@ recapcha key
 
 # Local source photos (uploaded to R2 media, not for repo)
 /photos/
+
+# codegraph local index (machine-specific)
+.codegraph/

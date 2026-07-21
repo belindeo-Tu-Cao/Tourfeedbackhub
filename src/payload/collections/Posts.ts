@@ -104,5 +104,29 @@ export const Posts: CollectionConfig = {
       name: 'seo',
       type: 'json',
     },
+    {
+      name: 'relatedPosts',
+      type: 'relationship',
+      relationTo: 'posts',
+      hasMany: true,
+    },
+    {
+      name: 'relatedStories',
+      type: 'relationship',
+      relationTo: 'stories',
+      hasMany: true,
+    },
+    {
+      name: 'relatedGuides',
+      type: 'relationship',
+      relationTo: 'guides',
+      hasMany: true,
+    },
+    {
+      name: 'relatedTourTypes',
+      type: 'relationship',
+      relationTo: 'tour-types',
+      hasMany: true,
+    },
   ],
 }

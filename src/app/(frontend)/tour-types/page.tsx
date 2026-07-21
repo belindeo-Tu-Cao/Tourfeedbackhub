@@ -36,7 +36,11 @@ export default async function TourTypesPage() {
                   <Badge variant="outline" className="text-lg">
                     {tourType.icon ?? '✨'}
                   </Badge>
-                  <CardTitle className="text-xl font-headline">{tourType.title}</CardTitle>
+                  <CardTitle className="text-xl font-headline">
+                    <Link href={`/tour-types/${tourType.slug}`} className="hover:text-primary transition-colors">
+                      {tourType.title}
+                    </Link>
+                  </CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="flex-1 space-y-4">
