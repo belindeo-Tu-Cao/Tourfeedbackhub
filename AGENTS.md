@@ -1,5 +1,10 @@
 # Repository Guidelines
 
+## Content Rules
+- **ALL blog posts, stories, and website content MUST be in English** - The target audience is international travelers (pax) from around the world.
+- When creating or editing content, always use English as the primary language.
+- Vietnamese content should only be used for specific local pages if needed, but blogs and public-facing content must be English.
+
 ## Branch Policy
 - This repository uses only one branch: `main`.
 - Do NOT create any feature, hotfix, or staging branches — all work goes directly to `main`.

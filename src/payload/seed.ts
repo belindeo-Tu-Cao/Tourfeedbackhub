@@ -517,16 +517,16 @@ async function seed() {
     },
     {
       type: 'post',
-      title: 'Bản Đồ Chiến Lược Lịch Sử Quảng Trị - 14 Địa Danh Lưu Dấu',
-      slug: 'ban-do-chien-luoc-lich-su-quang-tri',
-      excerpt: 'Khám phá 14 địa danh lịch sử tiêu biểu của Quảng Trị - vùng đất lửa anh hùng, từ Địa đạo Vĩnh Mốc đến Thành cổ Quảng Trị, Căn cứ Khe Sanh và Đại lộ Kinh hoàng.',
-      content: richText('Quảng Trị - vùng đất lửa anh hùng, nơi lưu giữ những dấu ấn lịch sử sâu đậm nhất của cuộc kháng chiến chống Mỹ. Từ sông Bến Hải đến Đường 9, từ Địa đạo Vĩnh Mốc đến Thành cổ Quảng Trị, mỗi tấc đất ở đây đều gắn liền với những câu chuyện chiến đấu anh dũng của quân và dân ta.'),
+      title: 'Quang Tri Strategic War History Map - 14 Historic Landmarks',
+      slug: 'quang-tri-strategic-war-history-map',
+      excerpt: 'Explore 14 iconic historical sites of Quang Tri - the legendary "Land of Fire" - from Vinh Moc Tunnels to Quang Tri Citadel, Khe Sanh Combat Base, and the Highway of Horror.',
+      content: richText('Quang Tri province, once the dividing line between North and South Vietnam, holds some of the most significant wartime history in Southeast Asia. From the Ben Hai River at the 17th Parallel to Route 9, from the underground Vinh Moc Tunnels to the ancient Quang Tri Citadel, every inch of this land tells a story of courage, sacrifice, and the relentless pursuit of peace. This guide explores 14 must-visit historical landmarks that bring Vietnam\'s wartime history to life.'),
       status: 'published',
       author: adminUser.id,
       categories: [categories['destinations']],
       tags: [tags['vietnam'], tags['quang-tri'], tags['history'], tags['war-history']],
       publishedAt: new Date('2026-07-21').toISOString(),
-      locale: 'vi',
+      locale: 'en',
     },
   ]
   for (const p of postDefs) {

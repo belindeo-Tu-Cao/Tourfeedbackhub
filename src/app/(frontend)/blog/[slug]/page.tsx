@@ -1,11 +1,16 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 import { format } from 'date-fns';
 import { RichText } from '@payloadcms/richtext-lexical/react';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, User, Eye } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Calendar, User, Eye, Clock, Share2, ArrowLeft, BookOpen, Tag } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { BreadcrumbStructuredData } from '@/components/structured-data';
-import { getBlogPost } from '@/lib/blog';
+import { getBlogPost, getBlogPosts } from '@/lib/blog';
 import { mediaUrl } from '@/lib/payload';
 
 export const dynamic = 'force-dynamic';
@@ -42,74 +47,246 @@ export default async function BlogPostPage({
     ? p.tags.filter((t: unknown): t is { id: string | number; name?: string } => Boolean(t) && typeof t === 'object')
     : [];
 
+  // Estimate reading time (rough: 200 words per minute)
+  const contentText = typeof p.content === 'object' ? JSON.stringify(p.content) : '';
+  const wordCount = contentText.split(/\s+/).length;
+  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+
+  // Get related posts (same category)
+  let relatedPosts: Array<Record<string, any>> = [];
+  try {
+    const allPosts = await getBlogPosts();
+    relatedPosts = allPosts
+      .filter((rp: any) => rp.slug !== slug && rp.status === 'published')
+      .slice(0, 3);
+  } catch {
+    // Ignore errors
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <BreadcrumbStructuredData items={[{ name: 'Blog', url: '/blog' }, { name: title }]} />
 
-      <article className="max-w-4xl mx-auto px-4 py-12">
-        <Breadcrumb items={[{ label: 'Blog', href: '/blog' }, { label: title }]} className="mb-6" />
+      {/* Hero Section with Featured Image */}
+      <section className="relative w-full h-[40vh] md:h-[50vh] lg:h-[60vh] bg-muted">
+        {featuredImageUrl ? (
+          <Image
+            src={featuredImageUrl}
+            alt={featuredImageAlt}
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
+            <BookOpen className="h-16 w-16 text-primary/30" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute inset-0 flex items-end">
+          <div className="container mx-auto px-4 pb-8 md:pb-12">
+            <div className="max-w-4xl mx-auto">
+              {/* Back button */}
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white mb-6 transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Blog
+              </Link>
 
-        <header className="mb-8">
-          {categories.length > 0 && (
-            <div className="flex gap-2 mb-4">
-              {categories.map((cat) => (
-                <Badge key={String(cat.id)} variant="secondary">
-                  {cat.name}
-                </Badge>
-              ))}
+              {/* Categories */}
+              {categories.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {categories.map((cat) => (
+                    <Badge key={String(cat.id)} className="bg-primary text-primary-foreground">
+                      {cat.name}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              {/* Title */}
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold text-white mb-4 leading-tight">
+                {title}
+              </h1>
+
+              {/* Meta info */}
+              <div className="flex flex-wrap items-center gap-4 text-sm text-white/80">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>{authorName}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <time dateTime={createdAt.toISOString()}>
+                    {format(publishedAt ?? createdAt, 'MMMM d, yyyy')}
+                  </time>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  <span>{readingTime} min read</span>
+                </div>
+                {viewCount > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Eye className="h-4 w-4" />
+                    <span>{viewCount} views</span>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
+          </div>
+        </div>
+      </section>
 
-          <h1 className="text-4xl md:text-5xl font-headline font-bold mb-4">{title}</h1>
-
-          {excerpt && <p className="text-xl text-muted-foreground mb-6">{excerpt}</p>}
-
-          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              <span>{authorName}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              <time dateTime={createdAt.toISOString()}>
-                {format(publishedAt ?? createdAt, 'MMMM d, yyyy')}
-              </time>
-            </div>
-            {viewCount > 0 && (
-              <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4" />
-                <span>{viewCount} views</span>
+      {/* Article Content */}
+      <section className="py-8 md:py-12 lg:py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            {/* Excerpt */}
+            {excerpt && (
+              <div className="mb-8 p-6 rounded-2xl bg-muted/50 border border-border/60">
+                <p className="text-lg md:text-xl text-muted-foreground leading-relaxed italic">
+                  "{excerpt}"
+                </p>
               </div>
             )}
-          </div>
-        </header>
 
-        {featuredImageUrl && (
-          <div className="mb-8 rounded-lg overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={featuredImageUrl} alt={featuredImageAlt} className="w-full h-auto object-cover" />
-          </div>
-        )}
+            {/* Content */}
+            {p.content && (
+              <article className="prose prose-lg prose-headlines:font-headline prose-a:text-primary prose-img:rounded-xl prose-img:shadow-lg max-w-none">
+                <RichText data={p.content} />
+              </article>
+            )}
 
-        {p.content && (
-          <div className="prose prose-lg max-w-none">
-            <RichText data={p.content} />
-          </div>
-        )}
+            {/* Tags */}
+            {tags.length > 0 && (
+              <div className="mt-12 pt-8 border-t">
+                <div className="flex items-center gap-2 mb-4">
+                  <Tag className="h-4 w-4 text-muted-foreground" />
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Tags</h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {tags.map((tag) => (
+                    <Badge key={String(tag.id)} variant="secondary" className="text-sm">
+                      {tag.name}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
 
-        {tags.length > 0 && (
-          <div className="mt-12 pt-8 border-t">
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3">TAGS</h3>
-            <div className="flex flex-wrap gap-2">
-              {tags.map((tag) => (
-                <Badge key={String(tag.id)} variant="outline">
-                  {tag.name}
-                </Badge>
-              ))}
+            {/* Share Section */}
+            <div className="mt-12 p-6 rounded-2xl bg-muted/30 border border-border/60">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Share2 className="h-5 w-5 text-muted-foreground" />
+                  <span className="font-medium">Share this article</span>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <Button asChild variant="outline" size="sm">
+                    <a
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(process.env.NEXT_PUBLIC_SITE_URL || 'https://tourfeedbackhub.com')}/blog/${slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Facebook
+                    </a>
+                  </Button>
+                  <Button asChild variant="outline" size="sm">
+                    <a
+                      href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(process.env.NEXT_PUBLIC_SITE_URL || 'https://tourfeedbackhub.com')}/blog/${slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Twitter
+                    </a>
+                  </Button>
+                  <Button asChild variant="outline" size="sm">
+                    <a
+                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(process.env.NEXT_PUBLIC_SITE_URL || 'https://tourfeedbackhub.com')}/blog/${slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      LinkedIn
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Author Card */}
+            <div className="mt-12 p-6 rounded-2xl border border-border/60 bg-background">
+              <div className="flex items-start gap-4">
+                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <User className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Written by</p>
+                  <h4 className="text-lg font-headline font-semibold">{authorName}</h4>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Tour guide and travel enthusiast sharing insights about Vietnam's hidden gems and historical treasures.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        )}
-      </article>
+        </div>
+      </section>
+
+      {/* Related Posts */}
+      {relatedPosts.length > 0 && (
+        <section className="py-12 md:py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-2xl md:text-3xl font-headline font-bold text-center mb-8">
+                More Travel Stories
+              </h2>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {relatedPosts.map((rp: any) => {
+                  const rpImageUrl = mediaUrl(rp.featuredImage);
+                  return (
+                    <Link key={rp.id} href={`/blog/${rp.slug}`} className="group">
+                      <Card className="h-full overflow-hidden border-border/60 bg-background/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                        <div className="relative h-48 bg-muted">
+                          {rpImageUrl ? (
+                            <Image
+                              src={rpImageUrl}
+                              alt={rp.title}
+                              fill
+                              className="object-cover transition-transform duration-500 group-hover:scale-105"
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
+                              <BookOpen className="h-10 w-10 text-primary/30" />
+                            </div>
+                          )}
+                        </div>
+                        <CardContent className="p-5">
+                          <h3 className="font-headline font-semibold text-lg mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                            {rp.title}
+                          </h3>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {rp.excerpt}
+                          </p>
+                          <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+                            <Calendar className="h-3 w-3" />
+                            <time>
+                              {rp.publishedAt ? format(new Date(rp.publishedAt), 'MMM d, yyyy') : ''}
+                            </time>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
