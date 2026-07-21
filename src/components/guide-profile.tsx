@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,9 @@ import {
   Award,
   Briefcase,
   MessageCircle,
+  ArrowLeft,
+  ChevronRight,
+  Quote,
 } from 'lucide-react';
 import type { Guide, Tour, Review } from '@/lib/types';
 import { format } from 'date-fns';
@@ -36,10 +40,10 @@ const proficiencyLabels: Record<string, string> = {
 };
 
 const proficiencyColors: Record<string, string> = {
-  beginner: 'bg-blue-100 text-blue-800',
-  intermediate: 'bg-green-100 text-green-800',
-  advanced: 'bg-purple-100 text-purple-800',
-  native: 'bg-amber-100 text-amber-800',
+  beginner: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+  intermediate: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+  advanced: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+  native: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
 };
 
 export default function GuideProfile({ guide, tours, reviews }: GuideProfileProps) {
@@ -62,112 +66,135 @@ export default function GuideProfile({ guide, tours, reviews }: GuideProfileProp
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-b from-primary/10 to-background py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-4xl">
-            <div className="flex flex-col gap-8 md:flex-row md:items-start">
-              {/* Photo */}
-              <div className="relative h-48 w-48 flex-shrink-0 overflow-hidden rounded-2xl border-4 border-background shadow-xl md:h-64 md:w-64">
-                {guide.photo ? (
-                  <Image
-                    src={guide.photo}
-                    alt={guide.name}
-                    fill
-                    className="object-cover"
-                    sizes="256px"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-muted text-4xl font-bold text-muted-foreground">
-                    {guide.name.charAt(0)}
-                  </div>
-                )}
-              </div>
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary/20 via-primary/10 to-background">
+        <div className="absolute inset-0 bg-[url('/asset/pattern.svg')] opacity-5" />
+        <div className="relative z-10 container mx-auto px-4 py-8 md:py-12">
+          {/* Back button */}
+          <Link
+            href="/guides"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            All Guides
+          </Link>
 
-              {/* Info */}
-              <div className="flex-1 space-y-4">
-                <div>
-                  <h1 className="text-3xl font-headline font-bold md:text-4xl">
-                    {guide.name}
-                  </h1>
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+            {/* Photo */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="relative mx-auto lg:mx-0 h-56 w-56 flex-shrink-0 overflow-hidden rounded-3xl border-4 border-background shadow-2xl lg:h-72 lg:w-72"
+            >
+              {guide.photo ? (
+                <Image
+                  src={guide.photo}
+                  alt={guide.name}
+                  fill
+                  className="object-cover"
+                  sizes="288px"
+                  priority
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/30 to-primary/10 text-5xl font-bold text-primary/40">
+                  {guide.name.charAt(0)}
+                </div>
+              )}
+              {guide.cardType && (
+                <div className="absolute bottom-4 left-4 right-4">
+                  <Badge
+                    variant="secondary"
+                    className="w-full justify-center bg-background/90 backdrop-blur-sm border-0 py-2"
+                  >
+                    {guide.cardType === 'international' ? '🌍 International Guide' : '🇻🇳 Domestic Guide'}
+                  </Badge>
+                </div>
+              )}
+            </motion.div>
+
+            {/* Info */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="flex-1 space-y-6"
+            >
+              <div>
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold">
+                  {guide.name}
+                </h1>
+                <div className="mt-3 flex flex-wrap items-center gap-3">
                   {guide.cardType && (
-                    <div className="mt-2 flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
                       <Award className="h-4 w-4 text-primary" />
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-sm">
                         {guide.cardType === 'international'
-                          ? 'International Guide'
-                          : 'Domestic Guide'}
+                          ? 'International Tour Guide'
+                          : 'Domestic Tour Guide'}
                       </span>
-                      {guide.experienceYears && (
-                        <Badge variant="secondary">
-                          {guide.experienceYears}+ years experience
-                        </Badge>
-                      )}
                     </div>
                   )}
-                </div>
-
-                {guide.bio && (
-                  <p className="text-lg text-muted-foreground leading-relaxed">
-                    {guide.bio}
-                  </p>
-                )}
-
-                {/* Quick Stats */}
-                <div className="flex flex-wrap gap-6 pt-4">
-                  <div className="flex items-center gap-2">
-                    <Briefcase className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="text-2xl font-bold">{guide.totalTours || tours.length}</p>
-                      <p className="text-xs text-muted-foreground">Tours Guided</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="text-2xl font-bold">{totalPax}</p>
-                      <p className="text-xs text-muted-foreground">Pax Served</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Star className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="text-2xl font-bold">
-                        {averageRating > 0 ? averageRating.toFixed(1) : 'N/A'}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Average Rating ({reviews.length} reviews)
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contact Actions */}
-                <div className="flex flex-wrap gap-3 pt-4">
-                  {guide.phone && (
-                    <Button asChild variant="outline">
-                      <a href={`tel:${guide.phone}`}>
-                        <Phone className="mr-2 h-4 w-4" />
-                        Call
-                      </a>
-                    </Button>
+                  {guide.experienceYears && (
+                    <Badge variant="secondary" className="text-sm">
+                      {guide.experienceYears}+ years experience
+                    </Badge>
                   )}
-                  {guide.email && (
-                    <Button asChild variant="outline">
-                      <a href={`mailto:${guide.email}`}>
-                        <Mail className="mr-2 h-4 w-4" />
-                        Email
-                      </a>
-                    </Button>
-                  )}
-                  <Button asChild variant="outline">
-                    <Link href={`/feedback?guide=${guide.id}`}>
-                      <MessageCircle className="mr-2 h-4 w-4" />
-                      Leave Feedback
-                    </Link>
-                  </Button>
                 </div>
               </div>
-            </div>
+
+              {guide.bio && (
+                <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl">
+                  {guide.bio}
+                </p>
+              )}
+
+              {/* Quick Stats */}
+              <div className="grid grid-cols-3 gap-4 md:gap-6 max-w-lg">
+                <div className="rounded-2xl bg-background/80 p-4 text-center shadow-sm border border-border/60">
+                  <Briefcase className="mx-auto h-5 w-5 text-primary mb-2" />
+                  <p className="text-2xl font-bold">{guide.totalTours || tours.length}</p>
+                  <p className="text-xs text-muted-foreground">Tours</p>
+                </div>
+                <div className="rounded-2xl bg-background/80 p-4 text-center shadow-sm border border-border/60">
+                  <Users className="mx-auto h-5 w-5 text-primary mb-2" />
+                  <p className="text-2xl font-bold">{totalPax}</p>
+                  <p className="text-xs text-muted-foreground">Pax Served</p>
+                </div>
+                <div className="rounded-2xl bg-background/80 p-4 text-center shadow-sm border border-border/60">
+                  <Star className="mx-auto h-5 w-5 text-primary mb-2" />
+                  <p className="text-2xl font-bold">
+                    {averageRating > 0 ? averageRating.toFixed(1) : 'N/A'}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Rating</p>
+                </div>
+              </div>
+
+              {/* Contact Actions */}
+              <div className="flex flex-wrap gap-3">
+                {guide.phone && (
+                  <Button asChild variant="default" className="rounded-full">
+                    <a href={`tel:${guide.phone}`}>
+                      <Phone className="mr-2 h-4 w-4" />
+                      Call Now
+                    </a>
+                  </Button>
+                )}
+                {guide.email && (
+                  <Button asChild variant="outline" className="rounded-full">
+                    <a href={`mailto:${guide.email}`}>
+                      <Mail className="mr-2 h-4 w-4" />
+                      Send Email
+                    </a>
+                  </Button>
+                )}
+                <Button asChild variant="outline" className="rounded-full">
+                  <Link href={`/feedback?guide=${guide.id}`}>
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Leave Feedback
+                  </Link>
+                </Button>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -178,219 +205,275 @@ export default function GuideProfile({ guide, tours, reviews }: GuideProfileProp
           <div className="mx-auto max-w-4xl space-y-8">
             {/* Languages */}
             {guide.languages && guide.languages.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 font-headline">
-                    <Globe className="h-5 w-5" />
-                    Languages
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-3">
-                    {guide.languages.map((lang) => (
-                      <div
-                        key={lang.id}
-                        className="flex items-center gap-2 rounded-full border px-4 py-2"
-                      >
-                        <span className="font-medium">{lang.name}</span>
-                        {lang.proficiency && (
-                          <span
-                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                              proficiencyColors[lang.proficiency] || 'bg-gray-100 text-gray-800'
-                            }`}
-                          >
-                            {proficiencyLabels[lang.proficiency] || lang.proficiency}
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <Card className="border-border/60 bg-background/80">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 font-headline text-xl">
+                      <Globe className="h-5 w-5 text-primary" />
+                      Languages
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {guide.languages.map((lang) => (
+                        <div
+                          key={lang.id}
+                          className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/30 px-4 py-3"
+                        >
+                          <span className="font-medium">{lang.name}</span>
+                          {lang.proficiency && (
+                            <span
+                              className={`rounded-full px-3 py-1 text-xs font-medium ${
+                                proficiencyColors[lang.proficiency] || 'bg-gray-100 text-gray-800'
+                              }`}
+                            >
+                              {proficiencyLabels[lang.proficiency] || lang.proficiency}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             )}
 
             {/* Areas of Operation */}
             {(provinces.length > 0 || nationalities.length > 0) && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 font-headline">
-                    <MapPin className="h-5 w-5" />
-                    Areas of Operation
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {provinces.length > 0 && (
-                    <div>
-                      <p className="mb-2 text-sm font-medium text-muted-foreground">
-                        Provinces/Cities
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {provinces.map((province) => (
-                          <Badge key={province} variant="secondary">
-                            {province}
-                          </Badge>
-                        ))}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+              >
+                <Card className="border-border/60 bg-background/80">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 font-headline text-xl">
+                      <MapPin className="h-5 w-5 text-primary" />
+                      Areas of Operation
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {provinces.length > 0 && (
+                      <div>
+                        <p className="mb-3 text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                          Provinces & Cities
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {provinces.map((province) => (
+                            <Badge
+                              key={province}
+                              variant="secondary"
+                              className="text-sm py-1.5 px-3"
+                            >
+                              <MapPin className="mr-1 h-3 w-3" />
+                              {province}
+                            </Badge>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  {nationalities.length > 0 && (
-                    <div>
-                      <p className="mb-2 text-sm font-medium text-muted-foreground">
-                        Served Nationalities
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {nationalities.slice(0, 10).map((nat) => (
-                          <Badge key={nat} variant="outline">
-                            {nat}
-                          </Badge>
-                        ))}
-                        {nationalities.length > 10 && (
-                          <Badge variant="outline">+{nationalities.length - 10} more</Badge>
-                        )}
+                    )}
+                    {nationalities.length > 0 && (
+                      <div>
+                        <p className="mb-3 text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                          Served Nationalities
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {nationalities.slice(0, 12).map((nat) => (
+                            <Badge
+                              key={nat}
+                              variant="outline"
+                              className="text-sm py-1.5 px-3"
+                            >
+                              {nat}
+                            </Badge>
+                          ))}
+                          {nationalities.length > 12 && (
+                            <Badge variant="outline" className="text-sm py-1.5 px-3">
+                              +{nationalities.length - 12} more
+                            </Badge>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
             )}
 
             {/* Tour History */}
             {tours.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 font-headline">
-                    <Briefcase className="h-5 w-5" />
-                    Tour History
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {tours.slice(0, 10).map((tour) => (
-                      <div
-                        key={tour.id}
-                        className="flex items-start justify-between gap-4 rounded-lg border p-4"
-                      >
-                        <div className="space-y-1">
-                          <h3 className="font-medium">{tour.name}</h3>
-                          <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              {format(tour.startDate, 'MMM yyyy')}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Users className="h-3 w-3" />
-                              {tour.clientCount} pax
-                            </span>
-                            {tour.provinces && tour.provinces.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+              >
+                <Card className="border-border/60 bg-background/80">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 font-headline text-xl">
+                      <Briefcase className="h-5 w-5 text-primary" />
+                      Tour History
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {tours.slice(0, 8).map((tour, index) => (
+                        <motion.div
+                          key={tour.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: 0.1 * index }}
+                          className="group flex items-start justify-between gap-4 rounded-xl border border-border/60 bg-muted/20 p-4 transition-colors hover:bg-muted/40"
+                        >
+                          <div className="space-y-2 flex-1">
+                            <h3 className="font-medium group-hover:text-primary transition-colors">
+                              {tour.name}
+                            </h3>
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                               <span className="flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                {tour.provinces.slice(0, 2).join(', ')}
+                                <Calendar className="h-3.5 w-3.5" />
+                                {format(tour.startDate, 'MMM yyyy')}
                               </span>
-                            )}
+                              <span className="flex items-center gap-1">
+                                <Users className="h-3.5 w-3.5" />
+                                {tour.clientCount} pax
+                              </span>
+                              {tour.provinces && tour.provinces.length > 0 && (
+                                <span className="flex items-center gap-1">
+                                  <MapPin className="h-3.5 w-3.5" />
+                                  {tour.provinces.slice(0, 2).join(', ')}
+                                </span>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        <Badge variant={tour.status === 'finished' ? 'default' : 'secondary'}>
-                          {tour.status === 'finished' ? 'Completed' : 'For Sale'}
-                        </Badge>
-                      </div>
-                    ))}
-                    {tours.length > 10 && (
-                      <p className="text-center text-sm text-muted-foreground">
-                        And {tours.length - 10} more tours...
-                      </p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                          <Badge
+                            variant={tour.status === 'finished' ? 'default' : 'secondary'}
+                            className="flex-shrink-0"
+                          >
+                            {tour.status === 'finished' ? 'Completed' : 'For Sale'}
+                          </Badge>
+                        </motion.div>
+                      ))}
+                      {tours.length > 8 && (
+                        <p className="text-center text-sm text-muted-foreground pt-2">
+                          And {tours.length - 8} more tours...
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             )}
 
             {/* Reviews */}
             {reviews.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 font-headline">
-                    <Star className="h-5 w-5" />
-                    Guest Reviews
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    {reviews.slice(0, 5).map((review) => (
-                      <div key={review.id} className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{review.authorDisplay}</span>
-                            {review.country && (
-                              <Badge variant="outline" className="text-xs">
-                                {review.country}
-                              </Badge>
-                            )}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+              >
+                <Card className="border-border/60 bg-background/80">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 font-headline text-xl">
+                      <Star className="h-5 w-5 text-primary" />
+                      Guest Reviews
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-6">
+                      {reviews.slice(0, 4).map((review, index) => (
+                        <motion.div
+                          key={review.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: 0.1 * index }}
+                          className="relative rounded-xl border border-border/60 bg-muted/20 p-5"
+                        >
+                          <Quote className="absolute right-4 top-4 h-8 w-8 text-primary/10" />
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium">{review.authorDisplay}</span>
+                              {review.country && (
+                                <Badge variant="outline" className="text-xs">
+                                  {review.country}
+                                </Badge>
+                              )}
+                            </div>
+                            <StarRating rating={review.rating} readonly size="sm" />
                           </div>
-                          <StarRating rating={review.rating} readonly size="sm" />
-                        </div>
-                        <p className="text-sm text-muted-foreground">{review.message}</p>
-                        {review.tourName && (
-                          <p className="text-xs text-muted-foreground/70">
-                            Tour: {review.tourName}
-                          </p>
-                        )}
-                        <Separator className="mt-4" />
-                      </div>
-                    ))}
-                    {reviews.length > 5 && (
-                      <p className="text-center text-sm text-muted-foreground">
-                        And {reviews.length - 5} more reviews...
-                      </p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                          <p className="text-muted-foreground leading-relaxed">{review.message}</p>
+                          {review.tourName && (
+                            <p className="mt-3 text-xs text-muted-foreground/70 flex items-center gap-1">
+                              <Briefcase className="h-3 w-3" />
+                              Tour: {review.tourName}
+                            </p>
+                          )}
+                        </motion.div>
+                      ))}
+                      {reviews.length > 4 && (
+                        <p className="text-center text-sm text-muted-foreground">
+                          And {reviews.length - 4} more reviews...
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             )}
 
             {/* Guide License Info (for verification) */}
             {guide.cardNumber && (
-              <Card className="border-primary/20 bg-primary/5">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 font-headline text-primary">
-                    <Award className="h-5 w-5" />
-                    Verified Guide
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 text-sm md:grid-cols-2">
-                    <div>
-                      <p className="text-muted-foreground">License Type</p>
-                      <p className="font-medium">
-                        {guide.cardType === 'international'
-                          ? 'International Tour Guide'
-                          : 'Domestic Tour Guide'}
-                      </p>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.7 }}
+              >
+                <Card className="border-primary/30 bg-gradient-to-br from-primary/10 to-primary/5">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 font-headline text-xl text-primary">
+                      <Award className="h-5 w-5" />
+                      Verified Guide
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-4 text-sm sm:grid-cols-2">
+                      <div className="rounded-lg bg-background/50 p-3">
+                        <p className="text-muted-foreground text-xs uppercase tracking-wide">License Type</p>
+                        <p className="font-medium mt-1">
+                          {guide.cardType === 'international'
+                            ? 'International Tour Guide'
+                            : 'Domestic Tour Guide'}
+                        </p>
+                      </div>
+                      {guide.cardIssuePlace && (
+                        <div className="rounded-lg bg-background/50 p-3">
+                          <p className="text-muted-foreground text-xs uppercase tracking-wide">Issued By</p>
+                          <p className="font-medium mt-1">{guide.cardIssuePlace}</p>
+                        </div>
+                      )}
+                      {guide.cardIssueDate && (
+                        <div className="rounded-lg bg-background/50 p-3">
+                          <p className="text-muted-foreground text-xs uppercase tracking-wide">Issue Date</p>
+                          <p className="font-medium mt-1">
+                            {format(new Date(guide.cardIssueDate), 'MMM dd, yyyy')}
+                          </p>
+                        </div>
+                      )}
+                      {guide.cardExpiryDate && (
+                        <div className="rounded-lg bg-background/50 p-3">
+                          <p className="text-muted-foreground text-xs uppercase tracking-wide">Expiry Date</p>
+                          <p className="font-medium mt-1">
+                            {format(new Date(guide.cardExpiryDate), 'MMM dd, yyyy')}
+                          </p>
+                        </div>
+                      )}
                     </div>
-                    {guide.cardIssuePlace && (
-                      <div>
-                        <p className="text-muted-foreground">Issued By</p>
-                        <p className="font-medium">{guide.cardIssuePlace}</p>
-                      </div>
-                    )}
-                    {guide.cardIssueDate && (
-                      <div>
-                        <p className="text-muted-foreground">Issue Date</p>
-                        <p className="font-medium">
-                          {format(new Date(guide.cardIssueDate), 'MMM dd, yyyy')}
-                        </p>
-                      </div>
-                    )}
-                    {guide.cardExpiryDate && (
-                      <div>
-                        <p className="text-muted-foreground">Expiry Date</p>
-                        <p className="font-medium">
-                          {format(new Date(guide.cardExpiryDate), 'MMM dd, yyyy')}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </motion.div>
             )}
           </div>
         </div>
