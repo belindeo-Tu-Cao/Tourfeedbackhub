@@ -447,6 +447,9 @@ async function seed() {
     { name: 'Street Food', slug: 'street-food' },
     { name: 'Culture', slug: 'culture' },
     { name: 'Nature', slug: 'nature' },
+    { name: 'Quang Tri', slug: 'quang-tri' },
+    { name: 'History', slug: 'history' },
+    { name: 'War History', slug: 'war-history' },
   ]
   const tags: Record<string, string | number> = {}
   for (const t of tagDefs) {
@@ -511,6 +514,19 @@ async function seed() {
       status: 'published',
       author: adminUser.id,
       locale: 'en',
+    },
+    {
+      type: 'post',
+      title: 'Bản Đồ Chiến Lược Lịch Sử Quảng Trị - 14 Địa Danh Lưu Dấu',
+      slug: 'ban-do-chien-luoc-lich-su-quang-tri',
+      excerpt: 'Khám phá 14 địa danh lịch sử tiêu biểu của Quảng Trị - vùng đất lửa anh hùng, từ Địa đạo Vĩnh Mốc đến Thành cổ Quảng Trị, Căn cứ Khe Sanh và Đại lộ Kinh hoàng.',
+      content: richText('Quảng Trị - vùng đất lửa anh hùng, nơi lưu giữ những dấu ấn lịch sử sâu đậm nhất của cuộc kháng chiến chống Mỹ. Từ sông Bến Hải đến Đường 9, từ Địa đạo Vĩnh Mốc đến Thành cổ Quảng Trị, mỗi tấc đất ở đây đều gắn liền với những câu chuyện chiến đấu anh dũng của quân và dân ta.'),
+      status: 'published',
+      author: adminUser.id,
+      categories: [categories['destinations']],
+      tags: [tags['vietnam'], tags['quang-tri'], tags['history'], tags['war-history']],
+      publishedAt: new Date('2026-07-21').toISOString(),
+      locale: 'vi',
     },
   ]
   for (const p of postDefs) {
