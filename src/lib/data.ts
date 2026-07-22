@@ -304,8 +304,8 @@ export const reviews: Review[] = [
 ];
 
 const headerMenuFlatItems: NavigationMenuItem[] = [
-  { id: "header-home", label: "Home", href: "/", type: "internal", order: 10, parentId: null },
-  { id: "header-tours", label: "Tours", href: "/tours", type: "internal", order: 20, parentId: null },
+  { id: "header-home", label: "Home", href: "/", type: "internal", order: 10, parentId: null, icon: "Home" },
+  { id: "header-tours", label: "Tours", href: "/tours", type: "internal", order: 20, parentId: null, icon: "Compass" },
   {
     id: "header-tours-cycling",
     label: "Cycling Tours",
@@ -313,6 +313,7 @@ const headerMenuFlatItems: NavigationMenuItem[] = [
     type: "internal",
     order: 10,
     parentId: "header-tours",
+    icon: "Bike",
   },
   {
     id: "header-tours-cultural",
@@ -321,6 +322,7 @@ const headerMenuFlatItems: NavigationMenuItem[] = [
     type: "internal",
     order: 20,
     parentId: "header-tours",
+    icon: "Landmark",
   },
   {
     id: "header-tours-food",
@@ -329,15 +331,16 @@ const headerMenuFlatItems: NavigationMenuItem[] = [
     type: "internal",
     order: 30,
     parentId: "header-tours",
+    icon: "Utensils",
   },
-  { id: "header-destinations", label: "Destinations", href: "/destinations", type: "internal", order: 25, parentId: null },
-  { id: "header-guides", label: "Guides", href: "/guides", type: "internal", order: 27, parentId: null },
-  { id: "header-diaries", label: "Diaries", href: "/finished-tours", type: "internal", order: 30, parentId: null },
-  { id: "header-stories", label: "Stories", href: "/stories", type: "internal", order: 40, parentId: null },
-  { id: "header-reviews", label: "Reviews", href: "/reviews", type: "internal", order: 50, parentId: null },
-  { id: "header-faq", label: "FAQ", href: "/faq", type: "internal", order: 55, parentId: null },
-  { id: "header-about", label: "About", href: "/about", type: "internal", order: 60, parentId: null },
-  { id: "header-contact", label: "Contact", href: "/contact", type: "internal", order: 70, parentId: null },
+  { id: "header-destinations", label: "Destinations", href: "/destinations", type: "internal", order: 25, parentId: null, icon: "MapPin" },
+  { id: "header-guides", label: "Guides", href: "/guides", type: "internal", order: 27, parentId: null, icon: "Users" },
+  { id: "header-diaries", label: "Diaries", href: "/finished-tours", type: "internal", order: 30, parentId: null, icon: "NotebookPen" },
+  { id: "header-stories", label: "Stories", href: "/stories", type: "internal", order: 40, parentId: null, icon: "BookOpen" },
+  { id: "header-reviews", label: "Reviews", href: "/reviews", type: "internal", order: 50, parentId: null, icon: "Star" },
+  { id: "header-faq", label: "FAQ", href: "/faq", type: "internal", order: 55, parentId: null, icon: "HelpCircle" },
+  { id: "header-about", label: "About", href: "/about", type: "internal", order: 60, parentId: null, icon: "Info" },
+  { id: "header-contact", label: "Contact", href: "/contact", type: "internal", order: 70, parentId: null, icon: "Phone" },
   {
     id: "header-cta",
     label: "Share Your Story",
@@ -347,20 +350,21 @@ const headerMenuFlatItems: NavigationMenuItem[] = [
     parentId: null,
     target: "_self",
     group: "cta",
+    icon: "MessageSquare",
   },
 ];
 
 const footerMenuFlatItems: NavigationMenuItem[] = [
-  { id: "footer-links-about", area: "links", label: "About", href: "/about", type: "internal", order: 10, parentId: null },
-  { id: "footer-links-tours", area: "links", label: "Tours", href: "/tours", type: "internal", order: 20, parentId: null },
-  { id: "footer-links-destinations", area: "links", label: "Destinations", href: "/destinations", type: "internal", order: 25, parentId: null },
-  { id: "footer-links-guides", area: "links", label: "Guides", href: "/guides", type: "internal", order: 27, parentId: null },
-  { id: "footer-links-diaries", area: "links", label: "Diaries", href: "/finished-tours", type: "internal", order: 30, parentId: null },
-  { id: "footer-links-stories", area: "links", label: "Stories", href: "/stories", type: "internal", order: 40, parentId: null },
-  { id: "footer-links-reviews", area: "links", label: "Reviews", href: "/reviews", type: "internal", order: 50, parentId: null },
-  { id: "footer-links-faq", area: "links", label: "FAQ", href: "/faq", type: "internal", order: 55, parentId: null },
-  { id: "footer-legal-privacy", area: "legal", label: "Privacy Policy", href: "/privacy", type: "internal", order: 10, parentId: null },
-  { id: "footer-legal-terms", area: "legal", label: "Terms of Service", href: "/terms", type: "internal", order: 20, parentId: null },
+  { id: "footer-links-about", area: "links", label: "About", href: "/about", type: "internal", order: 10, parentId: null, icon: "Info" },
+  { id: "footer-links-tours", area: "links", label: "Tours", href: "/tours", type: "internal", order: 20, parentId: null, icon: "Compass" },
+  { id: "footer-links-destinations", area: "links", label: "Destinations", href: "/destinations", type: "internal", order: 25, parentId: null, icon: "MapPin" },
+  { id: "footer-links-guides", area: "links", label: "Guides", href: "/guides", type: "internal", order: 27, parentId: null, icon: "Users" },
+  { id: "footer-links-diaries", area: "links", label: "Diaries", href: "/finished-tours", type: "internal", order: 30, parentId: null, icon: "NotebookPen" },
+  { id: "footer-links-stories", area: "links", label: "Stories", href: "/stories", type: "internal", order: 40, parentId: null, icon: "BookOpen" },
+  { id: "footer-links-reviews", area: "links", label: "Reviews", href: "/reviews", type: "internal", order: 50, parentId: null, icon: "Star" },
+  { id: "footer-links-faq", area: "links", label: "FAQ", href: "/faq", type: "internal", order: 55, parentId: null, icon: "HelpCircle" },
+  { id: "footer-legal-privacy", area: "legal", label: "Privacy Policy", href: "/privacy", type: "internal", order: 10, parentId: null, icon: "Shield" },
+  { id: "footer-legal-terms", area: "legal", label: "Terms of Service", href: "/terms", type: "internal", order: 20, parentId: null, icon: "FileText" },
   {
     id: "footer-social-facebook",
     area: "social",
@@ -433,6 +437,7 @@ const footerMenuFlatItems: NavigationMenuItem[] = [
     order: 10,
     parentId: null,
     target: "_self",
+    icon: "MessageSquare",
   },
   {
     id: "footer-cta-review",
@@ -443,6 +448,7 @@ const footerMenuFlatItems: NavigationMenuItem[] = [
     order: 20,
     parentId: null,
     target: "_self",
+    icon: "Star",
   },
 ];
 

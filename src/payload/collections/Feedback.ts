@@ -4,6 +4,7 @@ export const Feedback: CollectionConfig = {
   slug: 'feedback',
   admin: {
     useAsTitle: 'name',
+    defaultColumns: ['name', 'photo', 'rating', 'status', 'submittedAt'],
   },
   fields: [
     {

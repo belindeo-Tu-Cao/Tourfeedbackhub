@@ -7,6 +7,7 @@ export const Stories: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
+    defaultColumns: ['title', 'coverImage', 'category', 'publishedAt'],
   },
   fields: [
     {
@@ -78,6 +79,7 @@ export const Slides: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
+    defaultColumns: ['title', 'image', 'status', 'order', 'active'],
   },
   fields: [
     {
@@ -211,6 +213,10 @@ export const NavigationMenus: CollectionConfig = {
         {
           name: 'icon',
           type: 'text',
+          required: true,
+          admin: {
+            description: 'Lucide icon name (e.g. Home, MapPin, Facebook) — required for all nav items.',
+          },
         },
         {
           name: 'target',
@@ -303,6 +309,7 @@ export const SiteSettings: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'siteName',
+    defaultColumns: ['siteName', 'logoLight', 'defaultLanguage'],
   },
   fields: [
     {

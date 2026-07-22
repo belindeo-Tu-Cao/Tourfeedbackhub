@@ -5,6 +5,7 @@ export const Users: CollectionConfig = {
   auth: true,
   admin: {
     useAsTitle: 'displayName',
+    defaultColumns: ['displayName', 'avatar', 'role', 'status'],
   },
   fields: [
     {

@@ -617,15 +617,15 @@ async function seed() {
   // ---------------------------------------------------------------------------
   // Always update header nav to include Guides menu
   const headerNavItems = [
-    { label: 'Home', href: '/', type: 'internal' as const, order: 1, target: '_self' as const },
-    { label: 'Tours', href: '/tours', type: 'internal' as const, order: 2, target: '_self' as const },
+    { label: 'Home', href: '/', type: 'internal' as const, order: 1, target: '_self' as const, icon: 'Home' },
+    { label: 'Tours', href: '/tours', type: 'internal' as const, order: 2, target: '_self' as const, icon: 'Compass' },
     { label: 'Destinations', href: '/destinations', type: 'internal' as const, order: 3, target: '_self' as const, icon: 'MapPin' },
     { label: 'Guides', href: '/guides', type: 'internal' as const, order: 4, target: '_self' as const, icon: 'Users' },
-    { label: 'Reviews', href: '/reviews', type: 'internal' as const, order: 5, target: '_self' as const },
-    { label: 'Stories', href: '/stories', type: 'internal' as const, order: 6, target: '_self' as const },
-    { label: 'Blog', href: '/blog', type: 'internal' as const, order: 7, target: '_self' as const },
-    { label: 'FAQ', href: '/faq', type: 'internal' as const, order: 8, target: '_self' as const },
-    { label: 'Contact', href: '/contact', type: 'internal' as const, order: 9, target: '_self' as const },
+    { label: 'Reviews', href: '/reviews', type: 'internal' as const, order: 5, target: '_self' as const, icon: 'Star' },
+    { label: 'Stories', href: '/stories', type: 'internal' as const, order: 6, target: '_self' as const, icon: 'BookOpen' },
+    { label: 'Blog', href: '/blog', type: 'internal' as const, order: 7, target: '_self' as const, icon: 'Newspaper' },
+    { label: 'FAQ', href: '/faq', type: 'internal' as const, order: 8, target: '_self' as const, icon: 'HelpCircle' },
+    { label: 'Contact', href: '/contact', type: 'internal' as const, order: 9, target: '_self' as const, icon: 'Phone' },
   ]
 
   const existingHeaderNav = await payload.find({
@@ -667,9 +667,9 @@ async function seed() {
       title: 'Footer Navigation',
       published: true,
       items: [
-        { label: 'Privacy Policy', href: '/privacy', type: 'internal', order: 1, area: 'legal', target: '_self' },
-        { label: 'Terms of Service', href: '/terms', type: 'internal', order: 2, area: 'legal', target: '_self' },
-        { label: 'Give Feedback', href: '/feedback', type: 'internal', order: 3, area: 'links', target: '_self' },
+        { label: 'Privacy Policy', href: '/privacy', type: 'internal', order: 1, area: 'legal', target: '_self', icon: 'Shield' },
+        { label: 'Terms of Service', href: '/terms', type: 'internal', order: 2, area: 'legal', target: '_self', icon: 'FileText' },
+        { label: 'Give Feedback', href: '/feedback', type: 'internal', order: 3, area: 'links', target: '_self', icon: 'MessageSquare' },
       ],
     },
   )

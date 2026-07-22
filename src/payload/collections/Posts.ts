@@ -8,6 +8,7 @@ export const Posts: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
+    defaultColumns: ['title', 'featuredImage', 'status', 'author', 'publishedAt'],
   },
   fields: [
     {

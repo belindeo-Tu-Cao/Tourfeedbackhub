@@ -7,6 +7,7 @@ export const Destinations: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'name',
+    defaultColumns: ['name', 'heroImage', 'slug', 'status'],
   },
   fields: [
     {
