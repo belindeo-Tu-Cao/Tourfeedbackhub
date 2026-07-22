@@ -4,6 +4,7 @@ export const Guides: CollectionConfig = {
   slug: 'guides',
   admin: {
     useAsTitle: 'name',
+    defaultColumns: ['name', 'photo', 'phone', 'email'],
   },
   fields: [
     {
@@ -213,6 +214,74 @@ export const Tours: CollectionConfig = {
       type: 'relationship',
       relationTo: 'stories',
       hasMany: true,
+    },
+    {
+      type: 'collapsible',
+      label: 'Sale details (for_sale tours)',
+      admin: {
+        condition: (data) => data?.status === 'for_sale',
+      },
+      fields: [
+        {
+          name: 'price',
+          type: 'number',
+          min: 0,
+        },
+        {
+          name: 'currency',
+          type: 'select',
+          defaultValue: 'VND',
+          options: [
+            { label: 'VND', value: 'VND' },
+            { label: 'USD', value: 'USD' },
+          ],
+        },
+        {
+          name: 'priceUnit',
+          type: 'select',
+          defaultValue: 'per_person',
+          options: [
+            { label: 'Per person', value: 'per_person' },
+            { label: 'Per group', value: 'per_group' },
+          ],
+        },
+        {
+          name: 'durationDays',
+          label: 'Duration (days)',
+          type: 'number',
+          min: 1,
+        },
+        {
+          name: 'groupSizeMin',
+          type: 'number',
+          min: 1,
+        },
+        {
+          name: 'groupSizeMax',
+          type: 'number',
+          min: 1,
+        },
+        {
+          name: 'departureSchedule',
+          label: 'Departure schedule (e.g. "Daily", "Every Mon/Thu")',
+          type: 'text',
+        },
+        {
+          name: 'highlights',
+          type: 'array',
+          fields: [{ name: 'item', type: 'text', required: true }],
+        },
+        {
+          name: 'included',
+          type: 'array',
+          fields: [{ name: 'item', type: 'text', required: true }],
+        },
+        {
+          name: 'excluded',
+          type: 'array',
+          fields: [{ name: 'item', type: 'text', required: true }],
+        },
+      ],
     },
   ],
 }

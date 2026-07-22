@@ -47,6 +47,16 @@ export interface Tour {
   relatedStoryIds?: string[];
   relatedStories?: RelatedItemSummary[];
   reviews?: Review[];
+  price?: number;
+  currency?: 'VND' | 'USD';
+  priceUnit?: 'per_person' | 'per_group';
+  durationDays?: number;
+  groupSizeMin?: number;
+  groupSizeMax?: number;
+  departureSchedule?: string;
+  highlights?: string[];
+  included?: string[];
+  excluded?: string[];
 }
 
 export interface Story {

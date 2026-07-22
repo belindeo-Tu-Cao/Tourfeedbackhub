@@ -255,6 +255,16 @@ function mapTour(doc: Doc): Tour {
     relatedPosts: toRelatedItemSummaries(doc.relatedPosts, "post"),
     relatedStoryIds: relIds(doc.relatedStories),
     relatedStories: toRelatedItemSummaries(doc.relatedStories, "story"),
+    price: typeof doc.price === "number" ? doc.price : undefined,
+    currency: doc.currency === "USD" ? "USD" : doc.currency === "VND" ? "VND" : undefined,
+    priceUnit: doc.priceUnit === "per_group" ? "per_group" : doc.priceUnit === "per_person" ? "per_person" : undefined,
+    durationDays: typeof doc.durationDays === "number" ? doc.durationDays : undefined,
+    groupSizeMin: typeof doc.groupSizeMin === "number" ? doc.groupSizeMin : undefined,
+    groupSizeMax: typeof doc.groupSizeMax === "number" ? doc.groupSizeMax : undefined,
+    departureSchedule: doc.departureSchedule ?? undefined,
+    highlights: Array.isArray(doc.highlights) ? doc.highlights.map((h: Doc) => h?.item).filter(Boolean) : undefined,
+    included: Array.isArray(doc.included) ? doc.included.map((h: Doc) => h?.item).filter(Boolean) : undefined,
+    excluded: Array.isArray(doc.excluded) ? doc.excluded.map((h: Doc) => h?.item).filter(Boolean) : undefined,
   };
 }
 
@@ -386,7 +396,7 @@ async function fetchPublicContent(): Promise<PublicContent> {
   const [settings, tourTypes, tours, stories, reviews, slides, posts, guidesResult] = await Promise.all([
     fetchSiteSettings(),
     payload.find({ collection: "tour-types", limit: 100, depth: 0, sort: "order" }),
-    payload.find({ collection: "tours", limit: 100, depth: 2, where: { status: { equals: "finished" } } }),
+    payload.find({ collection: "tours", limit: 100, depth: 2 }),
     payload.find({ collection: "stories", limit: 100, depth: 1, sort: "-publishedAt" }),
     payload.find({
       collection: "reviews",

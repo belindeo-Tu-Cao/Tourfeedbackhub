@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { CalendarRange, MapPin, Users, Star } from 'lucide-react';
+import { CalendarRange, MapPin, Users, Star, Tag } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { getPublicContent, getTourReviews } from '@/lib/content-service';
@@ -21,11 +21,11 @@ interface TourPageProps {
 export async function generateMetadata({ params }: TourPageProps) {
   const { id } = await params;
   const { tours } = await getPublicContent();
-  const tour = tours.find((item) => item.id === id && item.status === 'finished');
+  const tour = tours.find((item) => item.id === id);
   if (!tour) return {};
 
   return {
-    title: `${tour.name} — Finished Tour Diary`,
+    title: tour.status === 'for_sale' ? `${tour.name} — Book This Tour` : `${tour.name} — Finished Tour Diary`,
     description: tour.summary,
   };
 }
@@ -33,14 +33,24 @@ export async function generateMetadata({ params }: TourPageProps) {
 export default async function FinishedTourPage({ params }: TourPageProps) {
   const { id } = await params;
   const { tours, tourTypes } = await getPublicContent();
-  const tour = tours.find((item) => item.id === id && item.status === 'finished');
+  const tour = tours.find((item) => item.id === id);
 
   if (!tour) {
     notFound();
   }
 
+  const isForSale = tour.status === 'for_sale';
+  const priceLabel = tour.price
+    ? `${tour.currency === 'USD' ? `$${tour.price.toLocaleString('en-US')}` : `${tour.price.toLocaleString('vi-VN')}₫`} ${tour.priceUnit === 'per_group' ? '/ group' : '/ person'}`
+    : 'Price on request';
+  const groupSizeLabel = tour.groupSizeMin || tour.groupSizeMax
+    ? tour.groupSizeMin && tour.groupSizeMax
+      ? `${tour.groupSizeMin}–${tour.groupSizeMax} travellers`
+      : `${tour.groupSizeMin ?? tour.groupSizeMax} travellers`
+    : null;
+
   const [comments, reviews] = await Promise.all([
-    getFinishedTourComments(tour.id),
+    isForSale ? Promise.resolve([]) : getFinishedTourComments(tour.id),
     getTourReviews(tour.id),
   ]);
   const ratingAggregate = comments.reduce(
@@ -108,7 +118,9 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
             <div className="absolute inset-0 bg-gradient-to-tr from-black/85 via-black/60 to-black/40" />
           </div>
           <div className="relative z-10 max-w-2xl space-y-4">
-            <p className="text-xs md:text-sm uppercase tracking-[0.35em] text-white/70">Finished tour diary</p>
+            <p className="text-xs md:text-sm uppercase tracking-[0.35em] text-white/70">
+              {isForSale ? 'Tour package' : 'Finished tour diary'}
+            </p>
             <h1 className="text-3xl md:text-5xl font-headline font-bold">{tour.name}</h1>
             <p className="text-sm md:text-lg text-white/80">{tour.summary}</p>
           </div>
@@ -127,7 +139,7 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
                   <div className="flex flex-wrap items-center gap-3 text-foreground/80 text-sm">
                     <span className="flex items-center gap-2">
                       <CalendarRange className="h-4 w-4 text-accent" />
-                      {formattedDateRange}
+                      {isForSale ? (tour.departureSchedule || formattedDateRange) : formattedDateRange}
                     </span>
                     <span className="flex items-center gap-2">
                       <MapPin className="h-4 w-4 text-accent" />
@@ -135,13 +147,26 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
                     </span>
                     <span className="flex items-center gap-2">
                       <Users className="h-4 w-4 text-accent" />
-                      {tour.clientCount} travellers
+                      {isForSale ? (groupSizeLabel ?? 'Group size flexible') : `${tour.clientCount} travellers`}
                     </span>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground/80 text-sm">Nationalities represented</h3>
-                    <p>{tour.clientNationalities.join(', ') || 'Not recorded'}</p>
-                  </div>
+                  {isForSale ? (
+                    tour.highlights && tour.highlights.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold text-foreground/80 text-sm">Highlights</h3>
+                        <ul className="mt-2 list-disc space-y-1 pl-5">
+                          {tour.highlights.map((highlight) => (
+                            <li key={highlight}>{highlight}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )
+                  ) : (
+                    <div>
+                      <h3 className="font-semibold text-foreground/80 text-sm">Nationalities represented</h3>
+                      <p>{tour.clientNationalities.join(', ') || 'Not recorded'}</p>
+                    </div>
+                  )}
                   <div>
                     <h3 className="font-semibold text-foreground/80 text-sm">Tour styles</h3>
                     <div className="mt-2 flex flex-wrap gap-2">
@@ -222,22 +247,54 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
               </Card>
             )}
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl font-headline">Guide feedback</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <FinishedTourCommentForm tourId={tour.id} />
-                <div className="space-y-4">
-                  {comments.length === 0 && (
-                    <p className="text-sm text-muted-foreground">No guide feedback yet. Be the first to share your experience.</p>
+            {isForSale && ((tour.included && tour.included.length > 0) || (tour.excluded && tour.excluded.length > 0)) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl font-headline">What&apos;s included</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-6 text-sm text-muted-foreground sm:grid-cols-2">
+                  {tour.included && tour.included.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold text-foreground/80 text-sm">Included</h3>
+                      <ul className="mt-2 list-disc space-y-1 pl-5">
+                        {tour.included.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
                   )}
-                  {comments.map((comment) => (
-                    <CommentCard key={comment.id} comment={comment} />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                  {tour.excluded && tour.excluded.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold text-foreground/80 text-sm">Not included</h3>
+                      <ul className="mt-2 list-disc space-y-1 pl-5">
+                        {tour.excluded.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {!isForSale && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl font-headline">Guide feedback</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <FinishedTourCommentForm tourId={tour.id} />
+                  <div className="space-y-4">
+                    {comments.length === 0 && (
+                      <p className="text-sm text-muted-foreground">No guide feedback yet. Be the first to share your experience.</p>
+                    )}
+                    {comments.map((comment) => (
+                      <CommentCard key={comment.id} comment={comment} />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {reviews.length > 0 && (
               <Card>
@@ -271,9 +328,15 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
                 <CardTitle className="text-xl font-headline">At a glance</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
+                {isForSale && (
+                  <div className="flex items-center gap-2 text-base font-semibold text-foreground">
+                    <Tag className="h-4 w-4 text-accent" />
+                    <span>{priceLabel}</span>
+                  </div>
+                )}
                 <div className="flex items-center gap-2">
                   <CalendarRange className="h-4 w-4 text-accent" />
-                  <span>{formattedDateRange}</span>
+                  <span>{isForSale ? (tour.departureSchedule || formattedDateRange) : formattedDateRange}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-accent" />
@@ -281,7 +344,7 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-accent" />
-                  <span>{tour.clientCount} guests</span>
+                  <span>{isForSale ? (groupSizeLabel ?? 'Group size flexible') : `${tour.clientCount} guests`}</span>
                 </div>
             {averageRating !== null && (
               <div className="flex items-center gap-2">

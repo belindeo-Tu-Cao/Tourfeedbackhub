@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { CalendarRange, MapPin, Users, Star, Filter, X, Compass } from 'lucide-react';
+import { CalendarRange, MapPin, Users, Filter, X, Compass, Tag } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -41,6 +41,27 @@ interface ClientTourSummary {
   guideLanguages: string[];
   itinerary: string;
   rating?: { average: number; count: number } | null;
+  price?: number | null;
+  currency?: string;
+  priceUnit?: string;
+  groupSizeMin?: number | null;
+  groupSizeMax?: number | null;
+  departureSchedule?: string | null;
+  highlights?: string[];
+}
+
+function formatPrice(price: number | null | undefined, currency: string | undefined, priceUnit: string | undefined) {
+  if (!price) return null;
+  const formatted = currency === 'USD'
+    ? `$${price.toLocaleString('en-US')}`
+    : `${price.toLocaleString('vi-VN')}₫`;
+  return `${formatted} ${priceUnit === 'per_group' ? '/ group' : '/ person'}`;
+}
+
+function formatGroupSize(min: number | null | undefined, max: number | null | undefined) {
+  if (!min && !max) return null;
+  if (min && max) return `${min}–${max} travellers`;
+  return `${min ?? max} travellers`;
 }
 
 interface TourTypeSummary {
@@ -304,7 +325,7 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
             )}
           </div>
           <p className="mt-4 text-sm text-muted-foreground md:mt-8">
-            Showing {filteredTours.length} of {tours.length} finished tours
+            Showing {filteredTours.length} of {tours.length} tours
           </p>
         </div>
       </div>
@@ -318,7 +339,8 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
           {filteredTours.map((tour) => {
             const start = new Date(tour.startDate);
             const end = new Date(tour.endDate);
-            const rating = tour.rating;
+            const priceLabel = formatPrice(tour.price, tour.currency, tour.priceUnit);
+            const groupSizeLabel = formatGroupSize(tour.groupSizeMin, tour.groupSizeMax);
             return (
               <Card key={tour.id} className="flex h-full flex-col overflow-hidden border-border/60 bg-background/80 shadow-md">
                 <CardHeader className="p-0">
@@ -339,13 +361,18 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
                     <Badge className="absolute left-4 top-4 bg-background/90 text-xs uppercase tracking-wide">
                       {tour.code}
                     </Badge>
+                    {priceLabel ? (
+                      <Badge className="absolute right-4 top-4 bg-primary text-primary-foreground text-xs">
+                        {priceLabel}
+                      </Badge>
+                    ) : null}
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col gap-4 p-6">
                   <div className="flex items-center justify-between gap-3">
                     <CardTitle className="font-headline text-2xl leading-tight">{tour.name}</CardTitle>
                     <Badge variant="outline" className="shrink-0">
-                      {format(start, 'MMM d')} – {format(end, 'MMM d')}
+                      {tour.departureSchedule || `${format(start, 'MMM d')} – ${format(end, 'MMM d')}`}
                     </Badge>
                   </div>
                   <CardDescription className="text-sm leading-relaxed text-muted-foreground">
@@ -365,16 +392,12 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
                     <div className="flex items-center gap-2">
                       <Users className="h-4 w-4" />
                       <span>
-                        {tour.clientCount} travellers • Guide {tour.guideName}
+                        {groupSizeLabel ?? 'Group size flexible'} • Guide {tour.guideName}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Star className={`h-4 w-4 ${rating && rating.count > 0 ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`} />
-                      <span>
-                        {rating && rating.count > 0
-                          ? `${rating.average.toFixed(1)} • ${rating.count} review${rating.count === 1 ? '' : 's'}`
-                          : 'Awaiting first reviews'}
-                      </span>
+                    <div className="flex items-center gap-2 text-foreground">
+                      <Tag className="h-4 w-4 text-accent" />
+                      <span className="font-medium">{priceLabel ?? 'Price on request'}</span>
                     </div>
                     {tour.tourTypeIds.length > 0 ? (
                       <div className="flex flex-wrap gap-2">
@@ -392,7 +415,7 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
                 </CardContent>
                 <CardFooter className="flex flex-wrap gap-3 p-6 pt-0">
                   <Button asChild className="flex-1 min-w-[150px]">
-                    <Link href={`/tours/${tour.id}`}>View diary</Link>
+                    <Link href={`/tours/${tour.id}`}>View tour</Link>
                   </Button>
                   <Button
                     type="button"
@@ -422,17 +445,31 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
                   <div className="grid gap-3 md:grid-cols-2">
                     <div className="rounded-lg bg-muted/40 p-4">
                       <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Journey</h3>
-                      <p>{format(new Date(activeTour.startDate), 'MMM d, yyyy')} – {format(new Date(activeTour.endDate), 'MMM d, yyyy')}</p>
+                      <p>{activeTour.departureSchedule || `${format(new Date(activeTour.startDate), 'MMM d, yyyy')} – ${format(new Date(activeTour.endDate), 'MMM d, yyyy')}`}</p>
                       <p>{formatDuration(activeTour.durationDays)}</p>
+                      {formatGroupSize(activeTour.groupSizeMin, activeTour.groupSizeMax) ? (
+                        <p>{formatGroupSize(activeTour.groupSizeMin, activeTour.groupSizeMax)}</p>
+                      ) : null}
                     </div>
                     <div className="rounded-lg bg-muted/40 p-4">
-                      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Guide</h3>
-                      <p>Lead guide {activeTour.guideName}</p>
+                      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Price</h3>
+                      <p className="font-medium text-foreground">{formatPrice(activeTour.price, activeTour.currency, activeTour.priceUnit) ?? 'Price on request'}</p>
+                      <p>Guide {activeTour.guideName}</p>
                       {activeTour.guideLanguages.length > 0 ? (
                         <p>Languages: {activeTour.guideLanguages.join(', ')}</p>
                       ) : null}
                     </div>
                   </div>
+                  {activeTour.highlights && activeTour.highlights.length > 0 ? (
+                    <div>
+                      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Highlights</h3>
+                      <ul className="list-disc space-y-1 pl-5">
+                        {activeTour.highlights.map((highlight) => (
+                          <li key={highlight}>{highlight}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
                   {activeTour.clientNationalities.length > 0 ? (
                     <div>
                       <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Traveller nationalities</h3>
@@ -465,7 +502,7 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
                   Close
                 </Button>
                 <Button asChild>
-                  <Link href={`/tours/${activeTour.id}`}>Open full diary</Link>
+                  <Link href={`/tours/${activeTour.id}`}>View full details</Link>
                 </Button>
               </div>
             </>

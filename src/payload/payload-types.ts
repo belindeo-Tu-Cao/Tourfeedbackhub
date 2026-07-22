@@ -471,6 +471,31 @@ export interface Tour {
   guideLanguages?: (number | Language)[] | null;
   relatedPosts?: (number | Post)[] | null;
   relatedStories?: (number | Story)[] | null;
+  price?: number | null;
+  currency?: ('VND' | 'USD') | null;
+  priceUnit?: ('per_person' | 'per_group') | null;
+  durationDays?: number | null;
+  groupSizeMin?: number | null;
+  groupSizeMax?: number | null;
+  departureSchedule?: string | null;
+  highlights?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  included?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  excluded?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -698,7 +723,10 @@ export interface NavigationMenu {
         type?: ('internal' | 'external' | 'hash') | null;
         order?: number | null;
         parentId?: string | null;
-        icon?: string | null;
+        /**
+         * Lucide icon name (e.g. Home, MapPin, Facebook) — required for all nav items.
+         */
+        icon: string;
         target?: ('_self' | '_blank') | null;
         visibleFor?:
           | {
@@ -1133,6 +1161,31 @@ export interface ToursSelect<T extends boolean = true> {
   guideLanguages?: T;
   relatedPosts?: T;
   relatedStories?: T;
+  price?: T;
+  currency?: T;
+  priceUnit?: T;
+  durationDays?: T;
+  groupSizeMin?: T;
+  groupSizeMax?: T;
+  departureSchedule?: T;
+  highlights?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  included?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  excluded?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
