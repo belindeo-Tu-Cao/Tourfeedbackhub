@@ -24,6 +24,7 @@ import { Stories, Slides, NavigationMenus, Mail, SiteSettings, ThemeSettings } f
 import { Destinations } from './collections/Destinations'
 import { FAQs } from './collections/FAQs'
 import { Translations } from './collections/Translations'
+import { withRevalidate } from '../lib/revalidate'
 import { purgeDatabaseEndpoint } from './endpoints/purgeDatabase'
 import { debugUserRoleEndpoint } from './endpoints/debugUserRole'
 
@@ -52,30 +53,36 @@ export default buildConfig({
     fallback: true,
   },
   collections: [
+    // Users/Mail are admin-only and don't affect the public frontend, so
+    // they skip the revalidation hooks.
     Users,
-    Posts,
-    Categories,
-    Tags,
-    Comments,
-    Media,
-    Tours,
-    TourComments,
-    Feedback,
-    Reviews,
-    Guides,
-    Languages,
-    Nationalities,
-    Provinces,
-    TourTypes,
-    Stories,
-    Destinations,
-    FAQs,
-    Translations,
-    Slides,
-    NavigationMenus,
-    SiteSettings,
-    ThemeSettings,
     Mail,
+    // Everything below feeds the public frontend: wrap each so edits bust
+    // the Next.js Full Route Cache immediately (see src/lib/revalidate.ts).
+    ...[
+      Posts,
+      Categories,
+      Tags,
+      Comments,
+      Media,
+      Tours,
+      TourComments,
+      Feedback,
+      Reviews,
+      Guides,
+      Languages,
+      Nationalities,
+      Provinces,
+      TourTypes,
+      Stories,
+      Destinations,
+      FAQs,
+      Translations,
+      Slides,
+      NavigationMenus,
+      SiteSettings,
+      ThemeSettings,
+    ].map(withRevalidate),
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || 'CHANGE-THIS',
