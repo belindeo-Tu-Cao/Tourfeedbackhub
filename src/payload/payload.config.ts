@@ -19,6 +19,8 @@ import { Languages, Nationalities, Provinces, TourTypes } from './collections/Ma
 import { Stories, Slides, NavigationMenus, Mail, SiteSettings, ThemeSettings } from './collections/SiteConfig'
 import { Destinations } from './collections/Destinations'
 import { FAQs } from './collections/FAQs'
+import { purgeDatabaseEndpoint } from './endpoints/purgeDatabase'
+import { debugUserRoleEndpoint } from './endpoints/debugUserRole'
 
 export default buildConfig({
   admin: {
@@ -26,7 +28,14 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      actions: [
+        './admin/PurgeDatabaseButton#PurgeDatabaseButton',
+        './admin/ProminentLogout#ProminentLogout',
+      ],
+    },
   },
+  endpoints: [purgeDatabaseEndpoint, debugUserRoleEndpoint],
   collections: [
     Users,
     Posts,

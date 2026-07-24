@@ -7,6 +7,8 @@ const SEED_MEDIA_DIR = path.resolve(process.cwd(), 'media', 'seed')
 const ADMIN_EMAIL = 'iposntmk@gmail.com'
 const ADMIN_PASSWORD = 'iposntmk@gmail.com'
 
+const EXTRA_ADMINS = [{ email: 'belindeo@gmail.com', password: 'belindeo@gmail.com' }]
+
 async function seed() {
   const payload = await getPayload({ config })
   const log = (msg: string) => payload.logger.info(`[seed] ${msg}`)
@@ -63,6 +65,29 @@ async function seed() {
       limit: 1,
     })
   ).docs[0]
+
+  for (const extraAdmin of EXTRA_ADMINS) {
+    const existingExtraAdmin = await payload.find({
+      collection: 'users',
+      where: { email: { equals: extraAdmin.email } },
+      limit: 1,
+    })
+    if (existingExtraAdmin.docs.length === 0) {
+      await payload.create({
+        collection: 'users',
+        data: {
+          email: extraAdmin.email,
+          password: extraAdmin.password,
+          displayName: extraAdmin.email,
+          role: 'admin',
+          status: 'active',
+        },
+      })
+      log(`created admin user ${extraAdmin.email}`)
+    } else {
+      log(`admin user ${extraAdmin.email} already exists`)
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // 1.5 Media — upload seed images to R2 (via storage-s3 adapter)
