@@ -685,9 +685,8 @@ export const getGuideReviews = cache(async (guideId: string, locale?: string) =>
 });
 
 export const getAllGuides = cache(async (locale?: string): Promise<Guide[]> => {
-  const payload = await getPayloadClient();
-
   try {
+    const payload = await getPayloadClient();
     const result = await payload.find({
       collection: "guides",
       depth: 1,
