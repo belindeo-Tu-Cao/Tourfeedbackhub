@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { format } from 'date-fns';
 import { ArrowRight, Star, Compass, ChevronRight, Map as MapIcon, Sparkles, Users, Globe2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

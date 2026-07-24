@@ -8,7 +8,7 @@ import {Card} from '@/components/ui/card';
 import {Badge} from '@/components/ui/badge';
 import {Separator} from '@/components/ui/separator';
 import {ScrollArea} from '@/components/ui/scroll-area';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import type {Post, MediaItem, Category, Tag as TagType} from '@/lib/types';
 
 interface SearchResult {

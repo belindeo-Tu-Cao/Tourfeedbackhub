@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import {useSearchParams} from 'next/navigation';
 import type {Post, Category, Tag} from '@/lib/types';
 import {format} from 'date-fns';
