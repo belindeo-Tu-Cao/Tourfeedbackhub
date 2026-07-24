@@ -205,7 +205,11 @@ async function seed() {
       name: 'Linh Nguyen',
       phone: '+84 90 123 4567',
       email: 'linh.guide@example.com',
-      languages: [languages.en, languages.vi, languages.fr],
+      spokenLanguages: [
+        { language: languages.en },
+        { language: languages.vi },
+        { language: languages.fr },
+      ],
       provinces: [provinces['Hanoi'], provinces['Ninh Binh']],
       nationalities: [nationalities.US, nationalities.FR],
       tourTypes: [tourTypes['Food & Culinary'], tourTypes['Nature'], tourTypes['Adventure']],
@@ -214,7 +218,11 @@ async function seed() {
       name: 'Minh Tran',
       phone: '+84 91 234 5678',
       email: 'minh.guide@example.com',
-      languages: [languages.en, languages.vi, languages.ja],
+      spokenLanguages: [
+        { language: languages.en },
+        { language: languages.vi },
+        { language: languages.ja },
+      ],
       provinces: [provinces['Da Nang'], provinces['Quang Nam']],
       nationalities: [nationalities.JP, nationalities.AU],
       tourTypes: [tourTypes['Cultural'], tourTypes['City']],
@@ -223,7 +231,11 @@ async function seed() {
       name: 'Hoa Pham',
       phone: '+84 92 345 6789',
       email: 'hoa.guide@example.com',
-      languages: [languages.en, languages.vi, languages.de],
+      spokenLanguages: [
+        { language: languages.en },
+        { language: languages.vi },
+        { language: languages.de },
+      ],
       provinces: [provinces['Ho Chi Minh City']],
       nationalities: [nationalities.DE, nationalities.GB],
       tourTypes: [tourTypes['Cultural'], tourTypes['City']],
@@ -236,7 +248,7 @@ async function seed() {
       cardIssuePlace: 'Thừa Thiên - Huế',
       cardExpiryDate: new Date('2028-05-31').toISOString(),
       experienceYears: 6,
-      languages: [languages.en],
+      spokenLanguages: [{ language: languages.en }],
       provinces: [provinces['Thua Thien Hue']],
       tourTypes: [tourTypes['Cultural'], tourTypes['Nature']],
     },
@@ -515,7 +527,6 @@ async function seed() {
       categories: [categories['food'], categories['travel-tips']],
       tags: [tags['vietnam'], tags['street-food']],
       publishedAt: new Date('2026-05-20').toISOString(),
-      locale: 'en',
       relatedGuides: [guides['Linh Nguyen']],
       relatedTourTypes: [tourTypes['Food & Culinary']],
     },
@@ -530,7 +541,6 @@ async function seed() {
       categories: [categories['destinations']],
       tags: [tags['vietnam'], tags['culture']],
       publishedAt: new Date('2026-06-10').toISOString(),
-      locale: 'en',
       relatedGuides: [guides['Minh Tran']],
       relatedTourTypes: [tourTypes['Cultural']],
     },
@@ -542,7 +552,6 @@ async function seed() {
       content: richText('We connect travelers with trusted local guides across Vietnam.'),
       status: 'published',
       author: adminUser.id,
-      locale: 'en',
     },
     {
       type: 'post',
@@ -555,7 +564,6 @@ async function seed() {
       categories: [categories['destinations']],
       tags: [tags['vietnam'], tags['quang-tri'], tags['history'], tags['war-history']],
       publishedAt: new Date('2026-07-21').toISOString(),
-      locale: 'en',
       relatedGuides: [guides['Tu Cao']],
       relatedTourTypes: [tourTypes['Cultural']],
     },
@@ -608,7 +616,6 @@ async function seed() {
   // ---------------------------------------------------------------------------
   const slideDefs = [
     {
-      locale: 'en',
       title: 'Discover Vietnam with Local Experts',
       subtitle: 'Authentic tours guided by people who call it home.',
       buttonText: 'Browse Tours',
@@ -620,7 +627,6 @@ async function seed() {
       alt: 'Scenic Vietnam landscape',
     },
     {
-      locale: 'en',
       title: 'Real Feedback from Real Travelers',
       subtitle: 'Read verified reviews before you book.',
       buttonText: 'Read Reviews',
@@ -675,7 +681,6 @@ async function seed() {
       collection: 'navigation-menus',
       data: {
         key: 'header',
-        locale: 'en',
         title: 'Main Navigation',
         published: true,
         items: headerNavItems,
@@ -688,7 +693,6 @@ async function seed() {
     { key: { equals: 'footer' } },
     {
       key: 'footer',
-      locale: 'en',
       title: 'Footer Navigation',
       published: true,
       items: [
@@ -718,8 +722,6 @@ async function seed() {
       contact: { email: 'hello@tourinsightshub.example', phone: '+84 90 000 0000', address: 'Hanoi, Vietnam' },
       social: { facebook: '#', instagram: '#', youtube: '#' },
       copyright: '© 2026 Tour Insights Hub. All rights reserved.',
-      languages: [{ lang: 'en' }, { lang: 'vi' }],
-      defaultLanguage: 'en',
       primaryColor: '#77B5FE',
       accentColor: '#4682B4',
     },

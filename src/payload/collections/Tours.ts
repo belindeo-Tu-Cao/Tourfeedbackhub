@@ -65,10 +65,51 @@ export const Guides: CollectionConfig = {
       type: 'textarea',
     },
     {
-      name: 'languages',
-      type: 'relationship',
-      relationTo: 'languages',
-      hasMany: true,
+      name: 'slogan',
+      type: 'text',
+      localized: true,
+    },
+    {
+      name: 'guideFeeUsd',
+      label: 'Guide Fee (USD/day)',
+      type: 'number',
+      min: 0,
+    },
+    {
+      name: 'showOnFrontend',
+      type: 'checkbox',
+      defaultValue: true,
+    },
+    {
+      name: 'socials',
+      type: 'group',
+      fields: [
+        { name: 'facebook', type: 'text' },
+        { name: 'instagram', type: 'text' },
+        { name: 'tiktok', type: 'text' },
+        { name: 'whatsapp', type: 'text' },
+        { name: 'zalo', type: 'text' },
+        { name: 'viber', type: 'text' },
+        { name: 'linkedin', type: 'text' },
+      ],
+    },
+    {
+      name: 'spokenLanguages',
+      type: 'array',
+      fields: [
+        { name: 'language', type: 'relationship', relationTo: 'languages', required: true },
+        {
+          name: 'level',
+          type: 'select',
+          options: [
+            { label: 'Basic', value: 'basic' },
+            { label: 'Intermediate', value: 'intermediate' },
+            { label: 'Fluent', value: 'fluent' },
+            { label: 'Native', value: 'native' },
+          ],
+        },
+        { name: 'certificate', type: 'text' },
+      ],
     },
     {
       name: 'provinces',
@@ -105,17 +146,25 @@ export const Tours: CollectionConfig = {
       type: 'text',
     },
     {
+      name: 'company',
+      label: 'Company',
+      type: 'text',
+    },
+    {
       name: 'name',
       type: 'text',
       required: true,
+      localized: true,
     },
     {
       name: 'summary',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'itinerary',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'startDate',
@@ -269,17 +318,17 @@ export const Tours: CollectionConfig = {
         {
           name: 'highlights',
           type: 'array',
-          fields: [{ name: 'item', type: 'text', required: true }],
+          fields: [{ name: 'item', type: 'text', required: true, localized: true }],
         },
         {
           name: 'included',
           type: 'array',
-          fields: [{ name: 'item', type: 'text', required: true }],
+          fields: [{ name: 'item', type: 'text', required: true, localized: true }],
         },
         {
           name: 'excluded',
           type: 'array',
-          fields: [{ name: 'item', type: 'text', required: true }],
+          fields: [{ name: 'item', type: 'text', required: true, localized: true }],
         },
       ],
     },

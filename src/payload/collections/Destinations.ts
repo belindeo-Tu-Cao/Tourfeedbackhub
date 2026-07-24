@@ -14,6 +14,7 @@ export const Destinations: CollectionConfig = {
       name: 'name',
       type: 'text',
       required: true,
+      localized: true,
     },
     {
       name: 'slug',
@@ -24,10 +25,12 @@ export const Destinations: CollectionConfig = {
     {
       name: 'summary',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'description',
       type: 'richText',
+      localized: true,
     },
     {
       name: 'heroImage',
@@ -87,8 +90,8 @@ export const Destinations: CollectionConfig = {
       name: 'mustSee',
       type: 'array',
       fields: [
-        { name: 'title', type: 'text' },
-        { name: 'description', type: 'textarea' },
+        { name: 'title', type: 'text', localized: true },
+        { name: 'description', type: 'textarea', localized: true },
         { name: 'image', type: 'upload', relationTo: 'media' },
       ],
     },
@@ -96,8 +99,8 @@ export const Destinations: CollectionConfig = {
       name: 'mustDo',
       type: 'array',
       fields: [
-        { name: 'title', type: 'text' },
-        { name: 'description', type: 'textarea' },
+        { name: 'title', type: 'text', localized: true },
+        { name: 'description', type: 'textarea', localized: true },
         { name: 'image', type: 'upload', relationTo: 'media' },
       ],
     },
@@ -105,14 +108,15 @@ export const Destinations: CollectionConfig = {
       name: 'mustEat',
       type: 'array',
       fields: [
-        { name: 'title', type: 'text' },
-        { name: 'description', type: 'textarea' },
+        { name: 'title', type: 'text', localized: true },
+        { name: 'description', type: 'textarea', localized: true },
         { name: 'image', type: 'upload', relationTo: 'media' },
       ],
     },
     {
       name: 'seo',
       type: 'json',
+      localized: true,
     },
   ],
 }

@@ -14,6 +14,7 @@ export const Stories: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
+      localized: true,
     },
     {
       name: 'slug',
@@ -24,10 +25,12 @@ export const Stories: CollectionConfig = {
     {
       name: 'excerpt',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'content',
       type: 'richText',
+      localized: true,
     },
     {
       name: 'coverImage',
@@ -49,6 +52,7 @@ export const Stories: CollectionConfig = {
         {
           name: 'tag',
           type: 'text',
+          localized: true,
         },
       ],
     },
@@ -83,22 +87,20 @@ export const Slides: CollectionConfig = {
   },
   fields: [
     {
-      name: 'locale',
-      type: 'text',
-      defaultValue: 'en',
-    },
-    {
       name: 'title',
       type: 'text',
       required: true,
+      localized: true,
     },
     {
       name: 'subtitle',
       type: 'text',
+      localized: true,
     },
     {
       name: 'buttonText',
       type: 'text',
+      localized: true,
     },
     {
       name: 'buttonLink',
@@ -166,10 +168,6 @@ export const NavigationMenus: CollectionConfig = {
       ],
     },
     {
-      name: 'locale',
-      type: 'text',
-    },
-    {
       name: 'title',
       type: 'text',
     },
@@ -186,6 +184,7 @@ export const NavigationMenus: CollectionConfig = {
           name: 'label',
           type: 'text',
           required: true,
+          localized: true,
         },
         {
           name: 'href',
@@ -309,7 +308,7 @@ export const SiteSettings: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'siteName',
-    defaultColumns: ['siteName', 'logoLight', 'defaultLanguage'],
+    defaultColumns: ['siteName', 'logoLight'],
   },
   fields: [
     {
@@ -329,10 +328,12 @@ export const SiteSettings: CollectionConfig = {
     {
       name: 'heroTitle',
       type: 'text',
+      localized: true,
     },
     {
       name: 'heroSubtitle',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'heroCtaLabel',
@@ -346,10 +347,12 @@ export const SiteSettings: CollectionConfig = {
     {
       name: 'aboutTitle',
       type: 'text',
+      localized: true,
     },
     {
       name: 'aboutDescription',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'aboutImage',
@@ -359,6 +362,7 @@ export const SiteSettings: CollectionConfig = {
     {
       name: 'missionStatement',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'values',
@@ -381,21 +385,6 @@ export const SiteSettings: CollectionConfig = {
     {
       name: 'copyright',
       type: 'text',
-    },
-    {
-      name: 'languages',
-      type: 'array',
-      fields: [
-        {
-          name: 'lang',
-          type: 'text',
-        },
-      ],
-    },
-    {
-      name: 'defaultLanguage',
-      type: 'text',
-      defaultValue: 'en',
     },
     {
       name: 'primaryColor',

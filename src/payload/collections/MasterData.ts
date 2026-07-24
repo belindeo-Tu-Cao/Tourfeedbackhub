@@ -76,6 +76,7 @@ export const TourTypes: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
+      localized: true,
     },
     {
       name: 'slug',
@@ -86,6 +87,7 @@ export const TourTypes: CollectionConfig = {
     {
       name: 'description',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'icon',

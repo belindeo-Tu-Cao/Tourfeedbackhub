@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { getPayloadClient, mediaUrl } from "@/lib/payload";
 import { siteSettings as fallbackSiteSettings } from "@/lib/data";
+import { locales as appLocales, defaultLocale as appDefaultLocale } from "@/i18n/routing";
 import type {
   PublicContent,
   Review,
@@ -82,7 +83,8 @@ function mapSiteSettings(data: Doc | undefined): SiteSettings {
     contact: { ...fallbackSiteSettings.contact },
     social: { ...fallbackSiteSettings.social },
     values: Array.isArray(fallbackSiteSettings.values) ? [...fallbackSiteSettings.values] : [],
-    languages: Array.isArray(fallbackSiteSettings.languages) ? [...fallbackSiteSettings.languages] : [],
+    languages: [...appLocales],
+    defaultLanguage: appDefaultLocale,
   };
 
   if (!data) return base;
@@ -90,9 +92,10 @@ function mapSiteSettings(data: Doc | undefined): SiteSettings {
   const values = Array.isArray(data.values)
     ? data.values.map((v: Doc) => (typeof v === "string" ? v : v?.value)).filter(Boolean)
     : base.values;
-  const languages = Array.isArray(data.languages)
-    ? data.languages.map((l: Doc) => (typeof l === "string" ? l : l?.lang)).filter(Boolean)
-    : base.languages;
+  // The set of site locales is owned by src/i18n/routing.ts, not by Payload
+  // content (the `languages`/`defaultLanguage` fields were removed from the
+  // site-settings collection in favor of that single source of truth).
+  const languages = [...appLocales];
 
   return {
     siteName: typeof data.siteName === "string" && data.siteName.trim() ? data.siteName : base.siteName,
@@ -116,7 +119,7 @@ function mapSiteSettings(data: Doc | undefined): SiteSettings {
     },
     copyright: typeof data.copyright === "string" ? data.copyright : base.copyright,
     languages,
-    defaultLanguage: typeof data.defaultLanguage === "string" ? data.defaultLanguage : base.defaultLanguage,
+    defaultLanguage: appDefaultLocale,
     primaryColor: typeof data.primaryColor === "string" ? data.primaryColor : base.primaryColor,
     accentColor: typeof data.accentColor === "string" ? data.accentColor : base.accentColor,
   };
@@ -463,18 +466,23 @@ export const getSiteSettings = cache(async () => {
 
 // Guide Profile functions
 
-function mapGuideLanguage(item: Doc): GuideLanguageProficiency {
+// A `spokenLanguages` row is `{ language: Language | id, level?, certificate? }`.
+// `language` may arrive unpopulated (an id) or populated (the related doc).
+function mapGuideLanguage(row: Doc): GuideLanguageProficiency {
+  const lang = row?.language;
+  const langDoc: Doc = typeof lang === "object" && lang !== null ? lang : {};
   return {
-    id: id(item.id ?? item),
-    name: item.name ?? (typeof item === "string" ? item : ""),
-    code: item.code ?? undefined,
-    proficiency: item.proficiency ?? undefined,
+    id: id(lang ?? row),
+    name: langDoc.name ?? (typeof lang === "string" ? lang : ""),
+    code: langDoc.code ?? undefined,
+    proficiency: row?.level ?? undefined,
+    certificate: typeof row?.certificate === "string" ? row.certificate : undefined,
   };
 }
 
 function mapGuide(doc: Doc): Guide {
-  const languages = Array.isArray(doc.languages)
-    ? doc.languages.map((l: Doc) => mapGuideLanguage(l))
+  const languages = Array.isArray(doc.spokenLanguages)
+    ? doc.spokenLanguages.map((l: Doc) => mapGuideLanguage(l)).filter((l: GuideLanguageProficiency) => l.name)
     : [];
   const provinces = relNames(doc.provinces);
   const nationalities = relNames(doc.nationalities);
@@ -493,7 +501,9 @@ function mapGuide(doc: Doc): Guide {
     cardExpiryDate: doc.cardExpiryDate ?? undefined,
     experienceYears: typeof doc.experienceYears === "number" ? doc.experienceYears : undefined,
     languages,
-    languageIds: relIds(doc.languages),
+    languageIds: Array.isArray(doc.spokenLanguages)
+      ? doc.spokenLanguages.map((l: Doc) => id(l?.language)).filter(Boolean)
+      : [],
     provinces,
     provinceIds: relIds(doc.provinces),
     nationalities,
