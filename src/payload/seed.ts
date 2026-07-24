@@ -1,8 +1,68 @@
-import { getPayload } from 'payload'
+import { getPayload, type Payload } from 'payload'
 import path from 'path'
 import config from './payload.config'
+import { locales, defaultLocale } from '../i18n/routing'
+import { seedTranslations } from './seed-translations'
 
 const SEED_MEDIA_DIR = path.resolve(process.cwd(), 'media', 'seed')
+
+const isEmpty = (v: unknown) =>
+  v === null || v === undefined || v === '' || (Array.isArray(v) && v.length === 0)
+
+// Per-collection localized scalar text fields to baseline-copy EN -> other locales.
+// IMPORTANT: only scalar text/textarea fields belong here. Arrays/groups whose rows
+// carry per-locale ids (e.g. richText, array subfields) must NOT be added — Payload
+// rejects writing another locale's id into those.
+// NOTE: `faqs` is intentionally excluded. Its `answer` field is a REQUIRED richText
+// field, so writing only `question` to a new locale fails required-field validation,
+// and richText is not a safe scalar to baseline-copy. FAQs rely on Payload
+// `fallback: true` to serve EN content for other locales until translated in admin.
+const LOCALIZED_FIELDS: Record<string, string[]> = {
+  posts: ['title', 'excerpt'],
+  stories: ['title', 'excerpt'],
+  destinations: ['name', 'summary'],
+  tours: ['name', 'summary'],
+  'tour-types': ['title', 'description'],
+}
+
+async function copyLocaleBaseline(payload: Payload, collection: string, id: string | number) {
+  const fields = LOCALIZED_FIELDS[collection] ?? []
+  if (!fields.length) return
+  const en = await payload.findByID({
+    collection: collection as never,
+    id,
+    locale: defaultLocale,
+    fallbackLocale: false,
+    depth: 0,
+  })
+  for (const locale of locales) {
+    if (locale === defaultLocale) continue
+    const cur = await payload.findByID({
+      collection: collection as never,
+      id,
+      locale,
+      fallbackLocale: false,
+      depth: 0,
+    })
+    const data: Record<string, unknown> = {}
+    for (const f of fields) {
+      if (
+        isEmpty((cur as Record<string, unknown>)[f]) &&
+        !isEmpty((en as Record<string, unknown>)[f])
+      ) {
+        data[f] = (en as Record<string, unknown>)[f]
+      }
+    }
+    if (Object.keys(data).length) {
+      await payload.update({
+        collection: collection as never,
+        id,
+        locale,
+        data: data as never,
+      })
+    }
+  }
+}
 
 const ADMIN_EMAIL = 'iposntmk@gmail.com'
 const ADMIN_PASSWORD = 'iposntmk@gmail.com'
@@ -194,6 +254,7 @@ async function seed() {
   for (const t of tourTypeDefs) {
     const doc = await ensure('tour-types', { title: { equals: t.title } }, t)
     tourTypes[t.title] = doc.id
+    await copyLocaleBaseline(payload, 'tour-types', doc.id)
   }
   log(`tour types ready (${tourTypeDefs.length})`)
 
@@ -341,6 +402,7 @@ async function seed() {
   for (const t of tourDefs) {
     const doc = await ensure('tours', { code: { equals: t.code } }, t)
     tours[t.code] = doc.id
+    await copyLocaleBaseline(payload, 'tours', doc.id)
   }
   log(`tours ready (${tourDefs.length})`)
 
@@ -572,6 +634,7 @@ async function seed() {
   for (const p of postDefs) {
     const doc = await ensure('posts', { slug: { equals: p.slug } }, p)
     posts[p.slug] = doc.id
+    await copyLocaleBaseline(payload, 'posts', doc.id)
   }
   log(`posts ready (${postDefs.length})`)
 
@@ -608,6 +671,7 @@ async function seed() {
   for (const s of storyDefs) {
     const doc = await ensure('stories', { title: { equals: s.title } }, s)
     stories[s.title] = doc.id
+    await copyLocaleBaseline(payload, 'stories', doc.id)
   }
   log(`stories ready (${storyDefs.length})`)
 
@@ -916,6 +980,7 @@ async function seed() {
   for (const d of destinationDefs) {
     const doc = await ensure('destinations', { slug: { equals: d.slug } }, d)
     destinations[d.slug] = doc.id
+    await copyLocaleBaseline(payload, 'destinations', doc.id)
   }
   log(`destinations ready (${destinationDefs.length})`)
 
@@ -962,9 +1027,15 @@ async function seed() {
     },
   ]
   for (const f of faqDefs) {
-    await ensure('faqs', { question: { equals: f.question } }, f)
+    const doc = await ensure('faqs', { question: { equals: f.question } }, f)
+    await copyLocaleBaseline(payload, 'faqs', doc.id)
   }
   log(`faqs ready (${faqDefs.length})`)
+
+  // ---------------------------------------------------------------------------
+  // 15. UI microcopy translations (from EN JSON)
+  // ---------------------------------------------------------------------------
+  await seedTranslations(payload)
 
   log('✅ Seed complete')
   process.exit(0)
