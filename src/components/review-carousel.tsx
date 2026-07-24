@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { Star, Quote } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,12 +14,13 @@ interface ReviewCarouselProps {
 }
 
 export default function ReviewCarousel({ reviews }: ReviewCarouselProps) {
+  const t = useTranslations('reviews');
   const slides = useMemo(() => reviews.slice(0, 8), [reviews]);
 
   if (slides.length === 0) {
     return (
       <div className="rounded-lg border bg-card/60 p-6 text-center text-sm text-muted-foreground">
-        Reviews will appear here once guests share their experiences.
+        {t('noReviews')}
       </div>
     );
   }

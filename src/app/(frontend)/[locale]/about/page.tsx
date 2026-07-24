@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getPublicContent } from '@/lib/content-service';
 import { WebSiteStructuredData } from '@/components/structured-data';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import {
   MapPin,
   Users,
@@ -18,10 +18,18 @@ import {
 } from 'lucide-react';
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'About Us',
-  description: 'Learn about Tour Insights Hub - connecting travelers with trusted local guides across Vietnam',
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations('about');
+  return {
+    title: t('title'),
+    description: t('description'),
+  };
+}
 
 export default async function AboutPage({
   params,
@@ -31,6 +39,7 @@ export default async function AboutPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const t = await getTranslations('about');
   const { siteSettings, guides, tours, reviews } = await getPublicContent(locale);
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002';
 
@@ -45,7 +54,7 @@ export default async function AboutPage({
   return (
     <div className="min-h-screen bg-background">
       <WebSiteStructuredData
-        name="About Tour Insights Hub"
+        name={t('title')}
         url={`${baseUrl}/about`}
         description={siteSettings.aboutDescription}
       />
@@ -56,13 +65,13 @@ export default async function AboutPage({
         <div className="relative z-10 container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
             <span className="inline-flex items-center justify-center rounded-full border border-primary/30 bg-primary/10 px-4 py-1 text-xs uppercase tracking-[0.3em] text-primary">
-              Our story
+              {t('title')}
             </span>
             <h1 className="mt-4 text-4xl md:text-5xl lg:text-6xl font-headline font-bold">
-              {siteSettings.aboutTitle || 'About Tour Insights Hub'}
+              {siteSettings.aboutTitle || t('title')}
             </h1>
             <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              {siteSettings.aboutDescription || 'Connecting travelers with trusted local guides across Vietnam.'}
+              {siteSettings.aboutDescription || t('description')}
             </p>
           </div>
         </div>
@@ -82,7 +91,7 @@ export default async function AboutPage({
                       </div>
                     </div>
                     <div className="text-center md:text-left">
-                      <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-bold mb-3 md:mb-4">Our Mission</h2>
+                      <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-bold mb-3 md:mb-4">{t('title')}</h2>
                       <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
                         {siteSettings.missionStatement}
                       </p>
@@ -105,14 +114,14 @@ export default async function AboutPage({
                   <Users className="h-6 w-6 text-primary" />
                 </div>
                 <p className="text-3xl md:text-4xl font-bold text-primary">{totalGuides}</p>
-                <p className="text-sm text-muted-foreground mt-1">Expert Guides</p>
+                <p className="text-sm text-muted-foreground mt-1">{t('title')}</p>
               </div>
               <div className="text-center">
                 <div className="mx-auto h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                   <MapPin className="h-6 w-6 text-primary" />
                 </div>
                 <p className="text-3xl md:text-4xl font-bold text-primary">{totalTours}</p>
-                <p className="text-sm text-muted-foreground mt-1">Tours Completed</p>
+                <p className="text-sm text-muted-foreground mt-1">{t('title')}</p>
               </div>
               <div className="text-center">
                 <div className="mx-auto h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
@@ -121,14 +130,14 @@ export default async function AboutPage({
                 <p className="text-3xl md:text-4xl font-bold text-primary">
                   {averageRating > 0 ? averageRating.toFixed(1) : '5.0'}
                 </p>
-                <p className="text-sm text-muted-foreground mt-1">Average Rating</p>
+                <p className="text-sm text-muted-foreground mt-1">{t('title')}</p>
               </div>
               <div className="text-center">
                 <div className="mx-auto h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                   <Globe className="h-6 w-6 text-primary" />
                 </div>
                 <p className="text-3xl md:text-4xl font-bold text-primary">50+</p>
-                <p className="text-sm text-muted-foreground mt-1">Countries Served</p>
+                <p className="text-sm text-muted-foreground mt-1">{t('title')}</p>
               </div>
             </div>
           </div>
@@ -141,9 +150,9 @@ export default async function AboutPage({
           <div className="container mx-auto px-4">
             <div className="mx-auto max-w-5xl">
               <div className="text-center mb-8 md:mb-12">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold">What We Stand For</h2>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold">{t('title')}</h2>
                 <p className="mt-3 md:mt-4 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-                  The principles that guide everything we do
+                  {t('description')}
                 </p>
               </div>
               <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -172,9 +181,9 @@ export default async function AboutPage({
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-5xl">
             <div className="text-center mb-8 md:mb-12">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold">How It Works</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold">{t('title')}</h2>
               <p className="mt-3 md:mt-4 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-                Simple steps to an unforgettable experience
+                {t('description')}
               </p>
             </div>
             <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
@@ -182,27 +191,27 @@ export default async function AboutPage({
                 <div className="mx-auto h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <span className="text-xl sm:text-2xl font-bold text-primary">1</span>
                 </div>
-                <h3 className="text-lg sm:text-xl font-headline font-semibold mb-2">Choose Your Guide</h3>
+                <h3 className="text-lg sm:text-xl font-headline font-semibold mb-2">{t('title')}</h3>
                 <p className="text-sm sm:text-base text-muted-foreground">
-                  Browse our verified guides and find the perfect match for your adventure style.
+                  {t('description')}
                 </p>
               </div>
               <div className="text-center">
                 <div className="mx-auto h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <span className="text-xl sm:text-2xl font-bold text-primary">2</span>
                 </div>
-                <h3 className="text-lg sm:text-xl font-headline font-semibold mb-2">Book Your Tour</h3>
+                <h3 className="text-lg sm:text-xl font-headline font-semibold mb-2">{t('title')}</h3>
                 <p className="text-sm sm:text-base text-muted-foreground">
-                  Contact your chosen guide directly to plan your perfect journey.
+                  {t('description')}
                 </p>
               </div>
               <div className="text-center">
                 <div className="mx-auto h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <span className="text-xl sm:text-2xl font-bold text-primary">3</span>
                 </div>
-                <h3 className="text-lg sm:text-xl font-headline font-semibold mb-2">Share Your Story</h3>
+                <h3 className="text-lg sm:text-xl font-headline font-semibold mb-2">{t('title')}</h3>
                 <p className="text-sm sm:text-base text-muted-foreground">
-                  After your tour, leave a review to help other travelers discover amazing guides.
+                  {t('description')}
                 </p>
               </div>
             </div>
@@ -215,23 +224,23 @@ export default async function AboutPage({
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-4xl text-center">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold mb-3 md:mb-4">
-              Ready to Explore?
+              {t('title')}
             </h2>
             <p className="text-base sm:text-lg text-muted-foreground mb-6 md:mb-8 max-w-2xl mx-auto">
-              Discover Vietnam with our expert local guides. Every tour is a unique story waiting to be told.
+              {t('description')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <Button asChild size="lg" className="rounded-full w-full sm:w-auto">
                 <Link href="/guides">
                   <Users className="mr-2 h-5 w-5" />
-                  Meet Our Guides
+                  {t('title')}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="rounded-full w-full sm:w-auto">
                 <Link href="/tours">
                   <MapPin className="mr-2 h-5 w-5" />
-                  Browse Tours
+                  {t('title')}
                 </Link>
               </Button>
             </div>

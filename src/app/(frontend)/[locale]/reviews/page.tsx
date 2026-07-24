@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Star } from 'lucide-react';
 import ReviewsExplorer from '@/components/reviews-explorer';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 const tripadvisorEmbedUrl = process.env.NEXT_PUBLIC_TRIPADVISOR_WIDGET_URL;
 const googleEmbedUrl = process.env.NEXT_PUBLIC_GOOGLE_REVIEWS_WIDGET_URL;
@@ -16,6 +16,7 @@ export default async function ReviewsPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const t = await getTranslations('reviews');
   const { siteSettings, reviews } = await getPublicContent(locale);
   const approvedReviews = reviews.filter((review) => review.status === 'approved');
   const heroImage = siteSettings.heroMediaUrl;
@@ -45,13 +46,13 @@ export default async function ReviewsPage({
         <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/40 to-transparent" />
         <div className="relative z-10 flex h-full flex-col items-center justify-center gap-6 px-4 text-center text-white">
           <div className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-4 py-1 text-xs uppercase tracking-[0.3em]">
-            Reviews & testimonials
+            {t('title')}
           </div>
-          <h1 className="text-4xl md:text-5xl font-headline font-bold">Traveller reviews</h1>
+          <h1 className="text-4xl md:text-5xl font-headline font-bold">{t('title')}</h1>
           <p className="max-w-2xl text-lg text-white/90">
             {totalReviews > 0
               ? `Rated ${averageRating.toFixed(1)} / 5 from ${totalReviews} verified guests.`
-              : 'Be the first to share a review and guide future travellers.'}
+              : t('noReviews')}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2">

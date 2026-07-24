@@ -1,13 +1,21 @@
 import { getAllGuides } from '@/lib/content-service';
 import GuidesExplorer from '@/components/guides-explorer';
 import { WebSiteStructuredData } from '@/components/structured-data';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Our Tour Guides',
-  description: 'Meet our experienced tour guides ready to show you the best of Vietnam',
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations('guides');
+  return {
+    title: t('title'),
+    description: t('description'),
+  };
+}
 
 export default async function GuidesPage({
   params,
@@ -17,6 +25,7 @@ export default async function GuidesPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const t = await getTranslations('guides');
   const guides = await getAllGuides(locale);
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002';
 
@@ -30,9 +39,9 @@ export default async function GuidesPage({
   return (
     <div className="min-h-screen bg-background">
       <WebSiteStructuredData
-        name="Tour Guides"
+        name={t('title')}
         url={`${baseUrl}/guides`}
-        description="Meet our experienced tour guides"
+        description={t('description')}
       />
 
       {/* Hero Section */}
@@ -41,29 +50,28 @@ export default async function GuidesPage({
         <div className="relative z-10 container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
             <span className="inline-flex items-center justify-center rounded-full border border-primary/30 bg-primary/10 px-4 py-1 text-xs uppercase tracking-[0.3em] text-primary">
-              Our team
+              {t('title')}
             </span>
             <h1 className="mt-4 text-4xl md:text-5xl lg:text-6xl font-headline font-bold">
-              Expert Tour Guides
+              {t('title')}
             </h1>
             <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Passionate professionals dedicated to creating unforgettable experiences.
-              Each guide is verified and ready for your next adventure.
+              {t('description')}
             </p>
 
             {/* Stats */}
             <div className="mt-8 flex flex-wrap items-center justify-center gap-6 sm:gap-8 md:gap-12">
               <div className="flex flex-col items-center">
                 <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">{totalGuides}</span>
-                <span className="text-xs sm:text-sm text-muted-foreground">Expert Guides</span>
+                <span className="text-xs sm:text-sm text-muted-foreground">{t('title')}</span>
               </div>
               <div className="flex flex-col items-center">
                 <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">{internationalGuides}</span>
-                <span className="text-xs sm:text-sm text-muted-foreground">International</span>
+                <span className="text-xs sm:text-sm text-muted-foreground">{t('title')}</span>
               </div>
               <div className="flex flex-col items-center">
                 <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">{allLanguages.length}</span>
-                <span className="text-xs sm:text-sm text-muted-foreground">Languages</span>
+                <span className="text-xs sm:text-sm text-muted-foreground">{t('languages')}</span>
               </div>
             </div>
           </div>

@@ -11,7 +11,7 @@ import { FinishedTourCommentForm } from '@/components/finished-tour/comment-form
 import { MediaCarousel } from '@/components/finished-tour/media-carousel';
 import { RelatedContentSection } from '@/components/related-content-section';
 import { TouristTripStructuredData } from '@/components/structured-data';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { buildAlternates } from '@/lib/locale-path';
 
 interface TourPageProps {
@@ -23,6 +23,7 @@ interface TourPageProps {
 
 export async function generateMetadata({ params }: TourPageProps) {
   const { locale, id } = await params;
+  const t = await getTranslations('tourDetail');
   const { tours } = await getPublicContent(locale);
   const tour = tours.find((item) => item.id === id);
   if (!tour) return {};
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: TourPageProps) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tourfeedbackhub.web.app';
 
   return {
-    title: tour.status === 'for_sale' ? `${tour.name} — Book This Tour` : `${tour.name} — Finished Tour Diary`,
+    title: tour.status === 'for_sale' ? `${tour.name} — ${t('tourPackage')}` : `${tour.name} — ${t('finishedTourDiary')}`,
     description: tour.summary,
     alternates: {
       languages: buildAlternates(siteUrl, `/tours/${id}`),
@@ -42,6 +43,7 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
   const { locale, id } = await params;
   setRequestLocale(locale);
 
+  const t = await getTranslations('tourDetail');
   const { tours, tourTypes } = await getPublicContent(locale);
   const tour = tours.find((item) => item.id === id);
 
@@ -52,11 +54,11 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
   const isForSale = tour.status === 'for_sale';
   const priceLabel = tour.price
     ? `${tour.currency === 'USD' ? `$${tour.price.toLocaleString('en-US')}` : `${tour.price.toLocaleString('vi-VN')}₫`} ${tour.priceUnit === 'per_group' ? '/ group' : '/ person'}`
-    : 'Price on request';
+    : t('priceOnRequest');
   const groupSizeLabel = tour.groupSizeMin || tour.groupSizeMax
     ? tour.groupSizeMin && tour.groupSizeMax
-      ? `${tour.groupSizeMin}–${tour.groupSizeMax} travellers`
-      : `${tour.groupSizeMin ?? tour.groupSizeMax} travellers`
+      ? `${tour.groupSizeMin}–${tour.groupSizeMax} ${t('travellers')}`
+      : `${tour.groupSizeMin ?? tour.groupSizeMax} ${t('travellers')}`
     : null;
 
   const [comments, reviews] = await Promise.all([
@@ -129,7 +131,7 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
           </div>
           <div className="relative z-10 max-w-2xl space-y-4">
             <p className="text-xs md:text-sm uppercase tracking-[0.35em] text-white/70">
-              {isForSale ? 'Tour package' : 'Finished tour diary'}
+              {isForSale ? t('tourPackage') : t('finishedTourDiary')}
             </p>
             <h1 className="text-3xl md:text-5xl font-headline font-bold">{tour.name}</h1>
             <p className="text-sm md:text-lg text-white/80">{tour.summary}</p>
@@ -142,7 +144,7 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
           <div className="space-y-10">
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="text-xl font-headline">Highlights</CardTitle>
+                <CardTitle className="text-xl font-headline">{t('highlights')}</CardTitle>
               </CardHeader>
               <CardContent className="grid gap-6 text-sm text-muted-foreground lg:grid-cols-2">
                 <div className="space-y-4">
@@ -157,13 +159,13 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
                     </span>
                     <span className="flex items-center gap-2">
                       <Users className="h-4 w-4 text-accent" />
-                      {isForSale ? (groupSizeLabel ?? 'Group size flexible') : `${tour.clientCount} travellers`}
+                      {isForSale ? (groupSizeLabel ?? t('groupSizeFlexible')) : `${tour.clientCount} ${t('travellers')}`}
                     </span>
                   </div>
                   {isForSale ? (
                     tour.highlights && tour.highlights.length > 0 && (
                       <div>
-                        <h3 className="font-semibold text-foreground/80 text-sm">Highlights</h3>
+                        <h3 className="font-semibold text-foreground/80 text-sm">{t('highlights')}</h3>
                         <ul className="mt-2 list-disc space-y-1 pl-5">
                           {tour.highlights.map((highlight) => (
                             <li key={highlight}>{highlight}</li>
@@ -173,12 +175,12 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
                     )
                   ) : (
                     <div>
-                      <h3 className="font-semibold text-foreground/80 text-sm">Nationalities represented</h3>
-                      <p>{tour.clientNationalities.join(', ') || 'Not recorded'}</p>
+                      <h3 className="font-semibold text-foreground/80 text-sm">{t('nationalitiesRepresented')}</h3>
+                      <p>{tour.clientNationalities.join(', ') || t('notRecorded')}</p>
                     </div>
                   )}
                   <div>
-                    <h3 className="font-semibold text-foreground/80 text-sm">Tour styles</h3>
+                    <h3 className="font-semibold text-foreground/80 text-sm">{t('tourStyles')}</h3>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {tour.tourTypeIds?.length ? (
                         tour.tourTypeIds.map((typeId) => {
@@ -186,13 +188,13 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
                           return (
                             <Link key={typeId} href={`/tour-types/${type?.slug ?? typeId}`}>
                               <Badge variant="secondary" className="hover:bg-secondary/80">
-                                {type?.title ?? 'Experience'}
+                                {type?.title ?? t('experience')}
                               </Badge>
                             </Link>
                           );
                         })
                       ) : (
-                        <span className="text-muted-foreground">Curated private journey</span>
+                        <span className="text-muted-foreground">{t('curatedPrivateJourney')}</span>
                       )}
                     </div>
                   </div>
@@ -200,7 +202,7 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
                 <div className="space-y-4">
                   <div>
                     <h3 className="font-semibold text-foreground/80 text-sm">
-                      {tour.guides && tour.guides.length > 1 ? 'Led by' : 'Lead guide'}
+                      {tour.guides && tour.guides.length > 1 ? t('ledBy') : t('leadGuide')}
                     </h3>
                     {tour.guides?.length ? (
                       <div className="flex flex-col gap-1">
@@ -211,23 +213,23 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-muted-foreground">Not assigned</p>
+                      <p className="text-muted-foreground">{t('notAssigned')}</p>
                     )}
                     {tour.guideLanguages?.length ? (
                       <p className="text-sm text-muted-foreground">
-                        Languages: {tour.guideLanguages.join(', ')}
+                        {t('languages')} {tour.guideLanguages.join(', ')}
                       </p>
                     ) : null}
                     {averageRating !== null && (
                       <p className="mt-2 flex flex-wrap gap-4 text-xs uppercase tracking-wide text-muted-foreground">
-                        <span>Average rating {averageRating.toFixed(1)} / 5</span>
-                        <span>{ratingAggregate.count} traveller {ratingAggregate.count === 1 ? 'review' : 'reviews'}</span>
+                        <span>{t('averageRating')} {averageRating.toFixed(1)} / 5</span>
+                        <span>{ratingAggregate.count} {ratingAggregate.count === 1 ? t('review') : t('reviewsPlural')}</span>
                       </p>
                     )}
                   </div>
                   {tour.provinces?.length ? (
                     <div>
-                      <h3 className="font-semibold text-foreground/80 text-sm">Provinces visited</h3>
+                      <h3 className="font-semibold text-foreground/80 text-sm">{t('provincesVisited')}</h3>
                       <p>{tour.provinces.join(', ')}</p>
                     </div>
                   ) : null}
@@ -237,7 +239,7 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl font-headline">Itinerary notes</CardTitle>
+                <CardTitle className="text-xl font-headline">{t('itineraryNotes')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
@@ -249,7 +251,7 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
             {(galleryPhotos.length > 0 || tour.videoUrls.length > 0) && (
               <Card className="shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-xl font-headline">Media keepsakes</CardTitle>
+                  <CardTitle className="text-xl font-headline">{t('mediaKeepsakes')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <MediaCarousel photos={galleryPhotos} videos={tour.videoUrls} />
@@ -260,12 +262,12 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
             {isForSale && ((tour.included && tour.included.length > 0) || (tour.excluded && tour.excluded.length > 0)) && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-xl font-headline">What&apos;s included</CardTitle>
+                  <CardTitle className="text-xl font-headline">{t('whatsIncluded')}</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-6 text-sm text-muted-foreground sm:grid-cols-2">
                   {tour.included && tour.included.length > 0 && (
                     <div>
-                      <h3 className="font-semibold text-foreground/80 text-sm">Included</h3>
+                      <h3 className="font-semibold text-foreground/80 text-sm">{t('included')}</h3>
                       <ul className="mt-2 list-disc space-y-1 pl-5">
                         {tour.included.map((item) => (
                           <li key={item}>{item}</li>
@@ -275,7 +277,7 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
                   )}
                   {tour.excluded && tour.excluded.length > 0 && (
                     <div>
-                      <h3 className="font-semibold text-foreground/80 text-sm">Not included</h3>
+                      <h3 className="font-semibold text-foreground/80 text-sm">{t('notIncluded')}</h3>
                       <ul className="mt-2 list-disc space-y-1 pl-5">
                         {tour.excluded.map((item) => (
                           <li key={item}>{item}</li>
@@ -290,13 +292,13 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
             {!isForSale && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-xl font-headline">Guide feedback</CardTitle>
+                  <CardTitle className="text-xl font-headline">{t('guideFeedback')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <FinishedTourCommentForm tourId={tour.id} />
                   <div className="space-y-4">
                     {comments.length === 0 && (
-                      <p className="text-sm text-muted-foreground">No guide feedback yet. Be the first to share your experience.</p>
+                      <p className="text-sm text-muted-foreground">{t('noGuideFeedback')}</p>
                     )}
                     {comments.map((comment) => (
                       <CommentCard key={comment.id} comment={comment} />
@@ -309,7 +311,7 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
             {reviews.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-xl font-headline">Traveller reviews</CardTitle>
+                  <CardTitle className="text-xl font-headline">{t('travellerReviews')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {reviews.map((review) => (
@@ -328,14 +330,14 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
               </Card>
             )}
 
-            <RelatedContentSection title="Related stories" items={tour.relatedStories} />
-            <RelatedContentSection title="Related posts" items={tour.relatedPosts} />
+            <RelatedContentSection title={t('relatedStories')} items={tour.relatedStories} />
+            <RelatedContentSection title={t('relatedPosts')} items={tour.relatedPosts} />
           </div>
 
           <aside className="space-y-6">
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="text-xl font-headline">At a glance</CardTitle>
+                <CardTitle className="text-xl font-headline">{t('atAGlance')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
                 {isForSale && (
@@ -354,12 +356,12 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-accent" />
-                  <span>{isForSale ? (groupSizeLabel ?? 'Group size flexible') : `${tour.clientCount} guests`}</span>
+                  <span>{isForSale ? (groupSizeLabel ?? t('groupSizeFlexible')) : `${tour.clientCount} ${t('guests')}`}</span>
                 </div>
             {averageRating !== null && (
               <div className="flex items-center gap-2">
                 <Star className="h-4 w-4 text-accent" />
-                <span>Avg guide rating {averageRating.toFixed(1)} ({ratingAggregate.count})</span>
+                <span>{t('avgGuideRating')} {averageRating.toFixed(1)} ({ratingAggregate.count})</span>
               </div>
             )}
               </CardContent>
@@ -368,11 +370,11 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
             {tour.photoUrls[0] && (
               <Card className="shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-xl font-headline">Cover moment</CardTitle>
+                  <CardTitle className="text-xl font-headline">{t('coverMoment')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
-                    <Image src={tour.photoUrls[0]} alt="Cover" fill className="object-cover" sizes="100vw" />
+                    <Image src={tour.photoUrls[0]} alt={t('cover')} fill className="object-cover" sizes="100vw" />
                   </div>
                 </CardContent>
               </Card>

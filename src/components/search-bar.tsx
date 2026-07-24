@@ -1,7 +1,8 @@
 'use client';
 
 import {useState, useEffect, useRef} from 'react';
-import {Search, X, FileText, Image as ImageIcon, Tag, Folder} from 'lucide-react';
+import { Search, X, FileText, Image as ImageIcon, Tag, Folder } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import {Input} from '@/components/ui/input';
 import {Button} from '@/components/ui/button';
 import {Card} from '@/components/ui/card';
@@ -21,6 +22,7 @@ interface SearchResult {
 }
 
 export function SearchBar() {
+  const t = useTranslations('search');
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -138,7 +140,7 @@ export function SearchBar() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search posts, pages, media..."
+          placeholder={t('placeholder')}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -167,7 +169,7 @@ export function SearchBar() {
           <ScrollArea className="max-h-[400px]">
             {loading ? (
               <div className="p-4 text-center text-muted-foreground">
-                <p className="text-sm">Searching...</p>
+                <p className="text-sm">{t('placeholder')}</p>
               </div>
             ) : results.length > 0 ? (
               <div className="p-2">
@@ -211,16 +213,16 @@ export function SearchBar() {
                     onClick={handleResultClick}
                     className="block text-sm text-primary hover:underline text-center"
                   >
-                    View all results for "{query}"
+                    {t('resultsFor', { query })}
                   </Link>
                 </div>
               </div>
             ) : (
               <div className="p-8 text-center">
                 <Search className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
-                <p className="text-sm text-muted-foreground">No results found for "{query}"</p>
+                <p className="text-sm text-muted-foreground">{t('noResults')}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Try different keywords or check spelling
+                  {t('noResults')}
                 </p>
               </div>
             )}

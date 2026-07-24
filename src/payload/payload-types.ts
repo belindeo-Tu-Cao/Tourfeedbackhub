@@ -68,6 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    mail: Mail;
     posts: Post;
     categories: Category;
     tags: Tag;
@@ -90,7 +91,6 @@ export interface Config {
     'navigation-menus': NavigationMenu;
     'site-settings': SiteSetting;
     'theme-settings': ThemeSetting;
-    mail: Mail;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -99,6 +99,7 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    mail: MailSelect<false> | MailSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
@@ -121,7 +122,6 @@ export interface Config {
     'navigation-menus': NavigationMenusSelect<false> | NavigationMenusSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     'theme-settings': ThemeSettingsSelect<false> | ThemeSettingsSelect<true>;
-    mail: MailSelect<false> | MailSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -230,6 +230,20 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mail".
+ */
+export interface Mail {
+  id: number;
+  to: string;
+  subject?: string | null;
+  html?: string | null;
+  text?: string | null;
+  status?: ('pending' | 'sent' | 'failed') | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -854,20 +868,6 @@ export interface ThemeSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "mail".
- */
-export interface Mail {
-  id: number;
-  to: string;
-  subject?: string | null;
-  html?: string | null;
-  text?: string | null;
-  status?: ('pending' | 'sent' | 'failed') | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -893,6 +893,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'mail';
+        value: number | Mail;
       } | null)
     | ({
         relationTo: 'posts';
@@ -981,10 +985,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'theme-settings';
         value: number | ThemeSetting;
-      } | null)
-    | ({
-        relationTo: 'mail';
-        value: number | Mail;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1062,6 +1062,19 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mail_select".
+ */
+export interface MailSelect<T extends boolean = true> {
+  to?: T;
+  subject?: T;
+  html?: T;
+  text?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1569,19 +1582,6 @@ export interface ThemeSettingsSelect<T extends boolean = true> {
   footerStyle?: T;
   customCSS?: T;
   customJS?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "mail_select".
- */
-export interface MailSelect<T extends boolean = true> {
-  to?: T;
-  subject?: T;
-  html?: T;
-  text?: T;
-  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }

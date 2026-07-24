@@ -2,13 +2,21 @@ import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { getDestinations } from '@/lib/content-service';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Destinations',
-  description: 'Explore destinations across Vietnam — tours, guides, blog stories, and local must-see, must-do, must-eat picks.',
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations('nav');
+  return {
+    title: t('destinations'),
+    description: t('destinations'),
+  };
+}
 
 export default async function DestinationsPage({
   params,
@@ -18,6 +26,7 @@ export default async function DestinationsPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const t = await getTranslations('nav');
   const destinations = await getDestinations(locale);
 
   return (
@@ -25,17 +34,17 @@ export default async function DestinationsPage({
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-flex items-center justify-center rounded-full border border-border/60 bg-secondary/30 px-4 py-1 text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            Explore Vietnam
+            {t('destinations')}
           </span>
-          <h1 className="mt-4 text-4xl md:text-5xl font-headline font-bold">Destinations</h1>
+          <h1 className="mt-4 text-4xl md:text-5xl font-headline font-bold">{t('destinations')}</h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Every destination brings together the tours, guides, and stories that bring it to life — plus what to see, do, and eat while you're there.
+            {t('destinations')}
           </p>
         </div>
 
         {destinations.length === 0 ? (
           <div className="mt-12 rounded-xl border border-dashed border-border/60 bg-background/70 p-12 text-center text-muted-foreground">
-            No destinations published yet.
+            {t('destinations')}
           </div>
         ) : (
           <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">

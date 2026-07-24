@@ -2,6 +2,7 @@
 
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,6 +25,7 @@ const initialState: QuickFeedbackState = {
 
 export default function HomeFeedbackForm() {
   const router = useRouter();
+  const t = useTranslations('feedback');
   const { toast } = useToast();
   const [formState, setFormState] = useState<QuickFeedbackState>(initialState);
 
@@ -38,8 +40,8 @@ export default function HomeFeedbackForm() {
       window.sessionStorage.setItem(QUICK_INTENT_KEY, JSON.stringify(formState));
     }
     toast({
-      title: 'Let’s capture the full story',
-      description: 'Almost there — add a few more details on the next screen.',
+      title: t('title'),
+      description: t('description'),
     });
     router.push('/feedback?from=homepage');
   };
@@ -47,9 +49,9 @@ export default function HomeFeedbackForm() {
   return (
     <Card className="shadow-xl">
       <CardHeader className="pb-4">
-        <CardTitle className="font-headline text-2xl">Share a moment with us</CardTitle>
+        <CardTitle className="font-headline text-2xl">{t('title')}</CardTitle>
         <p className="text-sm text-muted-foreground">
-          Leave a quick note and we’ll guide you through the full feedback form.
+          {t('description')}
         </p>
       </CardHeader>
       <CardContent>
@@ -58,29 +60,29 @@ export default function HomeFeedbackForm() {
             required
             value={formState.name}
             onChange={handleChange('name')}
-            placeholder="Your name"
-            aria-label="Your name"
+            placeholder={t('name')}
+            aria-label={t('name')}
           />
           <Input
             required
             type="email"
             value={formState.email}
             onChange={handleChange('email')}
-            placeholder="Email address"
-            aria-label="Email address"
+            placeholder={t('email')}
+            aria-label={t('email')}
           />
           <Textarea
             required
             value={formState.message}
             onChange={handleChange('message')}
-            placeholder="What made the journey special?"
-            aria-label="Message"
+            placeholder={t('message')}
+            aria-label={t('message')}
             className="min-h-[120px]"
           />
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-            <span>Your information is private &amp; secure.</span>
+            <span>{t('description')}</span>
             <Button type="submit" size="sm">
-              Continue to feedback
+              {t('submitFeedback')}
             </Button>
           </div>
         </form>

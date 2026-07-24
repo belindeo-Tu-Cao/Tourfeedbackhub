@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { getPublicContent } from '@/lib/content-service';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 export default async function TourTypesPage({
   params,
@@ -13,6 +13,8 @@ export default async function TourTypesPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const t = await getTranslations('home');
+  const tCommon = await getTranslations('common');
   const { tourTypes, tours } = await getPublicContent(locale);
   const toursByType = new Map<string, string[]>(
     tourTypes.map((type) => [
@@ -28,11 +30,11 @@ export default async function TourTypesPage({
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-flex items-center justify-center rounded-full border border-border/60 bg-secondary/30 px-4 py-1 text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            Tailored experiences
+            {t('tourStylesTitle')}
           </span>
-          <h1 className="mt-4 text-4xl md:text-5xl font-headline font-bold">Choose your travel personality</h1>
+          <h1 className="mt-4 text-4xl md:text-5xl font-headline font-bold">{t('tourStylesTitle')}</h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Each tour style combines boutique stays, curated dining, and insider access. Start with your travel persona and discover three hand-picked journeys to match.
+            {t('tourStylesDesc')}
           </p>
         </div>
 
@@ -55,7 +57,7 @@ export default async function TourTypesPage({
                 <p className="text-sm text-muted-foreground leading-relaxed">{tourType.description}</p>
                 {toursByType.get(tourType.id)?.length ? (
                   <div className="space-y-2">
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Signature journeys</p>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">{t('tourStylesTitle')}</p>
                     <ul className="space-y-1 text-sm text-foreground/80">
                       {toursByType
                         .get(tourType.id)!
@@ -70,7 +72,7 @@ export default async function TourTypesPage({
               <CardFooter>
                 <Button asChild variant="ghost" className="px-0">
                   <Link href={`/tours?style=${tourType.id}`} className="flex items-center gap-2">
-                    View tours
+                    {tCommon('viewTours')}
                     <span aria-hidden>&rarr;</span>
                   </Link>
                 </Button>

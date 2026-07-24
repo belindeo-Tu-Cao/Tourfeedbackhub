@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -33,17 +34,17 @@ interface StoriesExplorerProps {
 }
 
 const timeframeOptions = [
-  { value: 'all', label: 'All time' },
-  { value: '30', label: 'Last 30 days' },
-  { value: '90', label: 'Last 3 months' },
-  { value: '365', label: 'Last year' },
+  { value: 'all', labelKey: 'allTime' },
+  { value: '30', labelKey: 'last30Days' },
+  { value: '90', labelKey: 'last3Months' },
+  { value: '365', labelKey: 'lastYear' },
 ];
 
 const lengthOptions = [
-  { value: 'all', label: 'Any length' },
-  { value: 'short', label: '< 5 min' },
-  { value: 'medium', label: '5 – 9 min' },
-  { value: 'long', label: '10+ min' },
+  { value: 'all', labelKey: 'anyLength' },
+  { value: 'short', labelKey: 'short' },
+  { value: 'medium', labelKey: 'medium' },
+  { value: 'long', labelKey: 'long' },
 ];
 
 function matchesTimeframe(publishedAt: Date, filter: string) {
@@ -64,6 +65,8 @@ function matchesLength(readTime: number | null | undefined, filter: string) {
 }
 
 export default function StoriesExplorer({ stories }: StoriesExplorerProps) {
+  const t = useTranslations('stories');
+  const tCommon = useTranslations('common');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [selectedTimeframe, setSelectedTimeframe] = useState<string>('all');
@@ -128,24 +131,24 @@ export default function StoriesExplorer({ stories }: StoriesExplorerProps) {
         <div className="grid gap-4 md:grid-cols-[2fr_1fr_1fr_1fr]">
           <div>
             <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Search stories
+              {t('searchStories')}
             </label>
             <Input
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search by title or excerpt"
+              placeholder={t('searchPlaceholder')}
             />
           </div>
           <div>
             <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Tag
+              {t('tag')}
             </label>
             <Select value={selectedTag} onValueChange={setSelectedTag}>
               <SelectTrigger>
-                <SelectValue placeholder="All tags" />
+                <SelectValue placeholder={t('allTags')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All tags</SelectItem>
+                <SelectItem value="all">{t('allTags')}</SelectItem>
                 {tagOptions.map((tag) => (
                   <SelectItem key={tag} value={tag}>
                     {tag}
@@ -156,16 +159,16 @@ export default function StoriesExplorer({ stories }: StoriesExplorerProps) {
           </div>
           <div>
             <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Timeframe
+              {t('timeframe')}
             </label>
             <Select value={selectedTimeframe} onValueChange={setSelectedTimeframe}>
               <SelectTrigger>
-                <SelectValue placeholder="All time" />
+                <SelectValue placeholder={t('allTime')} />
               </SelectTrigger>
               <SelectContent>
                 {timeframeOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
-                    {option.label}
+                    {t(option.labelKey)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -173,16 +176,16 @@ export default function StoriesExplorer({ stories }: StoriesExplorerProps) {
           </div>
           <div>
             <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Read length
+              {t('readTime')}
             </label>
             <Select value={selectedLength} onValueChange={setSelectedLength}>
               <SelectTrigger>
-                <SelectValue placeholder="Any length" />
+                <SelectValue placeholder={t('anyLength')} />
               </SelectTrigger>
               <SelectContent>
                 {lengthOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
-                    {option.label}
+                    {t(option.labelKey)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -192,7 +195,7 @@ export default function StoriesExplorer({ stories }: StoriesExplorerProps) {
         {(searchQuery || selectedTag !== 'all' || selectedTimeframe !== 'all' || selectedLength !== 'all') && (
           <div className="mt-4 flex justify-end">
             <Button variant="ghost" size="sm" onClick={resetFilters}>
-              Clear filters
+              {tCommon('close')}
             </Button>
           </div>
         )}
@@ -200,14 +203,14 @@ export default function StoriesExplorer({ stories }: StoriesExplorerProps) {
 
       {filteredStories.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border/60 bg-background/70 p-12 text-center text-muted-foreground">
-          No stories match your filters right now. Try adjusting your search to uncover more travel notes.
+          {t('noStories')}
         </div>
       ) : (
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {filteredStories.map((story) => {
             const publishedAt = new Date(story.publishedAt);
             const formattedDate = format(publishedAt, 'MMM d, yyyy');
-            const readTime = story.readTimeMinutes ? `${story.readTimeMinutes} min read` : 'Travel note';
+            const readTime = story.readTimeMinutes ? `${story.readTimeMinutes} ${t('readTime')}` : t('title');
             const tags = story.tags ?? (story.category ? [story.category] : []);
             return (
               <Card key={story.id} className="flex h-full flex-col overflow-hidden border-border/60 bg-background/80 shadow-md">
@@ -223,7 +226,7 @@ export default function StoriesExplorer({ stories }: StoriesExplorerProps) {
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center bg-secondary/30 text-secondary-foreground/70">
-                        Story imagery coming soon
+                        {t('title')}
                       </div>
                     )}
                     <Badge className="absolute left-4 top-4 bg-background/90 text-xs">{readTime}</Badge>

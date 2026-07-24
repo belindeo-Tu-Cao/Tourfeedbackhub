@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { format } from 'date-fns';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Star, MapPin } from 'lucide-react';
@@ -47,6 +48,8 @@ function matchesTimeframe(date: Date, filter: string) {
 }
 
 export default function ReviewsExplorer({ reviews, tourNames }: ReviewsExplorerProps) {
+  const t = useTranslations('reviews');
+  const tCommon = useTranslations('common');
   const [searchQuery, setSearchQuery] = useState('');
   const [ratingFilter, setRatingFilter] = useState('all');
   const [tourFilter, setTourFilter] = useState('all');
@@ -92,24 +95,24 @@ export default function ReviewsExplorer({ reviews, tourNames }: ReviewsExplorerP
         <div className="grid gap-4 md:grid-cols-[2fr_1fr_1fr_1fr]">
           <div>
             <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Search
+              {tCommon('search')}
             </label>
             <Input
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search reviewer, country, or keywords"
+              placeholder={tCommon('search')}
             />
           </div>
           <div>
             <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Rating
+              {t('rating')}
             </label>
             <Select value={ratingFilter} onValueChange={setRatingFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="All ratings" />
+                <SelectValue placeholder={t('title')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All ratings</SelectItem>
+                <SelectItem value="all">{t('title')}</SelectItem>
                 <SelectItem value="5">5 stars</SelectItem>
                 <SelectItem value="4">4 stars & up</SelectItem>
                 <SelectItem value="3">3 stars & up</SelectItem>
@@ -118,14 +121,14 @@ export default function ReviewsExplorer({ reviews, tourNames }: ReviewsExplorerP
           </div>
           <div>
             <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Tour
+              {t('filterByTour')}
             </label>
             <Select value={tourFilter} onValueChange={setTourFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="All tours" />
+                <SelectValue placeholder={t('allTours')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All tours</SelectItem>
+                <SelectItem value="all">{t('allTours')}</SelectItem>
                 {tourNames.map((name) => (
                   <SelectItem key={name} value={name}>
                     {name}
@@ -136,14 +139,14 @@ export default function ReviewsExplorer({ reviews, tourNames }: ReviewsExplorerP
           </div>
           <div>
             <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Timeframe
+              {t('title')}
             </label>
             <Select value={timeframeFilter} onValueChange={setTimeframeFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="All time" />
+                <SelectValue placeholder={t('title')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All time</SelectItem>
+                <SelectItem value="all">{t('title')}</SelectItem>
                 <SelectItem value="6">Last 6 months</SelectItem>
                 <SelectItem value="12">Last year</SelectItem>
               </SelectContent>
@@ -153,7 +156,7 @@ export default function ReviewsExplorer({ reviews, tourNames }: ReviewsExplorerP
         {(searchQuery || ratingFilter !== 'all' || tourFilter !== 'all' || timeframeFilter !== 'all') && (
           <div className="mt-4 flex justify-end">
             <Button variant="ghost" size="sm" onClick={resetFilters}>
-              Clear filters
+              {tCommon('close')}
             </Button>
           </div>
         )}
@@ -161,7 +164,7 @@ export default function ReviewsExplorer({ reviews, tourNames }: ReviewsExplorerP
 
       {filteredReviews.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border/60 bg-background/80 p-12 text-center text-muted-foreground">
-          No reviews match those filters just yet. Try expanding your search or choose a different rating.
+          {t('noReviews')}
         </div>
       ) : (
         <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">

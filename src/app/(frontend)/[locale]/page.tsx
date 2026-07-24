@@ -10,7 +10,7 @@ import { getPublicContent } from '@/lib/content-service';
 import HeroCarousel from '@/components/hero-carousel';
 import ReviewCarousel from '@/components/review-carousel';
 import HomeFeedbackForm from '@/components/home-feedback-form';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 export default async function Home({
   params,
@@ -19,6 +19,10 @@ export default async function Home({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  const t = await getTranslations('home');
+  const tCommon = await getTranslations('common');
+  const tNav = await getTranslations('nav');
 
   const { siteSettings, tours, reviews, tourTypes, stories, slides, posts } = await getPublicContent(locale);
   const finishedTours = tours.filter((tour) => tour.status === 'finished');
@@ -91,7 +95,7 @@ export default async function Home({
           <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
             <div className="space-y-6">
               <span className="inline-flex w-fit items-center rounded-full border border-border/60 bg-card/50 px-4 py-1 text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                Boutique travel, crafted locally
+                {t('heroBadge')}
               </span>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-headline font-bold leading-tight">
                 {siteSettings.aboutTitle}
@@ -117,10 +121,10 @@ export default async function Home({
               )}
               <div className="flex flex-wrap gap-3">
                 <Button asChild variant="outline">
-                  <Link href="/about">Discover the story</Link>
+                  <Link href="/about">{t('discoverStory')}</Link>
                 </Button>
                 <Button asChild variant="ghost">
-                  <Link href="/tour-types">Explore tour styles</Link>
+                  <Link href="/tour-types">{t('exploreStyles')}</Link>
                 </Button>
               </div>
             </div>
@@ -138,7 +142,7 @@ export default async function Home({
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/40 via-secondary/40 to-accent/40">
                     <span className="text-lg font-semibold text-primary-foreground/80">
-                      Our guides, your adventures
+                      {t('ourGuides')}
                     </span>
                   </div>
                 )}
@@ -147,7 +151,7 @@ export default async function Home({
               {featuredStory && (
                 <Card className="absolute -bottom-10 left-6 right-6 border border-border/60 bg-background/95 shadow-xl">
                   <CardHeader className="space-y-2">
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Latest diary highlight</p>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">{t('latestDiaryHighlight')}</p>
                     <CardTitle className="text-lg font-headline leading-snug">{featuredStory.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -156,7 +160,7 @@ export default async function Home({
                   <CardFooter className="flex items-center justify-between text-sm text-muted-foreground">
                     <span>{format(featuredStory.publishedAt, 'MMM d, yyyy')}</span>
                     <Button asChild variant="ghost" className="px-0">
-                      <Link href="/stories">Read the diary</Link>
+                      <Link href="/stories">{t('readDiary')}</Link>
                     </Button>
                   </CardFooter>
                 </Card>
@@ -168,9 +172,9 @@ export default async function Home({
 
       <section className="py-16 md:py-24 bg-secondary/40">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-headline font-bold text-center">Tour Styles</h2>
+          <h2 className="text-3xl md:text-4xl font-headline font-bold text-center">{t('tourStylesTitle')}</h2>
           <p className="mt-4 text-center max-w-2xl mx-auto text-muted-foreground">
-            Each journey blends boutique stays, curated dining, and cultural immersion tailored to your pace.
+            {t('tourStylesDesc')}
           </p>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {tourTypes.slice(0, 3).map((tourType) => (
@@ -189,7 +193,7 @@ export default async function Home({
                 <CardFooter>
                   <Button asChild variant="ghost" className="px-0">
                     <Link href={`/tours?style=${tourType.id}`} className="flex items-center gap-2">
-                      View tours
+                      {t('viewTours')}
                       <ArrowRight className="h-4 w-4" />
                     </Link>
                   </Button>
@@ -201,7 +205,7 @@ export default async function Home({
             <div className="mt-8 text-center">
               <Button asChild variant="outline">
                 <Link href="/tour-types" className="flex items-center gap-2">
-                  View all {tourTypes.length} tour styles
+                  {tCommon('viewAll')} {tourTypes.length} {t('tourStylesTitle').toLowerCase()}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
@@ -212,9 +216,9 @@ export default async function Home({
 
       <section id="tours" className="py-16 md:py-24 bg-background">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-headline font-bold text-center">Latest Tour Diaries</h2>
+          <h2 className="text-3xl md:text-4xl font-headline font-bold text-center">{t('latestDiaries')}</h2>
           <p className="mt-4 text-center max-w-2xl mx-auto text-muted-foreground">
-            Explore freshly wrapped journeys, see where guests ventured, and open the diary for day-by-day highlights.
+            {t('latestDiariesDesc')}
           </p>
           {recentDiaries.length > 0 ? (
             <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -224,14 +228,14 @@ export default async function Home({
             </div>
           ) : (
             <p className="mt-8 text-center text-muted-foreground">
-              Finished journey highlights will appear here once published.
+              {t('noDiaries')}
             </p>
           )}
           {recentDiaries.length > 0 && (
             <div className="mt-12 text-center">
               <Button asChild variant="outline">
                 <Link href="/tours">
-                  View all diaries <ArrowRight className="ml-2 h-4 w-4" />
+                  {t('viewAllDiaries')} <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>
@@ -243,9 +247,9 @@ export default async function Home({
         <section id="stories" className="py-16 md:py-24 bg-secondary/20">
           <div className="container mx-auto px-4">
             <div className="flex flex-col items-center text-center">
-              <h2 className="text-3xl md:text-4xl font-headline font-bold">Latest Stories</h2>
+              <h2 className="text-3xl md:text-4xl font-headline font-bold">{t('latestStories')}</h2>
               <p className="mt-4 max-w-2xl text-muted-foreground">
-                Narrative snapshots from guides and travellers, curated to inspire the next journey.
+                {t('latestStoriesDesc')}
               </p>
             </div>
             <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -279,7 +283,7 @@ export default async function Home({
                     <CardFooter>
                       <Button asChild variant="ghost" className="px-0 text-sm">
                         <Link href="/stories" className="flex items-center gap-2">
-                          Read the story
+                          {t('readStory')}
                           <ChevronRight className="h-4 w-4" />
                         </Link>
                       </Button>
@@ -291,7 +295,7 @@ export default async function Home({
             <div className="mt-12 text-center">
               <Button asChild variant="outline">
                 <Link href="/stories">
-                  Explore stories <ArrowRight className="ml-2 h-4 w-4" />
+                  {t('exploreStories')} <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>
@@ -303,9 +307,9 @@ export default async function Home({
         <section id="blog" className="py-16 md:py-24 bg-secondary/40">
           <div className="container mx-auto px-4">
             <div className="flex flex-col items-center text-center">
-              <h2 className="text-3xl md:text-4xl font-headline font-bold">Latest from the Blog</h2>
+              <h2 className="text-3xl md:text-4xl font-headline font-bold">{t('latestBlog')}</h2>
               <p className="mt-4 max-w-2xl text-muted-foreground">
-                Fresh stories and planning tips from the team and our travellers.
+                {t('latestBlogDesc')}
               </p>
             </div>
             <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -345,7 +349,7 @@ export default async function Home({
                     <CardFooter className="flex items-center justify-between">
                       <Button asChild variant="ghost" className="px-0 text-sm">
                         <Link href={`/blog/${post.slug}`} className="flex items-center gap-2">
-                          Read more
+                          {tCommon('readMore')}
                           <ChevronRight className="h-4 w-4" />
                         </Link>
                       </Button>
@@ -357,7 +361,7 @@ export default async function Home({
             <div className="mt-12 text-center">
               <Button asChild variant="outline">
                 <Link href="/blog">
-                  Explore the blog <ArrowRight className="ml-2 h-4 w-4" />
+                  {t('exploreBlog')} <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>
@@ -369,28 +373,28 @@ export default async function Home({
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center text-center gap-4">
             <span className="inline-flex items-center rounded-full border border-border/60 bg-background/60 px-4 py-1 text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              Guest feedback
+              {t('guestFeedback')}
             </span>
             <h2 className="text-3xl md:text-4xl font-headline font-bold">
-              Travellers rate us {overallAverageRating.toFixed(1)} / 5
+              {t('travellersRate', { rating: overallAverageRating.toFixed(1) })}
             </h2>
             <p className="max-w-2xl text-muted-foreground">
               {totalReviews > 0
-                ? `Based on ${totalReviews} verified review${totalReviews === 1 ? '' : 's'} from recent bespoke journeys.`
-                : 'Be the first to share your experience with our guides and boutique adventures.'}
+                ? t('basedOnReviews', { count: totalReviews })
+                : t('beFirst')}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground">
               <span className="inline-flex items-center gap-2 rounded-full bg-background/60 px-4 py-2">
                 <Star className="h-4 w-4 text-yellow-400" />
-                <span>Average rating {overallAverageRating.toFixed(1)}</span>
+                <span>{t('averageRating')} {overallAverageRating.toFixed(1)}</span>
               </span>
               <span className="inline-flex items-center gap-2 rounded-full bg-background/60 px-4 py-2">
                 <MapIcon className="h-4 w-4" />
-                <span>{finishedTours.length} tours guided this year</span>
+                <span>{t('toursGuided', { count: finishedTours.length })}</span>
               </span>
               <Button asChild variant="ghost" className="px-4">
                 <Link href="/feedback" className="flex items-center gap-2">
-                  Share your review
+                  {t('shareReview')}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
@@ -402,13 +406,13 @@ export default async function Home({
           <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
             <Button asChild variant="outline">
               <Link href="/reviews" className="flex items-center gap-2">
-                Read all reviews
+                {t('readAllReviews')}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="ghost">
               <Link href="/feedback" className="flex items-center gap-2">
-                Write a review
+                {t('writeReview')}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
@@ -433,39 +437,39 @@ export default async function Home({
                 <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/20 to-transparent" />
                 <div className="relative z-10 flex h-full flex-col justify-end gap-4 p-8 text-white">
                   <span className="inline-flex w-fit items-center rounded-full border border-white/40 bg-white/10 px-4 py-1 text-xs uppercase tracking-[0.3em]">
-                    Feedback matters
+                    {t('feedbackMatters')}
                   </span>
-                  <p className="text-2xl font-headline leading-snug drop-shadow">“Your reflections shape tomorrow’s adventures.”</p>
+                  <p className="text-2xl font-headline leading-snug drop-shadow">{t('feedbackQuote')}</p>
                   <span className="text-sm text-white/80">
-                    We share highlights with guides and planners each week to keep experiences boutique and personal.
+                    {t('feedbackShare')}
                   </span>
                 </div>
               </div>
               <div className="space-y-4 text-center lg:text-left">
-                <h2 className="text-3xl md:text-4xl font-headline font-bold">Your voice guides our next itinerary</h2>
+                <h2 className="text-3xl md:text-4xl font-headline font-bold">{t('voiceGuides')}</h2>
                 <p className="text-lg text-muted-foreground">
-                  Leave a quick note below and we will take you to the full feedback form to capture every detail of your journey.
+                  {t('voiceDesc')}
                 </p>
                 <ul className="space-y-3 text-sm text-muted-foreground">
                   <li className="flex items-start gap-3">
                     <Sparkles className="mt-1 h-4 w-4 text-accent" />
-                    Honest stories inspire new boutique routes and local partnerships.
+                    {t('honestStories')}
                   </li>
                   <li className="flex items-start gap-3">
                     <Users className="mt-1 h-4 w-4 text-accent" />
-                    Every review is shared with your guide so they can celebrate wins and refine the details.
+                    {t('everyReview')}
                   </li>
                   <li className="flex items-start gap-3">
                     <Compass className="mt-1 h-4 w-4 text-accent" />
-                    We protect your privacy and only publish feedback with your permission.
+                    {t('privacyNote')}
                   </li>
                 </ul>
                 <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
                   <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                    <Link href="/feedback">Open full feedback form</Link>
+                    <Link href="/feedback">{t('openFeedbackForm')}</Link>
                   </Button>
                   <Button asChild variant="ghost">
-                    <Link href="/reviews">Browse traveller stories</Link>
+                    <Link href="/reviews">{t('browseTravellerStories')}</Link>
                   </Button>
                 </div>
               </div>

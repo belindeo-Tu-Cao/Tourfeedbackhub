@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -50,6 +51,8 @@ const proficiencyColors: Record<string, string> = {
 };
 
 export default function GuideProfile({ guide, tours, reviews, relatedPosts }: GuideProfileProps) {
+  const t = useTranslations('guides');
+  const tCommon = useTranslations('common');
   const totalPax = tours.reduce((sum, tour) => sum + (tour.clientCount || 0), 0);
   const averageRating =
     reviews.length > 0
@@ -86,7 +89,7 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
-            All Guides
+            {t('title')}
           </Link>
 
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
@@ -140,14 +143,14 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                       <Award className="h-4 w-4 text-primary" />
                       <span className="text-sm">
                         {guide.cardType === 'international'
-                          ? 'International Tour Guide'
-                          : 'Domestic Tour Guide'}
+                          ? t('title')
+                          : t('title')}
                       </span>
                     </div>
                   )}
                   {guide.experienceYears && (
                     <Badge variant="secondary" className="text-sm">
-                      {guide.experienceYears}+ years experience
+                      {guide.experienceYears}+ {t('years')}
                     </Badge>
                   )}
                 </div>
@@ -164,19 +167,19 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                 <div className="rounded-xl sm:rounded-2xl bg-background/80 p-3 sm:p-4 text-center shadow-sm border border-border/60">
                   <Briefcase className="mx-auto h-4 w-4 sm:h-5 sm:w-5 text-primary mb-1 sm:mb-2" />
                   <p className="text-lg sm:text-2xl font-bold">{guide.totalTours || tours.length}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground">Tours</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">{t('title')}</p>
                 </div>
                 <div className="rounded-xl sm:rounded-2xl bg-background/80 p-3 sm:p-4 text-center shadow-sm border border-border/60">
                   <Users className="mx-auto h-4 w-4 sm:h-5 sm:w-5 text-primary mb-1 sm:mb-2" />
                   <p className="text-lg sm:text-2xl font-bold">{totalPax}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground">Pax Served</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">{t('title')}</p>
                 </div>
                 <div className="rounded-xl sm:rounded-2xl bg-background/80 p-3 sm:p-4 text-center shadow-sm border border-border/60">
                   <Star className="mx-auto h-4 w-4 sm:h-5 sm:w-5 text-primary mb-1 sm:mb-2" />
                   <p className="text-lg sm:text-2xl font-bold">
                     {averageRating > 0 ? averageRating.toFixed(1) : 'N/A'}
                   </p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground">Rating</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">{t('rating')}</p>
                 </div>
               </div>
 
@@ -186,7 +189,7 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                   <Button asChild variant="default" className="rounded-full">
                     <a href={`tel:${guide.phone}`}>
                       <Phone className="mr-2 h-4 w-4" />
-                      Call Now
+                      {t('title')}
                     </a>
                   </Button>
                 )}
@@ -194,14 +197,14 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                   <Button asChild variant="outline" className="rounded-full">
                     <a href={`mailto:${guide.email}`}>
                       <Mail className="mr-2 h-4 w-4" />
-                      Send Email
+                      {t('title')}
                     </a>
                   </Button>
                 )}
                 <Button asChild variant="outline" className="rounded-full">
                   <Link href={`/feedback?guide=${guide.id}`}>
                     <MessageCircle className="mr-2 h-4 w-4" />
-                    Leave Feedback
+                    {t('title')}
                   </Link>
                 </Button>
               </div>
@@ -225,7 +228,7 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 font-headline text-xl">
                       <Globe className="h-5 w-5 text-primary" />
-                      Languages
+                      {t('languages')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -264,7 +267,7 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 font-headline text-xl">
                       <Award className="h-5 w-5 text-primary" />
-                      Specializes In
+                      {t('title')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -293,14 +296,14 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 font-headline text-xl">
                       <MapPin className="h-5 w-5 text-primary" />
-                      Areas of Operation
+                      {t('title')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {provinces.length > 0 && (
                       <div>
                         <p className="mb-3 text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                          Provinces & Cities
+                          {t('title')}
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {provinces.map((province) => (
@@ -319,7 +322,7 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                     {nationalities.length > 0 && (
                       <div>
                         <p className="mb-3 text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                          Served Nationalities
+                          {t('title')}
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {nationalities.slice(0, 12).map((nat) => (
@@ -333,7 +336,7 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                           ))}
                           {nationalities.length > 12 && (
                             <Badge variant="outline" className="text-sm py-1.5 px-3">
-                              +{nationalities.length - 12} more
+                              +{nationalities.length - 12}
                             </Badge>
                           )}
                         </div>
@@ -355,7 +358,7 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 font-headline text-xl">
                       <Briefcase className="h-5 w-5 text-primary" />
-                      Tour History
+                      {t('title')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -380,7 +383,7 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                                 </span>
                                 <span className="flex items-center gap-1">
                                   <Users className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                                  {tour.clientCount} pax
+                                  {tour.clientCount}
                                 </span>
                                 {tour.provinces && tour.provinces.length > 0 && (
                                   <span className="flex items-center gap-1">
@@ -394,14 +397,14 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                               variant={tour.status === 'finished' ? 'default' : 'secondary'}
                               className="self-start text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1"
                             >
-                              {tour.status === 'finished' ? 'Completed' : 'For Sale'}
+                              {tour.status === 'finished' ? t('title') : t('title')}
                             </Badge>
                           </div>
                         </motion.div>
                       ))}
                       {tours.length > 8 && (
                         <p className="text-center text-sm text-muted-foreground pt-2">
-                          And {tours.length - 8} more tours...
+                          +{tours.length - 8}
                         </p>
                       )}
                     </div>
@@ -421,7 +424,7 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 font-headline text-xl">
                       <Star className="h-5 w-5 text-primary" />
-                      Guest Reviews
+                      {t('title')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -450,14 +453,14 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                           {review.tourName && (
                             <p className="mt-3 text-xs text-muted-foreground/70 flex items-center gap-1">
                               <Briefcase className="h-3 w-3" />
-                              Tour: {review.tourName}
+                              {t('title')}: {review.tourName}
                             </p>
                           )}
                         </motion.div>
                       ))}
                       {reviews.length > 4 && (
                         <p className="text-center text-sm text-muted-foreground">
-                          And {reviews.length - 4} more reviews...
+                          +{reviews.length - 4}
                         </p>
                       )}
                     </div>
@@ -477,28 +480,28 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 font-headline text-xl text-primary">
                       <Award className="h-5 w-5" />
-                      Verified Guide
+                      {t('title')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-4 text-sm sm:grid-cols-2">
                       <div className="rounded-lg bg-background/50 p-3">
-                        <p className="text-muted-foreground text-xs uppercase tracking-wide">License Type</p>
+                        <p className="text-muted-foreground text-xs uppercase tracking-wide">{t('title')}</p>
                         <p className="font-medium mt-1">
                           {guide.cardType === 'international'
-                            ? 'International Tour Guide'
-                            : 'Domestic Tour Guide'}
+                            ? t('title')
+                            : t('title')}
                         </p>
                       </div>
                       {guide.cardIssuePlace && (
                         <div className="rounded-lg bg-background/50 p-3">
-                          <p className="text-muted-foreground text-xs uppercase tracking-wide">Issued By</p>
+                          <p className="text-muted-foreground text-xs uppercase tracking-wide">{t('title')}</p>
                           <p className="font-medium mt-1">{guide.cardIssuePlace}</p>
                         </div>
                       )}
                       {guide.cardIssueDate && (
                         <div className="rounded-lg bg-background/50 p-3">
-                          <p className="text-muted-foreground text-xs uppercase tracking-wide">Issue Date</p>
+                          <p className="text-muted-foreground text-xs uppercase tracking-wide">{t('title')}</p>
                           <p className="font-medium mt-1">
                             {format(new Date(guide.cardIssueDate), 'MMM dd, yyyy')}
                           </p>
@@ -506,7 +509,7 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
                       )}
                       {guide.cardExpiryDate && (
                         <div className="rounded-lg bg-background/50 p-3">
-                          <p className="text-muted-foreground text-xs uppercase tracking-wide">Expiry Date</p>
+                          <p className="text-muted-foreground text-xs uppercase tracking-wide">{t('title')}</p>
                           <p className="font-medium mt-1">
                             {format(new Date(guide.cardExpiryDate), 'MMM dd, yyyy')}
                           </p>
@@ -518,7 +521,7 @@ export default function GuideProfile({ guide, tours, reviews, relatedPosts }: Gu
               </motion.div>
             )}
 
-            <RelatedContentSection title="Featured in" items={relatedPosts} />
+            <RelatedContentSection title={t('title')} items={relatedPosts} />
           </div>
         </div>
       </section>

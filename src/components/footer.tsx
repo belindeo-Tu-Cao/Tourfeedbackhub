@@ -1,6 +1,7 @@
 'use client';
 
 import { Link, usePathname } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { MessageSquare } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,12 +23,12 @@ interface FooterProps {
 
 type IconComponent = React.ComponentType<React.SVGProps<SVGSVGElement>>;
 
-const AREA_TITLES: Record<NavigationArea, string> = {
-  links: 'Explore',
-  legal: 'Legal',
-  social: 'Connect',
-  contact: 'Contact',
-  cta: 'Actions',
+const AREA_TITLES_MAP: Record<NavigationArea, string> = {
+  links: 'explore',
+  legal: 'legal',
+  social: 'connect',
+  contact: 'contact',
+  cta: 'actions',
 };
 
 const CONTACT_ICON_MAP: Partial<Record<keyof ContactInfo, string>> = {
@@ -270,6 +271,7 @@ function ContactDetail({ detail }: { detail: { id: string; label: string; href?:
 export default function Footer({ menu, siteSettings }: FooterProps) {
   const pathname = usePathname();
   const { isAdmin, user } = useAdmin();
+  const t = useTranslations('footer');
 
   if (pathname.startsWith('/admin')) {
     return null;
@@ -328,7 +330,7 @@ export default function Footer({ menu, siteSettings }: FooterProps) {
 
           {links.length ? (
             <div>
-              <h4 className="font-semibold"> {AREA_TITLES.links}</h4>
+              <h4 className="font-semibold"> {t(AREA_TITLES_MAP.links)}</h4>
               <div className="mt-4 flex flex-col gap-2">
                 {links.map((item) => (
                   <FooterLink key={item.id} item={item} />
@@ -339,7 +341,7 @@ export default function Footer({ menu, siteSettings }: FooterProps) {
 
           {legal.length ? (
             <div>
-              <h4 className="font-semibold">{AREA_TITLES.legal}</h4>
+              <h4 className="font-semibold">{t(AREA_TITLES_MAP.legal)}</h4>
               <div className="mt-4 flex flex-col gap-2">
                 {legal.map((item) => (
                   <FooterLink key={item.id} item={item} />
@@ -351,7 +353,7 @@ export default function Footer({ menu, siteSettings }: FooterProps) {
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-1">
             {contactLinks.length ? (
               <div>
-                <h4 className="font-semibold">{AREA_TITLES.contact}</h4>
+                <h4 className="font-semibold">{t(AREA_TITLES_MAP.contact)}</h4>
                 <div className="mt-4 flex flex-col gap-2">
                   {contactLinks.map((item) => (
                     <FooterLink key={item.id} item={item} />
@@ -362,7 +364,7 @@ export default function Footer({ menu, siteSettings }: FooterProps) {
 
             {socialLinks.length ? (
               <div>
-                <h4 className="font-semibold">{AREA_TITLES.social}</h4>
+                <h4 className="font-semibold">{t(AREA_TITLES_MAP.social)}</h4>
                 <div className="mt-4 flex gap-4 text-foreground/70">
                   {socialLinks.map((item) => {
                     const Icon = item.icon ? resolveIcon(item.icon) : undefined;

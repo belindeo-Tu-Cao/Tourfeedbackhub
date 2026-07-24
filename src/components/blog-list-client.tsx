@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import type { BlogListItem, BlogCategory } from '@/lib/blog';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +20,8 @@ export function BlogListClient({
   posts: BlogListItem[];
   categories: BlogCategory[];
 }) {
+  const t = useTranslations('blog');
+  const tCommon = useTranslations('common');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,7 +67,7 @@ export function BlogListClient({
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search posts..."
+            placeholder={tCommon('search')}
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -84,7 +87,7 @@ export function BlogListClient({
                 setCurrentPage(1);
               }}
             >
-              All Posts
+              {t('title')}
             </Button>
             {categories.map((category) => (
               <Button
@@ -168,7 +171,7 @@ export function BlogListClient({
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
                 >
-                  Previous
+                  {tCommon('previous')}
                 </Button>
                 <div className="flex items-center gap-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -187,7 +190,7 @@ export function BlogListClient({
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
                 >
-                  Next
+                  {tCommon('next')}
                 </Button>
               </div>
             )}
@@ -197,7 +200,7 @@ export function BlogListClient({
             {featuredPost && (
               <div className="rounded-xl border border-border/60 bg-background/70 p-6 shadow-sm">
                 <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                  Featured story
+                  {t('title')}
                 </h3>
                 <Link
                   href={`/blog/${featuredPost.slug}`}
@@ -216,7 +219,7 @@ export function BlogListClient({
             {trendingPosts.length > 0 && (
               <div className="rounded-xl border border-border/60 bg-background/70 p-6 shadow-sm">
                 <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                  Trending now
+                  {t('title')}
                 </h3>
                 <ul className="mt-4 space-y-3 text-sm">
                   {trendingPosts.map((post) => (
@@ -239,11 +242,11 @@ export function BlogListClient({
           <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center mb-4">
             <Search className="h-10 w-10 text-muted-foreground" />
           </div>
-          <h3 className="text-xl font-semibold mb-2">No posts found</h3>
+          <h3 className="text-xl font-semibold mb-2">{t('noPosts')}</h3>
           <p className="text-muted-foreground max-w-md">
             {searchQuery || selectedCategory
-              ? "Try adjusting your search or filter to find what you're looking for."
-              : 'No blog posts have been published yet. Check back soon!'}
+              ? t('noPosts')
+              : t('noPosts')}
           </p>
           {(searchQuery || selectedCategory) && (
             <Button
@@ -255,7 +258,7 @@ export function BlogListClient({
                 setCurrentPage(1);
               }}
             >
-              Clear Filters
+              {tCommon('close')}
             </Button>
           )}
         </div>

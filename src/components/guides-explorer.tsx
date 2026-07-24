@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -32,6 +33,8 @@ interface GuidesExplorerProps {
 }
 
 export default function GuidesExplorer({ guides }: GuidesExplorerProps) {
+  const t = useTranslations('guides');
+  const tCommon = useTranslations('common');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
@@ -98,10 +101,10 @@ export default function GuidesExplorer({ guides }: GuidesExplorerProps) {
           <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
             <SelectTrigger className="w-full">
               <Globe className="mr-2 h-4 w-4 flex-shrink-0" />
-              <SelectValue placeholder="Language" />
+              <SelectValue placeholder={t('languages')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Languages</SelectItem>
+              <SelectItem value="all">{t('languages')}</SelectItem>
               {allLanguages.map((lang) => (
                 <SelectItem key={lang} value={lang}>
                   {lang}
@@ -113,10 +116,10 @@ export default function GuidesExplorer({ guides }: GuidesExplorerProps) {
           <Select value={selectedType} onValueChange={setSelectedType}>
             <SelectTrigger className="w-full">
               <Filter className="mr-2 h-4 w-4 flex-shrink-0" />
-              <SelectValue placeholder="Type" />
+              <SelectValue placeholder={t('title')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="all">{t('title')}</SelectItem>
               <SelectItem value="international">International</SelectItem>
               <SelectItem value="domestic">Domestic</SelectItem>
             </SelectContent>
@@ -126,14 +129,14 @@ export default function GuidesExplorer({ guides }: GuidesExplorerProps) {
 
       {/* Results count */}
       <p className="text-sm text-muted-foreground">
-        Showing {filteredGuides.length} of {guides.length} guides
+        {filteredGuides.length} / {guides.length}
       </p>
 
       {/* Guides Grid */}
       {filteredGuides.length === 0 ? (
         <div className="py-12 text-center">
           <Users className="mx-auto h-12 w-12 text-muted-foreground/30" />
-          <p className="mt-4 text-muted-foreground">No guides match your filters.</p>
+          <p className="mt-4 text-muted-foreground">{t('noGuides')}</p>
           <Button
             variant="ghost"
             onClick={() => {
@@ -142,7 +145,7 @@ export default function GuidesExplorer({ guides }: GuidesExplorerProps) {
               setSelectedType('all');
             }}
           >
-            Clear filters
+            {tCommon('close')}
           </Button>
         </div>
       ) : (
@@ -208,7 +211,7 @@ export default function GuidesExplorer({ guides }: GuidesExplorerProps) {
                       </h3>
                       {guide.experienceYears && (
                         <p className="text-sm text-white/80">
-                          {guide.experienceYears}+ years experience
+                          {guide.experienceYears}+ {t('years')}
                         </p>
                       )}
                     </div>
@@ -246,18 +249,18 @@ export default function GuidesExplorer({ guides }: GuidesExplorerProps) {
                     <div className="flex items-center gap-4 text-sm text-muted-foreground pt-2 border-t">
                       <div className="flex items-center gap-1">
                         <Briefcase className="h-4 w-4" />
-                        <span>{guide.totalTours || 0} tours</span>
+                        <span>{guide.totalTours || 0}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
-                        <span>{guide.totalPax || 0} pax</span>
+                        <span>{guide.totalPax || 0}</span>
                       </div>
                     </div>
 
                     {/* CTA */}
                     <div className="flex items-center justify-between pt-2">
                       <span className="text-sm font-medium text-primary group-hover:underline">
-                        View Profile
+                        {t('viewProfile')}
                       </span>
                       <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-1" />
                     </div>

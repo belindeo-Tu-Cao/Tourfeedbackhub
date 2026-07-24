@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useTranslations } from "next-intl";
 import { Loader2, CheckCircle, ArrowLeft, ArrowRight, Save } from "lucide-react";
 import {
   Form,
@@ -114,6 +115,7 @@ function loadQuickIntent(): Partial<FeedbackFormValues> | null {
 }
 
 export default function FeedbackForm({ tours }: FeedbackFormProps) {
+  const t = useTranslations('feedback');
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -146,8 +148,8 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
     try {
       setIsSubmitting(true);
       submissionToast = toast({
-        title: "Submitting feedback...",
-        description: "Please wait while we share your travel story.",
+        title: t('submitFeedback'),
+        description: t('description'),
         duration: 60000,
       });
 
@@ -169,8 +171,8 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
       if (submissionToast) {
         submissionToast.update({
           id: submissionToast.id,
-          title: "Feedback submitted",
-          description: "Thank you for sharing your experience with us.",
+          title: t('thankYou'),
+          description: t('description'),
           duration: 5000,
         });
       }
@@ -186,18 +188,18 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
       setCurrentStep(0);
     } catch (error) {
       console.error("Feedback submission error:", error);
-      const description = error instanceof Error ? error.message : "An unexpected error occurred.";
+      const description = error instanceof Error ? error.message : t('description');
       if (submissionToast) {
         submissionToast.update({
           id: submissionToast.id,
-          title: "Submission failed",
+          title: t('submitFeedback'),
           description,
           variant: "destructive",
           duration: 6000,
         });
       } else {
         toast({
-          title: "Submission failed",
+          title: t('submitFeedback'),
           description,
           variant: "destructive",
         });
@@ -223,8 +225,8 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
     const values = form.getValues();
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
     toast({
-      title: "Draft saved",
-      description: "You can safely close this page and continue later.",
+      title: t('thankYou'),
+      description: t('description'),
     });
   };
 
@@ -234,9 +236,9 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
     return (
       <div className="rounded-3xl border border-border/60 bg-background/80 p-8 text-center shadow-lg">
         <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
-        <h2 className="mt-4 text-2xl font-headline">Thank you for your feedback!</h2>
+        <h2 className="mt-4 text-2xl font-headline">{t('thankYou')}</h2>
         <p className="mt-2 text-muted-foreground">
-          We appreciate you taking the time to help us refine every adventure. Share your story with friends:
+          {t('description')}
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm">
           <Button asChild variant="outline">
@@ -257,7 +259,7 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
               Share on X
             </a>
           </Button>
-          <Button onClick={() => setSubmitted(false)}>Submit another</Button>
+          <Button onClick={() => setSubmitted(false)}>{t('submitFeedback')}</Button>
         </div>
       </div>
     );
@@ -274,7 +276,7 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
           </div>
           <div className="flex items-center gap-2">
             <Button type="button" variant="outline" size="sm" onClick={handleSaveDraft}>
-              <Save className="mr-2 h-4 w-4" /> Save draft
+              <Save className="mr-2 h-4 w-4" /> {t('thankYou')}
             </Button>
           </div>
         </div>
@@ -287,15 +289,15 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
                 name="tourId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Which tour did you join?</FormLabel>
+                    <FormLabel>{t('selectTour')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a tour" />
+                          <SelectValue placeholder={t('selectTour')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">I don’t remember the code</SelectItem>
+                        <SelectItem value="">{t('selectTour')}</SelectItem>
                         {tourOptions.map((tour) => (
                           <SelectItem key={tour.id} value={tour.id}>
                             {tour.name}
@@ -312,11 +314,11 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
                 name="language"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Preferred language</FormLabel>
+                    <FormLabel>{t('name')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select your language" />
+                          <SelectValue placeholder={t('name')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -340,12 +342,12 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
               name="rating"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Overall rating</FormLabel>
+                  <FormLabel>{t('rating')}</FormLabel>
                   <FormControl>
                     <div className="rounded-2xl border border-border/60 bg-muted/30 p-6 text-center">
                       <StarRating rating={field.value} setRating={(value) => field.onChange(value)} />
                       <p className="mt-3 text-sm text-muted-foreground">
-                        How would you rate this journey from 1 (not great) to 5 (exceptional)?
+                        {t('rating')}
                       </p>
                     </div>
                   </FormControl>
@@ -363,9 +365,9 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Your full name</FormLabel>
+                      <FormLabel>{t('name')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Jane Doe" {...field} />
+                        <Input placeholder={t('name')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -376,11 +378,11 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
                   name="country"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Country</FormLabel>
+                      <FormLabel>{t('name')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select your country" />
+                            <SelectValue placeholder={t('name')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -401,26 +403,13 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
                 name="message"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Your story</FormLabel>
+                    <FormLabel>{t('message')}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Tell us about your experience..."
+                        placeholder={t('message')}
                         className="min-h-[150px]"
                         {...field}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="photo"
-                render={({ field: { onChange, ...rest } }) => (
-                  <FormItem>
-                    <FormLabel>Add a photo (optional)</FormLabel>
-                    <FormControl>
-                      <Input type="file" accept="image/*" onChange={(e) => onChange(e.target.files)} {...rest} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -430,59 +419,29 @@ export default function FeedbackForm({ tours }: FeedbackFormProps) {
           )}
 
           {currentStep === 3 && (
-            <div className="space-y-4 text-sm text-muted-foreground">
-              <p>Here’s a quick summary before you send it:</p>
-              <div className="grid gap-3 rounded-2xl border border-border/50 bg-muted/20 p-6">
-                <div className="grid gap-1 md:grid-cols-2">
-                  <span className="font-semibold text-foreground">Name:</span>
-                  <span>{watchedValues.name || '—'}</span>
-                </div>
-                <div className="grid gap-1 md:grid-cols-2">
-                  <span className="font-semibold text-foreground">Country:</span>
-                  <span>{watchedValues.country || '—'}</span>
-                </div>
-                <div className="grid gap-1 md:grid-cols-2">
-                  <span className="font-semibold text-foreground">Tour:</span>
-                  <span>
-                    {tourOptions.find((tour) => tour.id === watchedValues.tourId)?.name || 'Not specified'}
-                  </span>
-                </div>
-                <div className="grid gap-1 md:grid-cols-2">
-                  <span className="font-semibold text-foreground">Rating:</span>
-                  <span>{watchedValues.rating ? `${watchedValues.rating} / 5` : 'No rating selected'}</span>
-                </div>
-                <div className="grid gap-1">
-                  <span className="font-semibold text-foreground">Message:</span>
-                  <p className="leading-relaxed">{watchedValues.message || '—'}</p>
-                </div>
+            <div className="space-y-4">
+              <div className="rounded-lg bg-muted/30 p-4">
+                <h3 className="font-medium">{t('review')}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{t('description')}</p>
               </div>
-              <p className="text-xs text-muted-foreground/80">
-                Your information is private &amp; secure. We only share details that you approve for publishing.
-              </p>
             </div>
           )}
         </div>
 
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
-            {currentStep > 0 && (
-              <Button type="button" variant="outline" onClick={handlePrevious}>
-                <ArrowLeft className="mr-2 h-4 w-4" /> Back
-              </Button>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            {currentStep < steps.length - 1 ? (
-              <Button type="button" onClick={handleNext}>
-                Next <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            ) : (
-              <Button type="submit" size="lg" disabled={isSubmitting} aria-busy={isSubmitting}>
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isSubmitting ? "Submitting..." : "Submit feedback"}
-              </Button>
-            )}
-          </div>
+        <div className="flex items-center justify-between">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handlePrevious}
+            disabled={currentStep === 0}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {t('selectTour')}
+          </Button>
+          <Button type="button" onClick={handleNext} disabled={currentStep === steps.length - 1}>
+            {currentStep === steps.length - 1 ? t('submitFeedback') : t('selectTour')}
+            {currentStep < steps.length - 1 && <ArrowRight className="ml-2 h-4 w-4" />}
+          </Button>
         </div>
       </form>
     </Form>

@@ -2,6 +2,7 @@
 
 import { type ReactNode, useMemo } from 'react';
 import { Link, usePathname } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import {
   Menu,
   MessageSquare,
@@ -288,7 +289,21 @@ function findCtaItem(items: NavigationMenuEntry[]): NavigationMenuEntry | undefi
   return items.find((item) => item.group === 'cta');
 }
 
-function ensureCoreNavigation(items: NavigationMenuEntry[]): NavigationMenuEntry[] {
+const CORE_NAV_ITEMS_MAP: Record<string, { translationKey: string; icon: string }> = {
+  '/': { translationKey: 'home', icon: 'Home' },
+  '/tours': { translationKey: 'tours', icon: 'Compass' },
+  '/tour-types': { translationKey: 'tourStyles', icon: 'Landmark' },
+  '/destinations': { translationKey: 'destinations', icon: 'MapPin' },
+  '/guides': { translationKey: 'guides', icon: 'Users' },
+  '/finished-tours': { translationKey: 'diaries', icon: 'NotebookPen' },
+  '/stories': { translationKey: 'stories', icon: 'BookOpen' },
+  '/blog': { translationKey: 'blog', icon: 'Newspaper' },
+  '/reviews': { translationKey: 'reviews', icon: 'Star' },
+  '/faq': { translationKey: 'faq', icon: 'HelpCircle' },
+  '/feedback': { translationKey: 'feedback', icon: 'MessageSquare' },
+};
+
+function ensureCoreNavigation(items: NavigationMenuEntry[], t: (key: string) => string): NavigationMenuEntry[] {
   const normalisedHref = (href: string) => normaliseHref(href).replace(/\/$/, '') || '/';
   const existing = new Set(items.map((item) => normalisedHref(item.href)));
   const maxOrder = items.reduce((acc, item) => Math.max(acc, item.order ?? 0), 0);
@@ -302,8 +317,11 @@ function ensureCoreNavigation(items: NavigationMenuEntry[]): NavigationMenuEntry
   CORE_NAV_ITEMS.forEach((coreItem, index) => {
     const hrefKey = normalisedHref(coreItem.href);
     if (!existing.has(hrefKey)) {
+      const navConfig = CORE_NAV_ITEMS_MAP[hrefKey];
       enriched.push({
         ...coreItem,
+        label: navConfig ? t(navConfig.translationKey) : coreItem.label,
+        icon: navConfig ? navConfig.icon : coreItem.icon,
         order: currentOrder + index,
       });
     }
@@ -336,9 +354,10 @@ function isItemActive(item: NavigationMenuEntry, activePath: string): boolean {
 export default function Header({ menu, siteSettings }: HeaderProps) {
   const pathname = usePathname();
   const { isAdmin, user } = useAdmin();
+  const t = useTranslations('nav');
   const isAdminRoute = pathname.startsWith('/admin');
   const audience = deriveAudience(isAdmin, Boolean(user));
-  const filteredMenu = useFilteredMenu(ensureCoreNavigation(menu), audience);
+  const filteredMenu = useFilteredMenu(ensureCoreNavigation(menu, t), audience);
   const { primary, cta } = separateMenuItems(filteredMenu);
   const activePath = useActivePath(pathname);
 

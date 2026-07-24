@@ -1,6 +1,6 @@
 import { getPublicContent } from '@/lib/content-service';
 import ToursExplorer from '@/components/tours-explorer';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 export default async function ToursPage({
   params,
@@ -10,6 +10,7 @@ export default async function ToursPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const t = await getTranslations('tours');
   const { tours, tourTypes, reviews } = await getPublicContent(locale);
   const saleTours = tours.filter((tour) => tour.status === 'for_sale');
 
@@ -72,11 +73,11 @@ export default async function ToursPage({
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-flex items-center justify-center rounded-full border border-border/60 bg-secondary/30 px-4 py-1 text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            Tours for sale
+            {t('title')}
           </span>
-          <h1 className="mt-4 text-4xl md:text-5xl font-headline font-bold">Explore bespoke tours you can book</h1>
+          <h1 className="mt-4 text-4xl md:text-5xl font-headline font-bold">{t('description')}</h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Filter by style, travel dates, and region to find your next journey across Vietnam.
+            {t('description')}
           </p>
         </div>
 

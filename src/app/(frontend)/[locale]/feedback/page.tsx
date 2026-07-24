@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import FeedbackForm from '@/components/feedback-form';
 import { getPublicContent } from '@/lib/content-service';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 export default async function FeedbackPage({
   params,
@@ -11,6 +11,7 @@ export default async function FeedbackPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const t = await getTranslations('feedback');
   const { siteSettings, tours } = await getPublicContent(locale);
   const heroImage = siteSettings.heroMediaUrl;
 
@@ -28,9 +29,9 @@ export default async function FeedbackPage({
         )}
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4">
-          <h1 className="text-4xl md:text-6xl font-headline font-bold">Share Your Experience</h1>
+          <h1 className="text-4xl md:text-6xl font-headline font-bold">{t('title')}</h1>
           <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/90 font-body">
-            Your feedback helps us and fellow travellers.
+            {t('description')}
           </p>
         </div>
       </section>

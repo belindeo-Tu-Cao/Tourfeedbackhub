@@ -1,6 +1,6 @@
 import { getPublicContent } from '@/lib/content-service';
 import StoriesExplorer from '@/components/stories-explorer';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 export default async function StoriesPage({
   params,
@@ -10,6 +10,7 @@ export default async function StoriesPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const t = await getTranslations('stories');
   const { stories } = await getPublicContent(locale);
   const serialisedStories = stories.map((story) => ({
     id: story.id,
@@ -28,11 +29,11 @@ export default async function StoriesPage({
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-flex items-center justify-center rounded-full border border-border/60 bg-secondary/30 px-4 py-1 text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            Stories & diaries
+            {t('title')}
           </span>
-          <h1 className="mt-4 text-4xl md:text-5xl font-headline font-bold">Stories from the road</h1>
+          <h1 className="mt-4 text-4xl md:text-5xl font-headline font-bold">{t('title')}</h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Filter by theme or travel month to discover on-the-ground notes from guides, guests, and partners across Vietnam.
+            {t('description')}
           </p>
         </div>
 

@@ -3,7 +3,7 @@ import { Mail, Phone, MessageCircle, Facebook, Instagram, MapPin } from 'lucide-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getPublicContent } from '@/lib/content-service';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 
 export default async function ContactPage({
   params,
@@ -13,6 +13,7 @@ export default async function ContactPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const t = await getTranslations('contact');
   const { siteSettings } = await getPublicContent(locale);
   const { contact, social } = siteSettings;
 
@@ -26,15 +27,15 @@ export default async function ContactPage({
     <div className="py-16 md:py-24">
       <div className="container mx-auto px-4 grid gap-12 lg:grid-cols-[1.1fr_0.9fr] items-start">
         <div>
-          <h1 className="text-4xl md:text-5xl font-headline font-bold">Let’s Plan Your Journey</h1>
+          <h1 className="text-4xl md:text-5xl font-headline font-bold">{t('title')}</h1>
           <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-            Share your travel aspirations and I will craft a bespoke itinerary with trusted partners, meaningful encounters, and seamless coordination.
+            {t('description')}
           </p>
 
           <div className="mt-10 space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl font-headline">Direct Channels</CardTitle>
+                <CardTitle className="text-xl font-headline">{t('title')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm text-muted-foreground">
                 {contact.email && (
@@ -64,7 +65,7 @@ export default async function ContactPage({
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl font-headline">Messaging Apps</CardTitle>
+                <CardTitle className="text-xl font-headline">{t('title')}</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-wrap gap-3">
                 {whatsappLink && (
@@ -102,14 +103,14 @@ export default async function ContactPage({
 
         <Card className="bg-secondary/50">
           <CardHeader>
-            <CardTitle className="text-xl font-headline">Quick Briefing</CardTitle>
+            <CardTitle className="text-xl font-headline">{t('title')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm text-muted-foreground">
             <p>
-              Ready to co-create your itinerary? Send a short brief with preferred dates, group size, key interests, and desired pace. I will follow up within 24 hours with curated ideas and next steps.
+              {t('description')}
             </p>
             <Button asChild size="lg">
-              <Link href="/feedback">Submit feedback or a trip brief</Link>
+              <Link href="/feedback">{t('sendMessage')}</Link>
             </Button>
           </CardContent>
         </Card>

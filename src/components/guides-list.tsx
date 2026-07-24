@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,10 +14,12 @@ interface GuidesListProps {
 }
 
 export default function GuidesList({ guides }: GuidesListProps) {
+  const t = useTranslations('guides');
+
   if (guides.length === 0) {
     return (
       <div className="py-12 text-center">
-        <p className="text-muted-foreground">No guides available at the moment.</p>
+        <p className="text-muted-foreground">{t('noGuides')}</p>
       </div>
     );
   }
@@ -56,7 +59,7 @@ export default function GuidesList({ guides }: GuidesListProps) {
               <h2 className="text-xl font-headline font-semibold">{guide.name}</h2>
               {guide.experienceYears && (
                 <p className="text-sm text-muted-foreground">
-                  {guide.experienceYears}+ years experience
+                  {guide.experienceYears}+ {t('years')}
                 </p>
               )}
             </div>
@@ -89,15 +92,15 @@ export default function GuidesList({ guides }: GuidesListProps) {
             {/* Stats */}
             {(guide.totalTours || 0) > 0 && (
               <div className="flex gap-4 text-sm text-muted-foreground">
-                <span>{guide.totalTours} tours</span>
+                <span>{guide.totalTours}</span>
                 <span>•</span>
-                <span>{guide.totalPax || 0} pax served</span>
+                <span>{guide.totalPax || 0}</span>
               </div>
             )}
 
             <Button asChild variant="ghost" className="w-full justify-between px-4">
               <Link href={`/guide/${guide.id}`}>
-                View Profile
+                {t('viewProfile')}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>

@@ -1,14 +1,22 @@
 import { FAQPageStructuredData } from '@/components/structured-data';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { getFaqs } from '@/lib/content-service';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 import type { Faq } from '@/lib/types';
 
-export const metadata: Metadata = {
-  title: 'Frequently Asked Questions',
-  description: 'Answers to common questions about our tours, guides, and destinations.',
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations('faq');
+  return {
+    title: t('title'),
+    description: t('description'),
+  };
+}
 
 function groupByCategory(faqs: Faq[]): Map<string, Faq[]> {
   const groups = new Map<string, Faq[]>();
@@ -28,6 +36,7 @@ export default async function FaqPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const t = await getTranslations('faq');
   const faqs = await getFaqs(locale);
   const groups = groupByCategory(faqs);
 
@@ -36,15 +45,15 @@ export default async function FaqPage({
       <FAQPageStructuredData faqs={faqs} />
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-3xl text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-headline font-bold">Frequently Asked Questions</h1>
+          <h1 className="text-4xl md:text-5xl font-headline font-bold">{t('title')}</h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Answers to the questions travellers ask most about our tours, guides, and destinations.
+            {t('description')}
           </p>
         </div>
 
         {faqs.length === 0 ? (
           <div className="mx-auto max-w-2xl rounded-xl border border-dashed border-border/60 bg-background/70 p-12 text-center text-muted-foreground">
-            No FAQs published yet.
+            {t('noFAQ')}
           </div>
         ) : (
           <div className="mx-auto max-w-3xl space-y-10">

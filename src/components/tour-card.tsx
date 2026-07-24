@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Link } from '@/i18n/navigation';
 import { CalendarRange, MapPin, Users, Languages, Star } from "lucide-react";
+import { useTranslations } from 'next-intl';
 import {
   Card,
   CardContent,
@@ -24,6 +25,7 @@ interface TourCardProps {
 }
 
 export default function TourCard({ tour, ratingSummary }: TourCardProps) {
+  const t = useTranslations('tours');
   const coverImage = tour.photoUrls?.[0];
   const start = tour.startDate instanceof Date ? tour.startDate : new Date(tour.startDate);
   const end = tour.endDate instanceof Date ? tour.endDate : new Date(tour.endDate);
@@ -37,7 +39,7 @@ export default function TourCard({ tour, ratingSummary }: TourCardProps) {
   })}`;
   const averageLabel = ratingSummary && ratingSummary.count > 0
     ? `${ratingSummary.average.toFixed(1)} / 5`
-    : 'Awaiting reviews';
+    : t('rating');
 
   return (
     <Card className="flex flex-col overflow-hidden shadow-lg transition-shadow duration-300 hover:shadow-xl">
@@ -74,7 +76,7 @@ export default function TourCard({ tour, ratingSummary }: TourCardProps) {
           <div className="flex items-center gap-2">
             <CalendarRange className="h-4 w-4 opacity-0" aria-hidden />
             <span className="text-xs uppercase tracking-wide text-foreground/60">
-              {durationInDays} day{durationInDays === 1 ? '' : 's'} on the road
+              {durationInDays} day{durationInDays === 1 ? '' : 's'}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -85,7 +87,7 @@ export default function TourCard({ tour, ratingSummary }: TourCardProps) {
           </div>
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            <span>{tour.clientCount} travellers ・ Guide {tour.guides?.map((g) => g.title).join(', ') || 'TBD'}</span>
+            <span>{tour.clientCount} ・ {t('guide')} {tour.guides?.map((g) => g.title).join(', ') || 'TBD'}</span>
           </div>
           {tour.guideLanguages?.length ? (
             <div className="flex items-center gap-2">
@@ -105,7 +107,7 @@ export default function TourCard({ tour, ratingSummary }: TourCardProps) {
         </div>
         <Button asChild className="w-full" variant="outline">
           <Link href={`/tours/${tour.id}`}>
-            View Tour Diary
+            {t('title')}
           </Link>
         </Button>
       </CardFooter>

@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
 import { CalendarRange, MapPin, Users, Filter, X, Compass, Tag } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
@@ -50,18 +51,18 @@ interface ClientTourSummary {
   highlights?: string[];
 }
 
-function formatPrice(price: number | null | undefined, currency: string | undefined, priceUnit: string | undefined) {
+function formatPrice(price: number | null | undefined, currency: string | undefined, priceUnit: string | undefined, t: (key: string) => string) {
   if (!price) return null;
   const formatted = currency === 'USD'
     ? `$${price.toLocaleString('en-US')}`
     : `${price.toLocaleString('vi-VN')}₫`;
-  return `${formatted} ${priceUnit === 'per_group' ? '/ group' : '/ person'}`;
+  return `${formatted} ${priceUnit === 'per_group' ? t('perGroup') : t('perPerson')}`;
 }
 
-function formatGroupSize(min: number | null | undefined, max: number | null | undefined) {
+function formatGroupSize(min: number | null | undefined, max: number | null | undefined, t: (key: string) => string) {
   if (!min && !max) return null;
-  if (min && max) return `${min}–${max} travellers`;
-  return `${min ?? max} travellers`;
+  if (min && max) return `${min}–${max} ${t('travellers')}`;
+  return `${min ?? max} ${t('travellers')}`;
 }
 
 interface TourTypeSummary {
@@ -76,10 +77,10 @@ interface ToursExplorerProps {
 }
 
 const durationOptions = [
-  { value: 'all', label: 'All durations' },
-  { value: 'short', label: '1 – 4 days' },
-  { value: 'medium', label: '5 – 8 days' },
-  { value: 'long', label: '9+ days' },
+  { value: 'all', labelKey: 'allDurations' },
+  { value: 'short', labelKey: 'shortDuration' },
+  { value: 'medium', labelKey: 'mediumDuration' },
+  { value: 'long', labelKey: 'longDuration' },
 ];
 
 function matchesDurationFilter(duration: number, filter: string) {
@@ -90,11 +91,11 @@ function matchesDurationFilter(duration: number, filter: string) {
   return true;
 }
 
-function formatDuration(durationDays: number) {
-  if (durationDays <= 1) return '1 day escape';
-  if (durationDays <= 4) return `${durationDays} day boutique trip`;
-  if (durationDays <= 8) return `${durationDays} day discovery`;
-  return `${durationDays} day grand journey`;
+function formatDuration(durationDays: number, t: (key: string, params?: Record<string, string | number>) => string) {
+  if (durationDays <= 1) return t('dayEscape');
+  if (durationDays <= 4) return t('dayBoutiqueTrip', { days: durationDays });
+  if (durationDays <= 8) return t('dayDiscovery', { days: durationDays });
+  return t('dayGrandJourney', { days: durationDays });
 }
 
 function normaliseLocationKey(city: string, country: string) {
@@ -106,6 +107,8 @@ function resolveTourTypesMap(types: TourTypeSummary[]) {
 }
 
 export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) {
+  const t = useTranslations('tours');
+  const tCommon = useTranslations('common');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStyle, setSelectedStyle] = useState<string>('all');
   const [selectedDuration, setSelectedDuration] = useState<string>('all');
@@ -218,7 +221,7 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
                 <Input
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Search by name, code, or highlights"
+                  placeholder={tCommon('search')}
                   className="pl-10"
                 />
                 <Filter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -230,10 +233,10 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
               </label>
               <Select value={selectedStyle} onValueChange={setSelectedStyle}>
                 <SelectTrigger>
-                  <SelectValue placeholder="All styles" />
+                  <SelectValue placeholder={t('title')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All styles</SelectItem>
+                  <SelectItem value="all">{t('title')}</SelectItem>
                   {tourTypes.map((type) => (
                     <SelectItem key={type.id} value={type.id}>
                       {type.title}
@@ -244,16 +247,16 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
             </div>
             <div className="w-full md:w-40">
               <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Duration
+                {t('title')}
               </label>
               <Select value={selectedDuration} onValueChange={setSelectedDuration}>
                 <SelectTrigger>
-                  <SelectValue placeholder="All durations" />
+                  <SelectValue placeholder={t('title')} />
                 </SelectTrigger>
                 <SelectContent>
                   {durationOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
-                      {option.label}
+                      {t(option.labelKey)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -269,7 +272,7 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
                 <Button variant="outline" className="justify-between">
                   {dateRange?.from && dateRange?.to
                     ? `${format(dateRange.from, 'MMM d, yyyy')} – ${format(dateRange.to, 'MMM d, yyyy')}`
-                    : 'Select range'}
+                    : t('selectRange')}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="end">
@@ -282,14 +285,14 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
           <div className="flex flex-wrap items-center gap-3">
             <div className="w-full md:w-48">
               <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Location
+                {t('title')}
               </label>
               <Select value={selectedLocation} onValueChange={setSelectedLocation}>
                 <SelectTrigger>
-                  <SelectValue placeholder="All locations" />
+                  <SelectValue placeholder={t('title')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All locations</SelectItem>
+                  <SelectItem value="all">{t('title')}</SelectItem>
                   {locationOptions.map((location) => (
                     <SelectItem key={location} value={location}>
                       {location}
@@ -301,14 +304,14 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
             {guideLanguageOptions.length > 0 && (
               <div className="w-full md:w-48">
                 <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Guide Language
+                  {t('guide')}
                 </label>
                 <Select value={selectedGuideLanguage} onValueChange={setSelectedGuideLanguage}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All languages" />
+                    <SelectValue placeholder={t('guide')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All languages</SelectItem>
+                    <SelectItem value="all">{t('guide')}</SelectItem>
                     {guideLanguageOptions.map((lang) => (
                       <SelectItem key={lang} value={lang}>
                         {lang}
@@ -320,27 +323,27 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
             )}
             {(dateRange?.from || searchQuery || selectedStyle !== 'all' || selectedDuration !== 'all' || selectedLocation !== 'all' || selectedGuideLanguage !== 'all') && (
               <Button variant="ghost" size="sm" className="mt-6 md:mt-8" onClick={resetFilters}>
-                <X className="mr-2 h-4 w-4" /> Clear filters
+                <X className="mr-2 h-4 w-4" /> {tCommon('close')}
               </Button>
             )}
           </div>
           <p className="mt-4 text-sm text-muted-foreground md:mt-8">
-            Showing {filteredTours.length} of {tours.length} tours
+            {filteredTours.length} / {tours.length}
           </p>
         </div>
       </div>
 
       {filteredTours.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border/60 bg-background/80 p-12 text-center text-muted-foreground">
-          No tours match your filters yet. Try adjusting your search to explore more journeys.
+          {t('noToursMatch')}
         </div>
       ) : (
         <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
           {filteredTours.map((tour) => {
             const start = new Date(tour.startDate);
             const end = new Date(tour.endDate);
-            const priceLabel = formatPrice(tour.price, tour.currency, tour.priceUnit);
-            const groupSizeLabel = formatGroupSize(tour.groupSizeMin, tour.groupSizeMax);
+            const priceLabel = formatPrice(tour.price, tour.currency, tour.priceUnit, t);
+            const groupSizeLabel = formatGroupSize(tour.groupSizeMin, tour.groupSizeMax, t);
             return (
               <Card key={tour.id} className="flex h-full flex-col overflow-hidden border-border/60 bg-background/80 shadow-md">
                 <CardHeader className="p-0">
@@ -381,7 +384,7 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
                   <div className="space-y-2 text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <CalendarRange className="h-4 w-4" />
-                      <span>{formatDuration(tour.durationDays)}</span>
+                      <span>{formatDuration(tour.durationDays, t)}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4" />
@@ -392,12 +395,12 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
                     <div className="flex items-center gap-2">
                       <Users className="h-4 w-4" />
                       <span>
-                        {groupSizeLabel ?? 'Group size flexible'} • Guide {tour.guideName}
+                        {groupSizeLabel ?? t('groupSizeFlexible')} • {t('guide')} {tour.guideName}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-foreground">
                       <Tag className="h-4 w-4 text-accent" />
-                      <span className="font-medium">{priceLabel ?? 'Price on request'}</span>
+                      <span className="font-medium">{priceLabel ?? t('priceOnRequest')}</span>
                     </div>
                     {tour.tourTypeIds.length > 0 ? (
                       <div className="flex flex-wrap gap-2">
@@ -415,7 +418,7 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
                 </CardContent>
                 <CardFooter className="flex flex-wrap gap-3 p-6 pt-0">
                   <Button asChild className="flex-1 min-w-[150px]">
-                    <Link href={`/tours/${tour.id}`}>View tour</Link>
+                    <Link href={`/tours/${tour.id}`}>{t('title')}</Link>
                   </Button>
                   <Button
                     type="button"
@@ -423,7 +426,7 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
                     className="flex-1 min-w-[150px]"
                     onClick={() => setActiveTour(tour)}
                   >
-                    View highlights
+                    {t('title')}
                   </Button>
                 </CardFooter>
               </Card>
@@ -444,25 +447,25 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
                   <p>{activeTour.summary}</p>
                   <div className="grid gap-3 md:grid-cols-2">
                     <div className="rounded-lg bg-muted/40 p-4">
-                      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Journey</h3>
+                      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('title')}</h3>
                       <p>{activeTour.departureSchedule || `${format(new Date(activeTour.startDate), 'MMM d, yyyy')} – ${format(new Date(activeTour.endDate), 'MMM d, yyyy')}`}</p>
-                      <p>{formatDuration(activeTour.durationDays)}</p>
-                      {formatGroupSize(activeTour.groupSizeMin, activeTour.groupSizeMax) ? (
-                        <p>{formatGroupSize(activeTour.groupSizeMin, activeTour.groupSizeMax)}</p>
+                      <p>{formatDuration(activeTour.durationDays, t)}</p>
+                      {formatGroupSize(activeTour.groupSizeMin, activeTour.groupSizeMax, t) ? (
+                        <p>{formatGroupSize(activeTour.groupSizeMin, activeTour.groupSizeMax, t)}</p>
                       ) : null}
                     </div>
                     <div className="rounded-lg bg-muted/40 p-4">
-                      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Price</h3>
-                      <p className="font-medium text-foreground">{formatPrice(activeTour.price, activeTour.currency, activeTour.priceUnit) ?? 'Price on request'}</p>
-                      <p>Guide {activeTour.guideName}</p>
+                      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('title')}</h3>
+                      <p className="font-medium text-foreground">{formatPrice(activeTour.price, activeTour.currency, activeTour.priceUnit, t) ?? t('title')}</p>
+                      <p>{t('guide')} {activeTour.guideName}</p>
                       {activeTour.guideLanguages.length > 0 ? (
-                        <p>Languages: {activeTour.guideLanguages.join(', ')}</p>
+                        <p>{t('guide')}: {activeTour.guideLanguages.join(', ')}</p>
                       ) : null}
                     </div>
                   </div>
                   {activeTour.highlights && activeTour.highlights.length > 0 ? (
                     <div>
-                      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Highlights</h3>
+                      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('title')}</h3>
                       <ul className="list-disc space-y-1 pl-5">
                         {activeTour.highlights.map((highlight) => (
                           <li key={highlight}>{highlight}</li>
@@ -472,18 +475,18 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
                   ) : null}
                   {activeTour.clientNationalities.length > 0 ? (
                     <div>
-                      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Traveller nationalities</h3>
+                      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('title')}</h3>
                       <p>{activeTour.clientNationalities.join(', ')}</p>
                     </div>
                   ) : null}
                   {activeTour.provinces.length > 0 ? (
                     <div>
-                      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Route highlights</h3>
+                      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('title')}</h3>
                       <p>{activeTour.provinces.join(', ')}</p>
                     </div>
                   ) : null}
                   <div>
-                    <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Itinerary snapshot</h3>
+                    <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('title')}</h3>
                     <p className="whitespace-pre-line leading-relaxed">{activeTour.itinerary}</p>
                   </div>
                   {activeTourTypes.length > 0 ? (
@@ -499,10 +502,10 @@ export default function ToursExplorer({ tours, tourTypes }: ToursExplorerProps) 
               </ScrollArea>
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setActiveTour(null)}>
-                  Close
+                  {tCommon('close')}
                 </Button>
                 <Button asChild>
-                  <Link href={`/tours/${activeTour.id}`}>View full details</Link>
+                  <Link href={`/tours/${activeTour.id}`}>{t('title')}</Link>
                 </Button>
               </div>
             </>
