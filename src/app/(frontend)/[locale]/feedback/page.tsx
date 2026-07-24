@@ -1,9 +1,17 @@
 import Image from 'next/image';
 import FeedbackForm from '@/components/feedback-form';
 import { getPublicContent } from '@/lib/content-service';
+import { setRequestLocale } from 'next-intl/server';
 
-export default async function FeedbackPage() {
-  const { siteSettings, tours } = await getPublicContent();
+export default async function FeedbackPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const { siteSettings, tours } = await getPublicContent(locale);
   const heroImage = siteSettings.heroMediaUrl;
 
   return (

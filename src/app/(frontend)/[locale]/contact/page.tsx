@@ -3,9 +3,17 @@ import { Mail, Phone, MessageCircle, Facebook, Instagram, MapPin } from 'lucide-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getPublicContent } from '@/lib/content-service';
+import { setRequestLocale } from 'next-intl/server';
 
-export default async function ContactPage() {
-  const { siteSettings } = await getPublicContent();
+export default async function ContactPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const { siteSettings } = await getPublicContent(locale);
   const { contact, social } = siteSettings;
 
   const whatsappLink = contact.whatsapp

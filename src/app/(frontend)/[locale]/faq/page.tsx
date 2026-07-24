@@ -1,6 +1,7 @@
 import { FAQPageStructuredData } from '@/components/structured-data';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { getFaqs } from '@/lib/content-service';
+import { setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 import type { Faq } from '@/lib/types';
 
@@ -19,8 +20,15 @@ function groupByCategory(faqs: Faq[]): Map<string, Faq[]> {
   return groups;
 }
 
-export default async function FaqPage() {
-  const faqs = await getFaqs();
+export default async function FaqPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const faqs = await getFaqs(locale);
   const groups = groupByCategory(faqs);
 
   return (

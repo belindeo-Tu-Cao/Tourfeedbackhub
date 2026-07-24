@@ -3,12 +3,20 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Star } from 'lucide-react';
 import ReviewsExplorer from '@/components/reviews-explorer';
+import { setRequestLocale } from 'next-intl/server';
 
 const tripadvisorEmbedUrl = process.env.NEXT_PUBLIC_TRIPADVISOR_WIDGET_URL;
 const googleEmbedUrl = process.env.NEXT_PUBLIC_GOOGLE_REVIEWS_WIDGET_URL;
 
-export default async function ReviewsPage() {
-  const { siteSettings, reviews } = await getPublicContent();
+export default async function ReviewsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const { siteSettings, reviews } = await getPublicContent(locale);
   const approvedReviews = reviews.filter((review) => review.status === 'approved');
   const heroImage = siteSettings.heroMediaUrl;
   const totalReviews = approvedReviews.length;

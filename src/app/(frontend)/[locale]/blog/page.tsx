@@ -2,11 +2,19 @@ import { getBlogPosts, getBlogCategories } from '@/lib/blog';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { WebSiteStructuredData } from '@/components/structured-data';
 import { BlogListClient } from '@/components/blog-list-client';
+import { setRequestLocale } from 'next-intl/server';
 
 export const dynamic = 'force-dynamic';
 
-export default async function BlogPage() {
-  const [posts, categories] = await Promise.all([getBlogPosts(), getBlogCategories()]);
+export default async function BlogPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const [posts, categories] = await Promise.all([getBlogPosts(locale), getBlogCategories()]);
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002';
 
   return (

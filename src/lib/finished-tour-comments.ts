@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { getPayloadClient } from "@/lib/payload";
+import { asLocale } from "@/lib/locale";
 import type { FinishedTourComment } from "@/lib/types";
 
 function toDate(value: unknown): Date {
@@ -20,7 +21,7 @@ function relId(value: unknown): string {
 }
 
 export const getFinishedTourComments = cache(
-  async (tourId: string): Promise<FinishedTourComment[]> => {
+  async (tourId: string, locale?: string): Promise<FinishedTourComment[]> => {
     try {
       const payload = await getPayloadClient();
       const result = await payload.find({
@@ -34,6 +35,7 @@ export const getFinishedTourComments = cache(
             { tour: { equals: tourId } },
           ],
         },
+        locale: asLocale(locale),
       });
 
       return result.docs

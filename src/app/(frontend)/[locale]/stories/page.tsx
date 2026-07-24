@@ -1,8 +1,16 @@
 import { getPublicContent } from '@/lib/content-service';
 import StoriesExplorer from '@/components/stories-explorer';
+import { setRequestLocale } from 'next-intl/server';
 
-export default async function StoriesPage() {
-  const { stories } = await getPublicContent();
+export default async function StoriesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const { stories } = await getPublicContent(locale);
   const serialisedStories = stories.map((story) => ({
     id: story.id,
     slug: story.slug,

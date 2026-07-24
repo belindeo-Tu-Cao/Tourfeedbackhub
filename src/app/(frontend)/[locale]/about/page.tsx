@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getPublicContent } from '@/lib/content-service';
 import { WebSiteStructuredData } from '@/components/structured-data';
+import { setRequestLocale } from 'next-intl/server';
 import {
   MapPin,
   Users,
@@ -22,8 +23,15 @@ export const metadata: Metadata = {
   description: 'Learn about Tour Insights Hub - connecting travelers with trusted local guides across Vietnam',
 };
 
-export default async function AboutPage() {
-  const { siteSettings, guides, tours, reviews } = await getPublicContent();
+export default async function AboutPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const { siteSettings, guides, tours, reviews } = await getPublicContent(locale);
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002';
 
   // Compute stats

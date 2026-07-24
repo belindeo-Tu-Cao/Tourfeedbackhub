@@ -12,15 +12,16 @@ import {
   getRelatedTours,
   getRelatedPostsByField,
 } from '@/lib/content-service';
+import { setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 interface StoryPageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
 export async function generateMetadata({ params }: StoryPageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const story = await getStoryBySlug(slug);
+  const { locale, slug } = await params;
+  const story = await getStoryBySlug(slug, locale);
   if (!story) return { title: 'Story Not Found' };
   return {
     title: `${story.title} — Stories`,
@@ -29,16 +30,18 @@ export async function generateMetadata({ params }: StoryPageProps): Promise<Meta
 }
 
 export default async function StoryPage({ params }: StoryPageProps) {
-  const { slug } = await params;
-  const story = await getStoryBySlug(slug);
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
+
+  const story = await getStoryBySlug(slug, locale);
 
   if (!story) {
     notFound();
   }
 
   const [relatedTours, relatedPosts] = await Promise.all([
-    getRelatedTours('relatedStories', story.id),
-    getRelatedPostsByField('relatedStories', story.id),
+    getRelatedTours('relatedStories', story.id, locale),
+    getRelatedPostsByField('relatedStories', story.id, locale),
   ]);
 
   return (

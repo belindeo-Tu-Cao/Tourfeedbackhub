@@ -36,8 +36,13 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  const siteSettings = await getSiteSettings();
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const siteSettings = await getSiteSettings(locale);
   return {
     title: siteSettings.heroTitle,
     description: siteSettings.heroSubtitle,
@@ -73,7 +78,7 @@ export default async function LocaleLayout({
   if (!isAppLocale(locale)) notFound();
   setRequestLocale(locale);
 
-  const [messages, siteSettings] = await Promise.all([getMessages(), getSiteSettings()]);
+  const [messages, siteSettings] = await Promise.all([getMessages(), getSiteSettings(locale)]);
   const [headerMenu, footerMenu] = await Promise.all([
     getMenu('header', locale),
     getMenu('footer', locale),

@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { getDestinations } from '@/lib/content-service';
+import { setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -9,8 +10,15 @@ export const metadata: Metadata = {
   description: 'Explore destinations across Vietnam — tours, guides, blog stories, and local must-see, must-do, must-eat picks.',
 };
 
-export default async function DestinationsPage() {
-  const destinations = await getDestinations();
+export default async function DestinationsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const destinations = await getDestinations(locale);
 
   return (
     <div className="bg-background py-16 md:py-24">

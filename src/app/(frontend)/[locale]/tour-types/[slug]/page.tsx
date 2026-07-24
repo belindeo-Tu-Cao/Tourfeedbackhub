@@ -11,15 +11,16 @@ import {
   getRelatedPostsByField,
   getStoriesByField,
 } from '@/lib/content-service';
+import { setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 interface TourTypePageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
 export async function generateMetadata({ params }: TourTypePageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const tourType = await getTourTypeBySlug(slug);
+  const { locale, slug } = await params;
+  const tourType = await getTourTypeBySlug(slug, locale);
   if (!tourType) return { title: 'Tour Style Not Found' };
   return {
     title: `${tourType.title} — Tour Styles`,
@@ -28,18 +29,20 @@ export async function generateMetadata({ params }: TourTypePageProps): Promise<M
 }
 
 export default async function TourTypePage({ params }: TourTypePageProps) {
-  const { slug } = await params;
-  const tourType = await getTourTypeBySlug(slug);
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
+
+  const tourType = await getTourTypeBySlug(slug, locale);
 
   if (!tourType) {
     notFound();
   }
 
   const [tours, guides, posts, stories] = await Promise.all([
-    getToursForTourType(tourType.id),
-    getGuidesForTourType(tourType.id),
-    getRelatedPostsByField('relatedTourTypes', tourType.id),
-    getStoriesByField('relatedTourTypes', tourType.id),
+    getToursForTourType(tourType.id, locale),
+    getGuidesForTourType(tourType.id, locale),
+    getRelatedPostsByField('relatedTourTypes', tourType.id, locale),
+    getStoriesByField('relatedTourTypes', tourType.id, locale),
   ]);
 
   return (

@@ -10,18 +10,26 @@ import { getPublicContent } from '@/lib/content-service';
 import HeroCarousel from '@/components/hero-carousel';
 import ReviewCarousel from '@/components/review-carousel';
 import HomeFeedbackForm from '@/components/home-feedback-form';
+import { setRequestLocale } from 'next-intl/server';
 
-export default async function Home() {
-  const { siteSettings, tours, reviews, tourTypes, stories, slides, posts } = await getPublicContent();
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const { siteSettings, tours, reviews, tourTypes, stories, slides, posts } = await getPublicContent(locale);
   const finishedTours = tours.filter((tour) => tour.status === 'finished');
   const sortedDiaries = [...finishedTours].sort(
     (a, b) => b.startDate.getTime() - a.startDate.getTime()
   );
   const recentDiaries = sortedDiaries.slice(0, 3);
   const approvedReviews = reviews.filter((review) => review.status === 'approved');
-  const defaultLocale = (siteSettings.defaultLanguage ?? 'en').toLowerCase();
-  const slidesForLocale = slides.filter((slide) => slide.locale.toLowerCase() === defaultLocale);
-  const heroSlides = slidesForLocale.length ? slidesForLocale : slides;
+  // `slides` are already scoped to the current locale by getPublicContent, so no
+  // client-side locale filtering is needed.
+  const heroSlides = slides;
   const primarySlide = heroSlides[0];
   const heroImage = primarySlide?.imageUrl ?? siteSettings.heroMediaUrl;
   const sortedStories = [...stories].sort(

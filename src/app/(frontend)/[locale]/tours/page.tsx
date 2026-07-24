@@ -1,8 +1,16 @@
 import { getPublicContent } from '@/lib/content-service';
 import ToursExplorer from '@/components/tours-explorer';
+import { setRequestLocale } from 'next-intl/server';
 
-export default async function ToursPage() {
-  const { tours, tourTypes, reviews } = await getPublicContent();
+export default async function ToursPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const { tours, tourTypes, reviews } = await getPublicContent(locale);
   const saleTours = tours.filter((tour) => tour.status === 'for_sale');
 
   const ratingTotals = new Map<string, { total: number; count: number }>();

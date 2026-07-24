@@ -1,6 +1,7 @@
 import { getAllGuides } from '@/lib/content-service';
 import GuidesExplorer from '@/components/guides-explorer';
 import { WebSiteStructuredData } from '@/components/structured-data';
+import { setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,8 +9,15 @@ export const metadata: Metadata = {
   description: 'Meet our experienced tour guides ready to show you the best of Vietnam',
 };
 
-export default async function GuidesPage() {
-  const guides = await getAllGuides();
+export default async function GuidesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const guides = await getAllGuides(locale);
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002';
 
   // Compute stats

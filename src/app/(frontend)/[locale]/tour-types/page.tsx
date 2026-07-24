@@ -3,9 +3,17 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { getPublicContent } from '@/lib/content-service';
+import { setRequestLocale } from 'next-intl/server';
 
-export default async function TourTypesPage() {
-  const { tourTypes, tours } = await getPublicContent();
+export default async function TourTypesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const { tourTypes, tours } = await getPublicContent(locale);
   const toursByType = new Map<string, string[]>(
     tourTypes.map((type) => [
       type.id,

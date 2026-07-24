@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { getPayloadClient } from "@/lib/payload";
+import { asLocale } from "@/lib/locale";
 import { footerNavigationMenu, headerNavigationMenu } from "@/lib/data";
 import type {
   NavigationArea,
@@ -34,14 +35,6 @@ function toDate(value: unknown): Date | undefined {
     return (value as { toDate: () => Date }).toDate();
   }
   return undefined;
-}
-
-function normaliseLocale(value: unknown): string | null {
-  if (typeof value === "string") {
-    const trimmed = value.trim();
-    return trimmed.length ? trimmed : null;
-  }
-  return null;
 }
 
 function cloneFlatItems(items: NavigationMenuItem[]): NavigationMenuItem[] {
@@ -168,44 +161,22 @@ function mapNavigationItem(item: Doc): NavigationMenuItem {
   };
 }
 
-function chooseMenuDoc(
-  docs: Doc[],
-  desiredLocale: string | null,
-  key: NavigationMenuKey
-): Doc | undefined {
-  if (!docs.length) return undefined;
-
-  const targetLocale = normaliseLocale(desiredLocale);
-  const exactMatch = targetLocale
-    ? docs.find((doc) => normaliseLocale(doc.locale) === targetLocale)
-    : undefined;
-
-  if (exactMatch) return exactMatch;
-
-  const nullLocale = docs.find((doc) => normaliseLocale(doc.locale) === null);
-  if (nullLocale) return nullLocale;
-
-  return docs.find((doc) => doc.key === key) ?? docs[0];
-}
-
 async function fetchNavigationMenuInternal(
   key: NavigationMenuKey,
   locale?: string | null
 ): Promise<NavigationMenu> {
+  const loc = asLocale(locale ?? undefined);
   try {
     const payload = await getPayloadClient();
     const result = await payload.find({
       collection: "navigation-menus",
       depth: 0,
-      limit: 20,
+      limit: 1,
       where: { and: [{ key: { equals: key } }, { published: { equals: true } }] },
+      locale: loc,
     });
 
-    if (!result.docs.length) {
-      return cloneMenu(FALLBACK_MENUS[key]);
-    }
-
-    const selectedDoc = chooseMenuDoc(result.docs, locale ?? null, key);
+    const selectedDoc = result.docs[0];
     if (!selectedDoc) {
       return cloneMenu(FALLBACK_MENUS[key]);
     }
@@ -220,7 +191,7 @@ async function fetchNavigationMenuInternal(
     return {
       id: String(selectedDoc.id),
       key,
-      locale: normaliseLocale(selectedDoc.locale),
+      locale: loc,
       title:
         typeof selectedDoc.title === "string" && selectedDoc.title.trim()
           ? selectedDoc.title.trim()

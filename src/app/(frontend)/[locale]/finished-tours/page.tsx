@@ -2,9 +2,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import TourCard from '@/components/tour-card';
 import { getPublicContent } from '@/lib/content-service';
+import { setRequestLocale } from 'next-intl/server';
 
-export default async function FinishedToursPage() {
-  const { tours, tourTypes } = await getPublicContent();
+export default async function FinishedToursPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const { tours, tourTypes } = await getPublicContent(locale);
   const finishedTours = tours.filter((tour) => tour.status === 'finished');
   const tourTypeMap = new Map(tourTypes.map((type) => [type.id, type.title]));
 

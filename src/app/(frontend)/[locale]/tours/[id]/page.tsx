@@ -11,16 +11,18 @@ import { FinishedTourCommentForm } from '@/components/finished-tour/comment-form
 import { MediaCarousel } from '@/components/finished-tour/media-carousel';
 import { RelatedContentSection } from '@/components/related-content-section';
 import { TouristTripStructuredData } from '@/components/structured-data';
+import { setRequestLocale } from 'next-intl/server';
 
 interface TourPageProps {
   params: Promise<{
+    locale: string;
     id: string;
   }>;
 }
 
 export async function generateMetadata({ params }: TourPageProps) {
-  const { id } = await params;
-  const { tours } = await getPublicContent();
+  const { locale, id } = await params;
+  const { tours } = await getPublicContent(locale);
   const tour = tours.find((item) => item.id === id);
   if (!tour) return {};
 
@@ -31,8 +33,10 @@ export async function generateMetadata({ params }: TourPageProps) {
 }
 
 export default async function FinishedTourPage({ params }: TourPageProps) {
-  const { id } = await params;
-  const { tours, tourTypes } = await getPublicContent();
+  const { locale, id } = await params;
+  setRequestLocale(locale);
+
+  const { tours, tourTypes } = await getPublicContent(locale);
   const tour = tours.find((item) => item.id === id);
 
   if (!tour) {
@@ -50,8 +54,8 @@ export default async function FinishedTourPage({ params }: TourPageProps) {
     : null;
 
   const [comments, reviews] = await Promise.all([
-    isForSale ? Promise.resolve([]) : getFinishedTourComments(tour.id),
-    getTourReviews(tour.id),
+    isForSale ? Promise.resolve([]) : getFinishedTourComments(tour.id, locale),
+    getTourReviews(tour.id, locale),
   ]);
   const ratingAggregate = comments.reduce(
     (acc, current) => {

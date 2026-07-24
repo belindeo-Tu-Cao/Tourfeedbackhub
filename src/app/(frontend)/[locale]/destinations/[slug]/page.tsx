@@ -11,16 +11,17 @@ import {
 import { RelatedContentSection } from '@/components/related-content-section';
 import { FaqSection } from '@/components/faq-section';
 import { getDestination, getFaqsFor } from '@/lib/content-service';
+import { setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 import type { MustSeeDoEatItem } from '@/lib/types';
 
 interface DestinationPageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
 export async function generateMetadata({ params }: DestinationPageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const destination = await getDestination(slug);
+  const { locale, slug } = await params;
+  const destination = await getDestination(slug, locale);
   if (!destination) return { title: 'Destination Not Found' };
   return {
     title: `${destination.name} — Destinations`,
@@ -53,14 +54,16 @@ function MustItemsGrid({ items, icon: Icon }: { items: MustSeeDoEatItem[]; icon:
 }
 
 export default async function DestinationPage({ params }: DestinationPageProps) {
-  const { slug } = await params;
-  const destination = await getDestination(slug);
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
+
+  const destination = await getDestination(slug, locale);
 
   if (!destination) {
     notFound();
   }
 
-  const faqs = await getFaqsFor('destinations', destination.id);
+  const faqs = await getFaqsFor('destinations', destination.id, locale);
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
 
   return (

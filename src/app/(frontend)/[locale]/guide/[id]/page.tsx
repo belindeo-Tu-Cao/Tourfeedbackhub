@@ -1,15 +1,16 @@
 import { notFound } from 'next/navigation';
 import { getGuideProfile, getGuideTours, getGuideReviews, getGuideRelatedPosts } from '@/lib/content-service';
 import GuideProfile from '@/components/guide-profile';
+import { setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 interface GuidePageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }
 
 export async function generateMetadata({ params }: GuidePageProps): Promise<Metadata> {
-  const { id } = await params;
-  const guide = await getGuideProfile(id);
+  const { locale, id } = await params;
+  const guide = await getGuideProfile(id, locale);
 
   if (!guide) {
     return { title: 'Guide Not Found' };
@@ -22,12 +23,14 @@ export async function generateMetadata({ params }: GuidePageProps): Promise<Meta
 }
 
 export default async function GuidePage({ params }: GuidePageProps) {
-  const { id } = await params;
+  const { locale, id } = await params;
+  setRequestLocale(locale);
+
   const [guide, tours, reviews, relatedPosts] = await Promise.all([
-    getGuideProfile(id),
-    getGuideTours(id),
-    getGuideReviews(id),
-    getGuideRelatedPosts(id),
+    getGuideProfile(id, locale),
+    getGuideTours(id, locale),
+    getGuideReviews(id, locale),
+    getGuideRelatedPosts(id, locale),
   ]);
 
   if (!guide) {

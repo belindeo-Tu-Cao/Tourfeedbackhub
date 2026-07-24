@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { getPayloadClient, mediaUrl } from "@/lib/payload";
+import { asLocale, DEFAULT_LOCALE } from "@/lib/locale";
 
 type Doc = Record<string, any>;
 
@@ -66,7 +67,7 @@ function mapItem(doc: Doc): BlogListItem {
   };
 }
 
-export const getBlogPosts = cache(async (): Promise<BlogListItem[]> => {
+export const getBlogPosts = cache(async (locale?: string): Promise<BlogListItem[]> => {
   try {
     const payload = await getPayloadClient();
     const result = await payload.find({
@@ -75,6 +76,7 @@ export const getBlogPosts = cache(async (): Promise<BlogListItem[]> => {
       limit: 200,
       sort: "-publishedAt",
       where: { and: [{ type: { equals: "post" } }, { status: { equals: "published" } }] },
+      locale: asLocale(locale),
     });
     return result.docs.map(mapItem);
   } catch (error) {
@@ -98,13 +100,16 @@ export const getBlogCategories = cache(async (): Promise<BlogCategory[]> => {
   }
 });
 
-/** Raw published post by slug, including Lexical richText content for rendering. */
-export const getBlogPost = cache(async (slug: string) => {
+/**
+ * Raw published post by slug, including Lexical richText content for rendering.
+ * `slug` isn't localized, so match at DEFAULT_LOCALE first, then load the target locale.
+ */
+export const getBlogPost = cache(async (slug: string, locale?: string) => {
   try {
     const payload = await getPayloadClient();
-    const result = await payload.find({
+    const found = await payload.find({
       collection: "posts",
-      depth: 1,
+      depth: 0,
       limit: 1,
       where: {
         and: [
@@ -113,8 +118,16 @@ export const getBlogPost = cache(async (slug: string) => {
           { status: { equals: "published" } },
         ],
       },
+      locale: DEFAULT_LOCALE,
     });
-    return result.docs[0] ?? null;
+    const docId = found.docs[0]?.id;
+    if (!docId) return null;
+    return await payload.findByID({
+      collection: "posts",
+      id: docId,
+      depth: 1,
+      locale: asLocale(locale),
+    });
   } catch (error) {
     console.error("Failed to load blog post", error);
     return null;

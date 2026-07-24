@@ -19,16 +19,19 @@ import {
 } from '@/lib/content-service';
 import { RelatedContentSection } from '@/components/related-content-section';
 import { PostCommentForm } from '@/components/blog/post-comment-form';
+import { setRequestLocale } from 'next-intl/server';
 
 export const dynamic = 'force-dynamic';
 
 export default async function BlogPostPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { slug } = await params;
-  const post = await getBlogPost(slug);
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
+
+  const post = await getBlogPost(slug, locale);
 
   if (!post) {
     notFound();
@@ -66,8 +69,8 @@ export default async function BlogPostPage({
   const relatedGuides = toRelatedItemSummaries(p.relatedGuides, 'guide');
 
   const [relatedPosts, relatedTours, comments] = await Promise.all([
-    getRelatedPostsFor(postId, categoryIds, explicitRelatedPosts),
-    getRelatedTours('relatedPosts', postId),
+    getRelatedPostsFor(postId, categoryIds, explicitRelatedPosts, locale),
+    getRelatedTours('relatedPosts', postId, locale),
     getPostComments(postId),
   ]);
 
