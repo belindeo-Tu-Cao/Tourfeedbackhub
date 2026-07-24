@@ -14,6 +14,7 @@ import { getDestination, getFaqsFor } from '@/lib/content-service';
 import { setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
 import type { MustSeeDoEatItem } from '@/lib/types';
+import { buildAlternates } from '@/lib/locale-path';
 
 interface DestinationPageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -23,9 +24,13 @@ export async function generateMetadata({ params }: DestinationPageProps): Promis
   const { locale, slug } = await params;
   const destination = await getDestination(slug, locale);
   if (!destination) return { title: 'Destination Not Found' };
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tourfeedbackhub.web.app';
   return {
     title: `${destination.name} — Destinations`,
     description: destination.summary,
+    alternates: {
+      languages: buildAlternates(siteUrl, `/destinations/${slug}`),
+    },
   };
 }
 

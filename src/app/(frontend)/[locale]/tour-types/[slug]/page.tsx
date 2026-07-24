@@ -13,6 +13,7 @@ import {
 } from '@/lib/content-service';
 import { setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
+import { buildAlternates } from '@/lib/locale-path';
 
 interface TourTypePageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -22,9 +23,13 @@ export async function generateMetadata({ params }: TourTypePageProps): Promise<M
   const { locale, slug } = await params;
   const tourType = await getTourTypeBySlug(slug, locale);
   if (!tourType) return { title: 'Tour Style Not Found' };
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tourfeedbackhub.web.app';
   return {
     title: `${tourType.title} — Tour Styles`,
     description: tourType.description,
+    alternates: {
+      languages: buildAlternates(siteUrl, `/tour-types/${slug}`),
+    },
   };
 }
 

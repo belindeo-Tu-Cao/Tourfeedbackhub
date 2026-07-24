@@ -13,6 +13,7 @@ import Footer from '@/components/footer';
 import { getSiteSettings } from '@/lib/content-service';
 import { getMenu } from '@/lib/nav';
 import { routing, type AppLocale } from '@/i18n/routing';
+import { buildAlternates, localizedUrl } from '@/lib/locale-path';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -43,15 +44,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const siteSettings = await getSiteSettings(locale);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tourfeedbackhub.web.app';
   return {
     title: siteSettings.heroTitle,
     description: siteSettings.heroSubtitle,
     alternates: {
-      canonical: '/',
-      languages: siteSettings.languages.reduce<Record<string, string>>((acc, lang) => {
-        acc[lang] = lang === siteSettings.defaultLanguage ? '/' : `/${lang}`;
-        return acc;
-      }, {}),
+      canonical: localizedUrl(siteUrl, locale, '/'),
+      languages: buildAlternates(siteUrl, '/'),
     },
     openGraph: {
       title: siteSettings.heroTitle,

@@ -12,6 +12,7 @@ import { MediaCarousel } from '@/components/finished-tour/media-carousel';
 import { RelatedContentSection } from '@/components/related-content-section';
 import { TouristTripStructuredData } from '@/components/structured-data';
 import { setRequestLocale } from 'next-intl/server';
+import { buildAlternates } from '@/lib/locale-path';
 
 interface TourPageProps {
   params: Promise<{
@@ -26,9 +27,14 @@ export async function generateMetadata({ params }: TourPageProps) {
   const tour = tours.find((item) => item.id === id);
   if (!tour) return {};
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tourfeedbackhub.web.app';
+
   return {
     title: tour.status === 'for_sale' ? `${tour.name} — Book This Tour` : `${tour.name} — Finished Tour Diary`,
     description: tour.summary,
+    alternates: {
+      languages: buildAlternates(siteUrl, `/tours/${id}`),
+    },
   };
 }
 

@@ -30,6 +30,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useAdmin } from '@/hooks/use-admin';
 import HeaderSearch from '@/components/header-search';
+import { LanguageSwitcher } from '@/components/language-switcher';
 import type {
   NavigationAudience,
   NavigationMenuItem as NavigationMenuEntry,
@@ -392,6 +393,7 @@ export default function Header({ menu, siteSettings }: HeaderProps) {
 
         <div className="flex flex-1 items-center justify-end gap-2">
           <HeaderSearch />
+          <LanguageSwitcher />
 
           {isAdmin ? (
             <Button asChild variant="secondary" className="hidden md:flex">

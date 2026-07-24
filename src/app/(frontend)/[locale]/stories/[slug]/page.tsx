@@ -14,6 +14,7 @@ import {
 } from '@/lib/content-service';
 import { setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
+import { buildAlternates } from '@/lib/locale-path';
 
 interface StoryPageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -23,9 +24,13 @@ export async function generateMetadata({ params }: StoryPageProps): Promise<Meta
   const { locale, slug } = await params;
   const story = await getStoryBySlug(slug, locale);
   if (!story) return { title: 'Story Not Found' };
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tourfeedbackhub.web.app';
   return {
     title: `${story.title} — Stories`,
     description: story.excerpt,
+    alternates: {
+      languages: buildAlternates(siteUrl, `/stories/${slug}`),
+    },
   };
 }
 

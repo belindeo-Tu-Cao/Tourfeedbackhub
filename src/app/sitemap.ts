@@ -1,8 +1,17 @@
 import type {MetadataRoute} from 'next';
 import {getPublicContent, getDestinations, getAllGuides} from '@/lib/content-service';
 import {getPayloadClient} from '@/lib/payload';
+import {locales} from '@/i18n/routing';
+import {localizedUrl, buildAlternates} from '@/lib/locale-path';
 
 type SitemapDoc = { slug: string; updatedAt: Date };
+
+type RouteSpec = {
+  path: string;
+  lastModified: Date;
+  changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'];
+  priority: number;
+};
 
 async function getPostsByType(type: 'post' | 'page'): Promise<SitemapDoc[]> {
   try {
@@ -23,8 +32,25 @@ async function getPostsByType(type: 'post' | 'page'): Promise<SitemapDoc[]> {
   }
 }
 
+/** Expand a single locale-agnostic route into one sitemap entry per locale. */
+function expandRoute(baseUrl: string, spec: RouteSpec): MetadataRoute.Sitemap {
+  const languages = buildAlternates(baseUrl, spec.path);
+  return locales.map((locale) => ({
+    url: localizedUrl(baseUrl, locale, spec.path),
+    lastModified: spec.lastModified,
+    changeFrequency: spec.changeFrequency,
+    priority: spec.priority,
+    alternates: { languages },
+  }));
+}
+
+function expandRoutes(baseUrl: string, specs: RouteSpec[]): MetadataRoute.Sitemap {
+  return specs.flatMap((spec) => expandRoute(baseUrl, spec));
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://example.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tourfeedbackhub.web.app';
+  const now = new Date();
 
   // Get dynamic content
   const [publicContent, posts, pages, destinations, guides] = await Promise.all([
@@ -36,84 +62,84 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
 
   // Static pages with SEO priorities
-  const staticRoutes: MetadataRoute.Sitemap = [
-    {url: `${baseUrl}/`, lastModified: new Date(), changeFrequency: 'daily', priority: 1},
-    {url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8},
-    {url: `${baseUrl}/tour-types`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7},
-    {url: `${baseUrl}/tours`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9},
-    {url: `${baseUrl}/destinations`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8},
-    {url: `${baseUrl}/guides`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7},
-    {url: `${baseUrl}/stories`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8},
-    {url: `${baseUrl}/reviews`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9},
-    {url: `${baseUrl}/faq`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6},
-    {url: `${baseUrl}/feedback`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7},
-    {url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6},
+  const staticRoutes: RouteSpec[] = [
+    {path: '/', lastModified: now, changeFrequency: 'daily', priority: 1},
+    {path: '/about', lastModified: now, changeFrequency: 'monthly', priority: 0.8},
+    {path: '/tour-types', lastModified: now, changeFrequency: 'monthly', priority: 0.7},
+    {path: '/tours', lastModified: now, changeFrequency: 'weekly', priority: 0.9},
+    {path: '/destinations', lastModified: now, changeFrequency: 'weekly', priority: 0.8},
+    {path: '/guides', lastModified: now, changeFrequency: 'weekly', priority: 0.7},
+    {path: '/stories', lastModified: now, changeFrequency: 'weekly', priority: 0.8},
+    {path: '/reviews', lastModified: now, changeFrequency: 'daily', priority: 0.9},
+    {path: '/faq', lastModified: now, changeFrequency: 'monthly', priority: 0.6},
+    {path: '/feedback', lastModified: now, changeFrequency: 'monthly', priority: 0.7},
+    {path: '/contact', lastModified: now, changeFrequency: 'monthly', priority: 0.6},
   ];
 
   // Blog posts
-  const postEntries: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
+  const postRoutes: RouteSpec[] = posts.map((post) => ({
+    path: `/blog/${post.slug}`,
     lastModified: post.updatedAt,
     changeFrequency: 'weekly',
     priority: 0.7,
   }));
 
   // Custom pages
-  const pageEntries: MetadataRoute.Sitemap = pages.map((page) => ({
-    url: `${baseUrl}/${page.slug}`,
+  const pageRoutes: RouteSpec[] = pages.map((page) => ({
+    path: `/${page.slug}`,
     lastModified: page.updatedAt,
     changeFrequency: 'monthly',
     priority: 0.6,
   }));
 
   // Tours
-  const tourEntries: MetadataRoute.Sitemap = publicContent.tours.map((tour) => ({
-    url: `${baseUrl}/tours/${tour.id}`,
-    lastModified: new Date(),
+  const tourRoutes: RouteSpec[] = publicContent.tours.map((tour) => ({
+    path: `/tours/${tour.id}`,
+    lastModified: now,
     changeFrequency: 'weekly',
     priority: 0.7,
   }));
 
   // Stories
-  const storyEntries: MetadataRoute.Sitemap = publicContent.stories.map((story) => ({
-    url: `${baseUrl}/stories/${story.slug}`,
+  const storyRoutes: RouteSpec[] = publicContent.stories.map((story) => ({
+    path: `/stories/${story.slug}`,
     lastModified: story.publishedAt,
     changeFrequency: 'monthly',
     priority: 0.6,
   }));
 
   // Tour types
-  const tourTypeEntries: MetadataRoute.Sitemap = publicContent.tourTypes.map((type) => ({
-    url: `${baseUrl}/tour-types/${type.slug}`,
-    lastModified: new Date(),
+  const tourTypeRoutes: RouteSpec[] = publicContent.tourTypes.map((type) => ({
+    path: `/tour-types/${type.slug}`,
+    lastModified: now,
     changeFrequency: 'monthly',
     priority: 0.6,
   }));
 
   // Guides
-  const guideEntries: MetadataRoute.Sitemap = guides.map((guide) => ({
-    url: `${baseUrl}/guide/${guide.id}`,
-    lastModified: new Date(),
+  const guideRoutes: RouteSpec[] = guides.map((guide) => ({
+    path: `/guide/${guide.id}`,
+    lastModified: now,
     changeFrequency: 'monthly',
     priority: 0.6,
   }));
 
   // Destinations
-  const destinationEntries: MetadataRoute.Sitemap = destinations.map((destination) => ({
-    url: `${baseUrl}/destinations/${destination.slug}`,
-    lastModified: new Date(),
+  const destinationRoutes: RouteSpec[] = destinations.map((destination) => ({
+    path: `/destinations/${destination.slug}`,
+    lastModified: now,
     changeFrequency: 'weekly',
     priority: 0.7,
   }));
 
-  return [
+  return expandRoutes(baseUrl, [
     ...staticRoutes,
-    ...postEntries,
-    ...pageEntries,
-    ...tourEntries,
-    ...storyEntries,
-    ...tourTypeEntries,
-    ...guideEntries,
-    ...destinationEntries,
-  ];
+    ...postRoutes,
+    ...pageRoutes,
+    ...tourRoutes,
+    ...storyRoutes,
+    ...tourTypeRoutes,
+    ...guideRoutes,
+    ...destinationRoutes,
+  ]);
 }
