@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { format } from 'date-fns';
 import { CalendarRange, MapPin, Users, Filter, X, Compass, Tag } from 'lucide-react';
 import { DateRange } from 'react-day-picker';

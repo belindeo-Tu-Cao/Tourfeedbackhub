@@ -136,7 +136,8 @@ export interface GuideLanguageProficiency {
   id: string;
   name: string;
   code?: string;
-  proficiency?: 'beginner' | 'intermediate' | 'advanced' | 'native';
+  proficiency?: 'basic' | 'intermediate' | 'fluent' | 'native';
+  certificate?: string;
 }
 
 export interface Guide {

@@ -1,11 +1,73 @@
-import { getPayload } from 'payload'
+import { getPayload, type Payload } from 'payload'
 import path from 'path'
 import config from './payload.config'
+import { locales, defaultLocale } from '../i18n/routing'
+import { seedTranslations } from './seed-translations'
 
 const SEED_MEDIA_DIR = path.resolve(process.cwd(), 'media', 'seed')
 
+const isEmpty = (v: unknown) =>
+  v === null || v === undefined || v === '' || (Array.isArray(v) && v.length === 0)
+
+// Per-collection localized scalar text fields to baseline-copy EN -> other locales.
+// IMPORTANT: only scalar text/textarea fields belong here. Arrays/groups whose rows
+// carry per-locale ids (e.g. richText, array subfields) must NOT be added — Payload
+// rejects writing another locale's id into those.
+// NOTE: `faqs` is intentionally excluded. Its `answer` field is a REQUIRED richText
+// field, so writing only `question` to a new locale fails required-field validation,
+// and richText is not a safe scalar to baseline-copy. FAQs rely on Payload
+// `fallback: true` to serve EN content for other locales until translated in admin.
+const LOCALIZED_FIELDS: Record<string, string[]> = {
+  posts: ['title', 'excerpt'],
+  stories: ['title', 'excerpt'],
+  destinations: ['name', 'summary'],
+  tours: ['name', 'summary'],
+  'tour-types': ['title', 'description'],
+}
+
+async function copyLocaleBaseline(payload: Payload, collection: string, id: string | number) {
+  const fields = LOCALIZED_FIELDS[collection] ?? []
+  if (!fields.length) return
+  const en = await payload.findByID({
+    collection: collection as never,
+    id,
+    locale: defaultLocale,
+    fallbackLocale: false,
+    depth: 0,
+  })
+  for (const locale of locales) {
+    if (locale === defaultLocale) continue
+    const cur = await payload.findByID({
+      collection: collection as never,
+      id,
+      locale,
+      fallbackLocale: false,
+      depth: 0,
+    })
+    const data: Record<string, unknown> = {}
+    for (const f of fields) {
+      if (
+        isEmpty((cur as Record<string, unknown>)[f]) &&
+        !isEmpty((en as Record<string, unknown>)[f])
+      ) {
+        data[f] = (en as Record<string, unknown>)[f]
+      }
+    }
+    if (Object.keys(data).length) {
+      await payload.update({
+        collection: collection as never,
+        id,
+        locale,
+        data: data as never,
+      })
+    }
+  }
+}
+
 const ADMIN_EMAIL = 'iposntmk@gmail.com'
 const ADMIN_PASSWORD = 'iposntmk@gmail.com'
+
+const EXTRA_ADMINS = [{ email: 'belindeo@gmail.com', password: 'belindeo@gmail.com' }]
 
 async function seed() {
   const payload = await getPayload({ config })
@@ -63,6 +125,29 @@ async function seed() {
       limit: 1,
     })
   ).docs[0]
+
+  for (const extraAdmin of EXTRA_ADMINS) {
+    const existingExtraAdmin = await payload.find({
+      collection: 'users',
+      where: { email: { equals: extraAdmin.email } },
+      limit: 1,
+    })
+    if (existingExtraAdmin.docs.length === 0) {
+      await payload.create({
+        collection: 'users',
+        data: {
+          email: extraAdmin.email,
+          password: extraAdmin.password,
+          displayName: extraAdmin.email,
+          role: 'admin',
+          status: 'active',
+        },
+      })
+      log(`created admin user ${extraAdmin.email}`)
+    } else {
+      log(`admin user ${extraAdmin.email} already exists`)
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // 1.5 Media — upload seed images to R2 (via storage-s3 adapter)
@@ -169,6 +254,7 @@ async function seed() {
   for (const t of tourTypeDefs) {
     const doc = await ensure('tour-types', { title: { equals: t.title } }, t)
     tourTypes[t.title] = doc.id
+    await copyLocaleBaseline(payload, 'tour-types', doc.id)
   }
   log(`tour types ready (${tourTypeDefs.length})`)
 
@@ -180,7 +266,11 @@ async function seed() {
       name: 'Linh Nguyen',
       phone: '+84 90 123 4567',
       email: 'linh.guide@example.com',
-      languages: [languages.en, languages.vi, languages.fr],
+      spokenLanguages: [
+        { language: languages.en },
+        { language: languages.vi },
+        { language: languages.fr },
+      ],
       provinces: [provinces['Hanoi'], provinces['Ninh Binh']],
       nationalities: [nationalities.US, nationalities.FR],
       tourTypes: [tourTypes['Food & Culinary'], tourTypes['Nature'], tourTypes['Adventure']],
@@ -189,7 +279,11 @@ async function seed() {
       name: 'Minh Tran',
       phone: '+84 91 234 5678',
       email: 'minh.guide@example.com',
-      languages: [languages.en, languages.vi, languages.ja],
+      spokenLanguages: [
+        { language: languages.en },
+        { language: languages.vi },
+        { language: languages.ja },
+      ],
       provinces: [provinces['Da Nang'], provinces['Quang Nam']],
       nationalities: [nationalities.JP, nationalities.AU],
       tourTypes: [tourTypes['Cultural'], tourTypes['City']],
@@ -198,7 +292,11 @@ async function seed() {
       name: 'Hoa Pham',
       phone: '+84 92 345 6789',
       email: 'hoa.guide@example.com',
-      languages: [languages.en, languages.vi, languages.de],
+      spokenLanguages: [
+        { language: languages.en },
+        { language: languages.vi },
+        { language: languages.de },
+      ],
       provinces: [provinces['Ho Chi Minh City']],
       nationalities: [nationalities.DE, nationalities.GB],
       tourTypes: [tourTypes['Cultural'], tourTypes['City']],
@@ -211,7 +309,7 @@ async function seed() {
       cardIssuePlace: 'Thừa Thiên - Huế',
       cardExpiryDate: new Date('2028-05-31').toISOString(),
       experienceYears: 6,
-      languages: [languages.en],
+      spokenLanguages: [{ language: languages.en }],
       provinces: [provinces['Thua Thien Hue']],
       tourTypes: [tourTypes['Cultural'], tourTypes['Nature']],
     },
@@ -304,6 +402,7 @@ async function seed() {
   for (const t of tourDefs) {
     const doc = await ensure('tours', { code: { equals: t.code } }, t)
     tours[t.code] = doc.id
+    await copyLocaleBaseline(payload, 'tours', doc.id)
   }
   log(`tours ready (${tourDefs.length})`)
 
@@ -490,7 +589,6 @@ async function seed() {
       categories: [categories['food'], categories['travel-tips']],
       tags: [tags['vietnam'], tags['street-food']],
       publishedAt: new Date('2026-05-20').toISOString(),
-      locale: 'en',
       relatedGuides: [guides['Linh Nguyen']],
       relatedTourTypes: [tourTypes['Food & Culinary']],
     },
@@ -505,7 +603,6 @@ async function seed() {
       categories: [categories['destinations']],
       tags: [tags['vietnam'], tags['culture']],
       publishedAt: new Date('2026-06-10').toISOString(),
-      locale: 'en',
       relatedGuides: [guides['Minh Tran']],
       relatedTourTypes: [tourTypes['Cultural']],
     },
@@ -517,7 +614,6 @@ async function seed() {
       content: richText('We connect travelers with trusted local guides across Vietnam.'),
       status: 'published',
       author: adminUser.id,
-      locale: 'en',
     },
     {
       type: 'post',
@@ -530,7 +626,6 @@ async function seed() {
       categories: [categories['destinations']],
       tags: [tags['vietnam'], tags['quang-tri'], tags['history'], tags['war-history']],
       publishedAt: new Date('2026-07-21').toISOString(),
-      locale: 'en',
       relatedGuides: [guides['Tu Cao']],
       relatedTourTypes: [tourTypes['Cultural']],
     },
@@ -539,6 +634,7 @@ async function seed() {
   for (const p of postDefs) {
     const doc = await ensure('posts', { slug: { equals: p.slug } }, p)
     posts[p.slug] = doc.id
+    await copyLocaleBaseline(payload, 'posts', doc.id)
   }
   log(`posts ready (${postDefs.length})`)
 
@@ -575,6 +671,7 @@ async function seed() {
   for (const s of storyDefs) {
     const doc = await ensure('stories', { title: { equals: s.title } }, s)
     stories[s.title] = doc.id
+    await copyLocaleBaseline(payload, 'stories', doc.id)
   }
   log(`stories ready (${storyDefs.length})`)
 
@@ -583,7 +680,6 @@ async function seed() {
   // ---------------------------------------------------------------------------
   const slideDefs = [
     {
-      locale: 'en',
       title: 'Discover Vietnam with Local Experts',
       subtitle: 'Authentic tours guided by people who call it home.',
       buttonText: 'Browse Tours',
@@ -595,7 +691,6 @@ async function seed() {
       alt: 'Scenic Vietnam landscape',
     },
     {
-      locale: 'en',
       title: 'Real Feedback from Real Travelers',
       subtitle: 'Read verified reviews before you book.',
       buttonText: 'Read Reviews',
@@ -650,7 +745,6 @@ async function seed() {
       collection: 'navigation-menus',
       data: {
         key: 'header',
-        locale: 'en',
         title: 'Main Navigation',
         published: true,
         items: headerNavItems,
@@ -663,7 +757,6 @@ async function seed() {
     { key: { equals: 'footer' } },
     {
       key: 'footer',
-      locale: 'en',
       title: 'Footer Navigation',
       published: true,
       items: [
@@ -693,8 +786,6 @@ async function seed() {
       contact: { email: 'hello@tourinsightshub.example', phone: '+84 90 000 0000', address: 'Hanoi, Vietnam' },
       social: { facebook: '#', instagram: '#', youtube: '#' },
       copyright: '© 2026 Tour Insights Hub. All rights reserved.',
-      languages: [{ lang: 'en' }, { lang: 'vi' }],
-      defaultLanguage: 'en',
       primaryColor: '#77B5FE',
       accentColor: '#4682B4',
     },
@@ -889,6 +980,7 @@ async function seed() {
   for (const d of destinationDefs) {
     const doc = await ensure('destinations', { slug: { equals: d.slug } }, d)
     destinations[d.slug] = doc.id
+    await copyLocaleBaseline(payload, 'destinations', doc.id)
   }
   log(`destinations ready (${destinationDefs.length})`)
 
@@ -935,9 +1027,15 @@ async function seed() {
     },
   ]
   for (const f of faqDefs) {
+    // faqs intentionally not baseline-copied (see LOCALIZED_FIELDS note) — rely on fallback:true
     await ensure('faqs', { question: { equals: f.question } }, f)
   }
   log(`faqs ready (${faqDefs.length})`)
+
+  // ---------------------------------------------------------------------------
+  // 15. UI microcopy translations (from EN JSON)
+  // ---------------------------------------------------------------------------
+  await seedTranslations(payload)
 
   log('✅ Seed complete')
   process.exit(0)

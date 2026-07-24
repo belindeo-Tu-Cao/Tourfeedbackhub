@@ -85,6 +85,7 @@ export interface Config {
     stories: Story;
     destinations: Destination;
     faqs: Faq;
+    translations: Translation;
     slides: Slide;
     'navigation-menus': NavigationMenu;
     'site-settings': SiteSetting;
@@ -115,6 +116,7 @@ export interface Config {
     stories: StoriesSelect<false> | StoriesSelect<true>;
     destinations: DestinationsSelect<false> | DestinationsSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
+    translations: TranslationsSelect<false> | TranslationsSelect<true>;
     slides: SlidesSelect<false> | SlidesSelect<true>;
     'navigation-menus': NavigationMenusSelect<false> | NavigationMenusSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
@@ -128,10 +130,11 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: null;
+  fallbackLocale:
+    ('false' | 'none' | 'null') | false | null | ('en' | 'es' | 'it' | 'vi') | ('en' | 'es' | 'it' | 'vi')[];
   globals: {};
   globalsSelect: {};
-  locale: null;
+  locale: 'en' | 'es' | 'it' | 'vi';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -258,7 +261,6 @@ export interface Post {
   featuredImage?: (number | null) | Media;
   categories?: (number | Category)[] | null;
   tags?: (number | Tag)[] | null;
-  locale?: string | null;
   scheduledFor?: string | null;
   publishedAt?: string | null;
   viewCount?: number | null;
@@ -364,7 +366,26 @@ export interface Guide {
   cardExpiryDate?: string | null;
   experienceYears?: number | null;
   bio?: string | null;
-  languages?: (number | Language)[] | null;
+  slogan?: string | null;
+  guideFeeUsd?: number | null;
+  showOnFrontend?: boolean | null;
+  socials?: {
+    facebook?: string | null;
+    instagram?: string | null;
+    tiktok?: string | null;
+    whatsapp?: string | null;
+    zalo?: string | null;
+    viber?: string | null;
+    linkedin?: string | null;
+  };
+  spokenLanguages?:
+    | {
+        language: number | Language;
+        level?: ('basic' | 'intermediate' | 'fluent' | 'native') | null;
+        certificate?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   provinces?: (number | Province)[] | null;
   nationalities?: (number | Nationality)[] | null;
   tourTypes?: (number | TourType)[] | null;
@@ -442,6 +463,7 @@ export interface Comment {
 export interface Tour {
   id: number;
   code?: string | null;
+  company?: string | null;
   name: string;
   summary?: string | null;
   itinerary?: string | null;
@@ -686,11 +708,23 @@ export interface Faq {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "translations".
+ */
+export interface Translation {
+  id: number;
+  key: string;
+  group?: string | null;
+  value: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "slides".
  */
 export interface Slide {
   id: number;
-  locale?: string | null;
   title: string;
   subtitle?: string | null;
   buttonText?: string | null;
@@ -713,7 +747,6 @@ export interface Slide {
 export interface NavigationMenu {
   id: number;
   key: 'header' | 'footer';
-  locale?: string | null;
   title?: string | null;
   published?: boolean | null;
   items?:
@@ -793,13 +826,6 @@ export interface SiteSetting {
     | boolean
     | null;
   copyright?: string | null;
-  languages?:
-    | {
-        lang?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  defaultLanguage?: string | null;
   primaryColor?: string | null;
   accentColor?: string | null;
   updatedAt: string;
@@ -937,6 +963,10 @@ export interface PayloadLockedDocument {
         value: number | Faq;
       } | null)
     | ({
+        relationTo: 'translations';
+        value: number | Translation;
+      } | null)
+    | ({
         relationTo: 'slides';
         value: number | Slide;
       } | null)
@@ -1048,7 +1078,6 @@ export interface PostsSelect<T extends boolean = true> {
   featuredImage?: T;
   categories?: T;
   tags?: T;
-  locale?: T;
   scheduledFor?: T;
   publishedAt?: T;
   viewCount?: T;
@@ -1132,6 +1161,7 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface ToursSelect<T extends boolean = true> {
   code?: T;
+  company?: T;
   name?: T;
   summary?: T;
   itinerary?: T;
@@ -1273,7 +1303,28 @@ export interface GuidesSelect<T extends boolean = true> {
   cardExpiryDate?: T;
   experienceYears?: T;
   bio?: T;
-  languages?: T;
+  slogan?: T;
+  guideFeeUsd?: T;
+  showOnFrontend?: T;
+  socials?:
+    | T
+    | {
+        facebook?: T;
+        instagram?: T;
+        tiktok?: T;
+        whatsapp?: T;
+        zalo?: T;
+        viber?: T;
+        linkedin?: T;
+      };
+  spokenLanguages?:
+    | T
+    | {
+        language?: T;
+        level?: T;
+        certificate?: T;
+        id?: T;
+      };
   provinces?: T;
   nationalities?: T;
   tourTypes?: T;
@@ -1409,10 +1460,21 @@ export interface FaqsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "translations_select".
+ */
+export interface TranslationsSelect<T extends boolean = true> {
+  key?: T;
+  group?: T;
+  value?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "slides_select".
  */
 export interface SlidesSelect<T extends boolean = true> {
-  locale?: T;
   title?: T;
   subtitle?: T;
   buttonText?: T;
@@ -1434,7 +1496,6 @@ export interface SlidesSelect<T extends boolean = true> {
  */
 export interface NavigationMenusSelect<T extends boolean = true> {
   key?: T;
-  locale?: T;
   title?: T;
   published?: T;
   items?:
@@ -1486,13 +1547,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   contact?: T;
   social?: T;
   copyright?: T;
-  languages?:
-    | T
-    | {
-        lang?: T;
-        id?: T;
-      };
-  defaultLanguage?: T;
   primaryColor?: T;
   accentColor?: T;
   updatedAt?: T;

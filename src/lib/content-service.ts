@@ -1,6 +1,9 @@
 import { cache } from "react";
 import { getPayloadClient, mediaUrl } from "@/lib/payload";
 import { siteSettings as fallbackSiteSettings } from "@/lib/data";
+import { locales as appLocales, defaultLocale as appDefaultLocale } from "@/i18n/routing";
+import { asLocale, DEFAULT_LOCALE } from "@/lib/locale";
+import type { AppLocale } from "@/i18n/routing";
 import type {
   PublicContent,
   Review,
@@ -82,7 +85,8 @@ function mapSiteSettings(data: Doc | undefined): SiteSettings {
     contact: { ...fallbackSiteSettings.contact },
     social: { ...fallbackSiteSettings.social },
     values: Array.isArray(fallbackSiteSettings.values) ? [...fallbackSiteSettings.values] : [],
-    languages: Array.isArray(fallbackSiteSettings.languages) ? [...fallbackSiteSettings.languages] : [],
+    languages: [...appLocales],
+    defaultLanguage: appDefaultLocale,
   };
 
   if (!data) return base;
@@ -90,9 +94,10 @@ function mapSiteSettings(data: Doc | undefined): SiteSettings {
   const values = Array.isArray(data.values)
     ? data.values.map((v: Doc) => (typeof v === "string" ? v : v?.value)).filter(Boolean)
     : base.values;
-  const languages = Array.isArray(data.languages)
-    ? data.languages.map((l: Doc) => (typeof l === "string" ? l : l?.lang)).filter(Boolean)
-    : base.languages;
+  // The set of site locales is owned by src/i18n/routing.ts, not by Payload
+  // content (the `languages`/`defaultLanguage` fields were removed from the
+  // site-settings collection in favor of that single source of truth).
+  const languages = [...appLocales];
 
   return {
     siteName: typeof data.siteName === "string" && data.siteName.trim() ? data.siteName : base.siteName,
@@ -116,7 +121,7 @@ function mapSiteSettings(data: Doc | undefined): SiteSettings {
     },
     copyright: typeof data.copyright === "string" ? data.copyright : base.copyright,
     languages,
-    defaultLanguage: typeof data.defaultLanguage === "string" ? data.defaultLanguage : base.defaultLanguage,
+    defaultLanguage: appDefaultLocale,
     primaryColor: typeof data.primaryColor === "string" ? data.primaryColor : base.primaryColor,
     accentColor: typeof data.accentColor === "string" ? data.accentColor : base.accentColor,
   };
@@ -307,7 +312,7 @@ function mapReview(doc: Doc): Review {
   };
 }
 
-function mapPost(doc: Doc): Post {
+function mapPost(doc: Doc, locale: AppLocale = DEFAULT_LOCALE): Post {
   const allowedStatuses: PostStatus[] = ["draft", "published", "scheduled", "private", "trash"];
   const rawStatus = typeof doc.status === "string" ? doc.status.toLowerCase() : "draft";
   const status: PostStatus = allowedStatuses.includes(rawStatus as PostStatus)
@@ -339,7 +344,7 @@ function mapPost(doc: Doc): Post {
     commentCount: typeof doc.commentCount === "number" ? doc.commentCount : 0,
     allowComments: doc.allowComments !== false,
     seo: typeof doc.seo === "object" ? doc.seo : undefined,
-    locale: typeof doc.locale === "string" ? doc.locale : undefined,
+    locale,
     relatedPostIds: relIds(doc.relatedPosts),
     relatedPosts: toRelatedItemSummaries(doc.relatedPosts, "post"),
     relatedStoryIds: relIds(doc.relatedStories),
@@ -351,10 +356,10 @@ function mapPost(doc: Doc): Post {
   };
 }
 
-function mapSlide(doc: Doc): HeroSlide {
+function mapSlide(doc: Doc, locale: AppLocale = DEFAULT_LOCALE): HeroSlide {
   return {
     id: id(doc.id),
-    locale: String(doc.locale ?? "en").toLowerCase(),
+    locale,
     title: doc.title ?? "Untitled slide",
     subtitle: doc.subtitle ?? undefined,
     buttonText: doc.buttonText ?? "Learn more",
@@ -380,45 +385,48 @@ function isSlideLive(slide: HeroSlide, reference: Date): boolean {
   return true;
 }
 
-async function fetchSiteSettings(): Promise<SiteSettings> {
+async function fetchSiteSettings(locale: AppLocale): Promise<SiteSettings> {
   const payload = await getPayloadClient();
   const result = await payload.find({
     collection: "site-settings",
     limit: 1,
     depth: 1,
+    locale,
   });
   return mapSiteSettings(result.docs[0]);
 }
 
-async function fetchPublicContent(): Promise<PublicContent> {
+async function fetchPublicContent(locale: AppLocale): Promise<PublicContent> {
   const payload = await getPayloadClient();
 
   const [settings, tourTypes, tours, stories, reviews, slides, posts, guidesResult] = await Promise.all([
-    fetchSiteSettings(),
-    payload.find({ collection: "tour-types", limit: 100, depth: 0, sort: "order" }),
-    payload.find({ collection: "tours", limit: 100, depth: 2 }),
-    payload.find({ collection: "stories", limit: 100, depth: 1, sort: "-publishedAt" }),
+    fetchSiteSettings(locale),
+    payload.find({ collection: "tour-types", limit: 100, depth: 0, sort: "order", locale }),
+    payload.find({ collection: "tours", limit: 100, depth: 2, locale }),
+    payload.find({ collection: "stories", limit: 100, depth: 1, sort: "-publishedAt", locale }),
     payload.find({
       collection: "reviews",
       limit: 100,
       depth: 1,
       where: { status: { equals: "approved" } },
       sort: "-approvedAt",
+      locale,
     }),
-    payload.find({ collection: "slides", limit: 100, depth: 1, sort: "order" }),
+    payload.find({ collection: "slides", limit: 100, depth: 1, sort: "order", locale }),
     payload.find({
       collection: "posts",
       limit: 6,
       depth: 1,
       where: { and: [{ type: { equals: "post" } }, { status: { equals: "published" } }] },
       sort: "-publishedAt",
+      locale,
     }),
-    payload.find({ collection: "guides", limit: 100, depth: 1, sort: "name" }),
+    payload.find({ collection: "guides", limit: 100, depth: 1, sort: "name", locale }),
   ]);
 
   const now = new Date();
   const mappedSlides = slides.docs
-    .map(mapSlide)
+    .map((doc) => mapSlide(doc, locale))
     .filter((slide) => isSlideLive(slide, now))
     .sort((a, b) => (a.order === b.order ? a.title.localeCompare(b.title) : a.order - b.order));
 
@@ -429,14 +437,15 @@ async function fetchPublicContent(): Promise<PublicContent> {
     stories: stories.docs.map(mapStory),
     reviews: reviews.docs.map(mapReview),
     slides: mappedSlides,
-    posts: posts.docs.map(mapPost),
+    posts: posts.docs.map((doc) => mapPost(doc, locale)),
     guides: guidesResult.docs.map(mapGuide),
   };
 }
 
-export const getPublicContent = cache(async (): Promise<PublicContent> => {
+export const getPublicContent = cache(async (locale?: string): Promise<PublicContent> => {
+  const loc = asLocale(locale);
   try {
-    return await fetchPublicContent();
+    return await fetchPublicContent(loc);
   } catch (error) {
     console.warn("Falling back to local content because the database could not be reached", error);
     return {
@@ -452,9 +461,9 @@ export const getPublicContent = cache(async (): Promise<PublicContent> => {
   }
 });
 
-export const getSiteSettings = cache(async () => {
+export const getSiteSettings = cache(async (locale?: string) => {
   try {
-    return await fetchSiteSettings();
+    return await fetchSiteSettings(asLocale(locale));
   } catch (error) {
     console.warn("Falling back to local site settings", error);
     return fallbackSiteSettings;
@@ -463,18 +472,23 @@ export const getSiteSettings = cache(async () => {
 
 // Guide Profile functions
 
-function mapGuideLanguage(item: Doc): GuideLanguageProficiency {
+// A `spokenLanguages` row is `{ language: Language | id, level?, certificate? }`.
+// `language` may arrive unpopulated (an id) or populated (the related doc).
+function mapGuideLanguage(row: Doc): GuideLanguageProficiency {
+  const lang = row?.language;
+  const langDoc: Doc = typeof lang === "object" && lang !== null ? lang : {};
   return {
-    id: id(item.id ?? item),
-    name: item.name ?? (typeof item === "string" ? item : ""),
-    code: item.code ?? undefined,
-    proficiency: item.proficiency ?? undefined,
+    id: id(lang ?? row),
+    name: langDoc.name ?? (typeof lang === "string" ? lang : ""),
+    code: langDoc.code ?? undefined,
+    proficiency: row?.level ?? undefined,
+    certificate: typeof row?.certificate === "string" ? row.certificate : undefined,
   };
 }
 
 function mapGuide(doc: Doc): Guide {
-  const languages = Array.isArray(doc.languages)
-    ? doc.languages.map((l: Doc) => mapGuideLanguage(l))
+  const languages = Array.isArray(doc.spokenLanguages)
+    ? doc.spokenLanguages.map((l: Doc) => mapGuideLanguage(l)).filter((l: GuideLanguageProficiency) => l.name)
     : [];
   const provinces = relNames(doc.provinces);
   const nationalities = relNames(doc.nationalities);
@@ -493,7 +507,9 @@ function mapGuide(doc: Doc): Guide {
     cardExpiryDate: doc.cardExpiryDate ?? undefined,
     experienceYears: typeof doc.experienceYears === "number" ? doc.experienceYears : undefined,
     languages,
-    languageIds: relIds(doc.languages),
+    languageIds: Array.isArray(doc.spokenLanguages)
+      ? doc.spokenLanguages.map((l: Doc) => id(l?.language)).filter(Boolean)
+      : [],
     provinces,
     provinceIds: relIds(doc.provinces),
     nationalities,
@@ -503,7 +519,7 @@ function mapGuide(doc: Doc): Guide {
   };
 }
 
-async function fetchGuideById(guideId: string): Promise<Guide | null> {
+async function fetchGuideById(guideId: string, locale: AppLocale): Promise<Guide | null> {
   const payload = await getPayloadClient();
 
   try {
@@ -511,6 +527,7 @@ async function fetchGuideById(guideId: string): Promise<Guide | null> {
       collection: "guides",
       id: guideId,
       depth: 2,
+      locale,
     });
 
     if (!guideDoc) return null;
@@ -529,6 +546,7 @@ async function fetchGuideById(guideId: string): Promise<Guide | null> {
       },
       sort: "-startDate",
       limit: 100,
+      locale,
     });
 
     const tours = toursResult.docs.map(mapTour);
@@ -550,6 +568,7 @@ async function fetchGuideById(guideId: string): Promise<Guide | null> {
           ],
         },
         limit: 100,
+        locale,
       });
 
       const reviews = reviewsResult.docs.map(mapReview);
@@ -570,7 +589,7 @@ async function fetchGuideById(guideId: string): Promise<Guide | null> {
   }
 }
 
-async function fetchGuideTours(guideId: string): Promise<Tour[]> {
+async function fetchGuideTours(guideId: string, locale: AppLocale): Promise<Tour[]> {
   const payload = await getPayloadClient();
 
   try {
@@ -585,6 +604,7 @@ async function fetchGuideTours(guideId: string): Promise<Tour[]> {
       },
       sort: "-startDate",
       limit: 100,
+      locale,
     });
 
     return result.docs.map(mapTour);
@@ -594,7 +614,7 @@ async function fetchGuideTours(guideId: string): Promise<Tour[]> {
   }
 }
 
-async function fetchGuideReviews(guideId: string): Promise<Review[]> {
+async function fetchGuideReviews(guideId: string, locale: AppLocale): Promise<Review[]> {
   const payload = await getPayloadClient();
 
   try {
@@ -627,6 +647,7 @@ async function fetchGuideReviews(guideId: string): Promise<Review[]> {
       },
       sort: "-approvedAt",
       limit: 100,
+      locale,
     });
 
     return reviewsResult.docs.map(mapReview);
@@ -636,34 +657,34 @@ async function fetchGuideReviews(guideId: string): Promise<Review[]> {
   }
 }
 
-export const getGuideProfile = cache(async (guideId: string) => {
+export const getGuideProfile = cache(async (guideId: string, locale?: string) => {
   try {
-    return await fetchGuideById(guideId);
+    return await fetchGuideById(guideId, asLocale(locale));
   } catch (error) {
     console.warn("Error fetching guide profile:", error);
     return null;
   }
 });
 
-export const getGuideTours = cache(async (guideId: string) => {
+export const getGuideTours = cache(async (guideId: string, locale?: string) => {
   try {
-    return await fetchGuideTours(guideId);
+    return await fetchGuideTours(guideId, asLocale(locale));
   } catch (error) {
     console.warn("Error fetching guide tours:", error);
     return [];
   }
 });
 
-export const getGuideReviews = cache(async (guideId: string) => {
+export const getGuideReviews = cache(async (guideId: string, locale?: string) => {
   try {
-    return await fetchGuideReviews(guideId);
+    return await fetchGuideReviews(guideId, asLocale(locale));
   } catch (error) {
     console.warn("Error fetching guide reviews:", error);
     return [];
   }
 });
 
-export const getAllGuides = cache(async (): Promise<Guide[]> => {
+export const getAllGuides = cache(async (locale?: string): Promise<Guide[]> => {
   const payload = await getPayloadClient();
 
   try {
@@ -672,6 +693,7 @@ export const getAllGuides = cache(async (): Promise<Guide[]> => {
       depth: 1,
       limit: 100,
       sort: "name",
+      locale: asLocale(locale),
     });
 
     return result.docs.map(mapGuide);
@@ -681,12 +703,13 @@ export const getAllGuides = cache(async (): Promise<Guide[]> => {
   }
 });
 
-export const getGuideRelatedPosts = cache(async (guideId: string): Promise<RelatedItemSummary[]> => {
+export const getGuideRelatedPosts = cache(async (guideId: string, locale?: string): Promise<RelatedItemSummary[]> => {
   try {
     const payload = await getPayloadClient();
     const result = await payload.find({
       collection: "posts",
       depth: 1,
+      locale: asLocale(locale),
       limit: 20,
       where: {
         and: [
@@ -703,7 +726,7 @@ export const getGuideRelatedPosts = cache(async (guideId: string): Promise<Relat
   }
 });
 
-export const getTourReviews = cache(async (tourId: string): Promise<Review[]> => {
+export const getTourReviews = cache(async (tourId: string, locale?: string): Promise<Review[]> => {
   try {
     const payload = await getPayloadClient();
     const result = await payload.find({
@@ -717,6 +740,7 @@ export const getTourReviews = cache(async (tourId: string): Promise<Review[]> =>
         ],
       },
       sort: "-approvedAt",
+      locale: asLocale(locale),
     });
     return result.docs.map(mapReview);
   } catch (error) {
@@ -727,7 +751,11 @@ export const getTourReviews = cache(async (tourId: string): Promise<Review[]> =>
 
 /** Tours whose `relatedPosts`/`relatedStories` reference this content item (reverse lookup). */
 export const getRelatedTours = cache(
-  async (field: "relatedPosts" | "relatedStories", targetId: string): Promise<RelatedItemSummary[]> => {
+  async (
+    field: "relatedPosts" | "relatedStories",
+    targetId: string,
+    locale?: string
+  ): Promise<RelatedItemSummary[]> => {
     try {
       const payload = await getPayloadClient();
       const result = await payload.find({
@@ -735,6 +763,7 @@ export const getRelatedTours = cache(
         depth: 1,
         limit: 20,
         where: { [field]: { equals: targetId } },
+        locale: asLocale(locale),
       });
       return toRelatedItemSummaries(result.docs, "tour");
     } catch (error) {
@@ -748,7 +777,8 @@ export const getRelatedTours = cache(
 export const getRelatedPostsByField = cache(
   async (
     field: "relatedStories" | "relatedGuides" | "relatedTourTypes",
-    targetId: string
+    targetId: string,
+    locale?: string
   ): Promise<RelatedItemSummary[]> => {
     try {
       const payload = await getPayloadClient();
@@ -762,6 +792,7 @@ export const getRelatedPostsByField = cache(
             { status: { equals: "published" } },
           ],
         },
+        locale: asLocale(locale),
       });
       return toRelatedItemSummaries(result.docs, "post");
     } catch (error) {
@@ -771,16 +802,25 @@ export const getRelatedPostsByField = cache(
   }
 );
 
-export const getTourTypeBySlug = cache(async (slug: string): Promise<TourType | null> => {
+/** Tour types don't have `slug` fallback, so match at DEFAULT_LOCALE first, then load the target locale. */
+export const getTourTypeBySlug = cache(async (slug: string, locale?: string): Promise<TourType | null> => {
   try {
     const payload = await getPayloadClient();
-    const result = await payload.find({
+    const found = await payload.find({
       collection: "tour-types",
       depth: 0,
       limit: 1,
       where: { slug: { equals: slug } },
+      locale: DEFAULT_LOCALE,
     });
-    const doc = result.docs[0];
+    const docId = found.docs[0]?.id;
+    if (!docId) return null;
+    const doc = await payload.findByID({
+      collection: "tour-types",
+      id: docId,
+      depth: 0,
+      locale: asLocale(locale),
+    });
     return doc ? mapTourType(doc) : null;
   } catch (error) {
     console.warn("Error fetching tour type:", error);
@@ -788,7 +828,7 @@ export const getTourTypeBySlug = cache(async (slug: string): Promise<TourType | 
   }
 });
 
-export const getToursForTourType = cache(async (tourTypeId: string): Promise<RelatedItemSummary[]> => {
+export const getToursForTourType = cache(async (tourTypeId: string, locale?: string): Promise<RelatedItemSummary[]> => {
   try {
     const payload = await getPayloadClient();
     const result = await payload.find({
@@ -796,6 +836,7 @@ export const getToursForTourType = cache(async (tourTypeId: string): Promise<Rel
       depth: 1,
       limit: 50,
       where: { and: [{ tourTypes: { equals: tourTypeId } }, { status: { equals: "finished" } }] },
+      locale: asLocale(locale),
     });
     return toRelatedItemSummaries(result.docs, "tour");
   } catch (error) {
@@ -804,7 +845,7 @@ export const getToursForTourType = cache(async (tourTypeId: string): Promise<Rel
   }
 });
 
-export const getGuidesForTourType = cache(async (tourTypeId: string): Promise<RelatedItemSummary[]> => {
+export const getGuidesForTourType = cache(async (tourTypeId: string, locale?: string): Promise<RelatedItemSummary[]> => {
   try {
     const payload = await getPayloadClient();
     const result = await payload.find({
@@ -812,6 +853,7 @@ export const getGuidesForTourType = cache(async (tourTypeId: string): Promise<Re
       depth: 1,
       limit: 50,
       where: { tourTypes: { equals: tourTypeId } },
+      locale: asLocale(locale),
     });
     return toRelatedItemSummaries(result.docs, "guide");
   } catch (error) {
@@ -821,7 +863,11 @@ export const getGuidesForTourType = cache(async (tourTypeId: string): Promise<Re
 });
 
 export const getStoriesByField = cache(
-  async (field: "relatedTourTypes" | "relatedGuides", targetId: string): Promise<RelatedItemSummary[]> => {
+  async (
+    field: "relatedTourTypes" | "relatedGuides",
+    targetId: string,
+    locale?: string
+  ): Promise<RelatedItemSummary[]> => {
     try {
       const payload = await getPayloadClient();
       const result = await payload.find({
@@ -829,6 +875,7 @@ export const getStoriesByField = cache(
         depth: 1,
         limit: 20,
         where: { [field]: { equals: targetId } },
+        locale: asLocale(locale),
       });
       return toRelatedItemSummaries(result.docs, "story");
     } catch (error) {
@@ -838,16 +885,25 @@ export const getStoriesByField = cache(
   }
 );
 
-export const getStoryBySlug = cache(async (slug: string): Promise<Story | null> => {
+/** `slug` isn't localized, so match at DEFAULT_LOCALE first, then load the target locale. */
+export const getStoryBySlug = cache(async (slug: string, locale?: string): Promise<Story | null> => {
   try {
     const payload = await getPayloadClient();
-    const result = await payload.find({
+    const found = await payload.find({
       collection: "stories",
-      depth: 1,
+      depth: 0,
       limit: 1,
       where: { slug: { equals: slug } },
+      locale: DEFAULT_LOCALE,
     });
-    const doc = result.docs[0];
+    const docId = found.docs[0]?.id;
+    if (!docId) return null;
+    const doc = await payload.findByID({
+      collection: "stories",
+      id: docId,
+      depth: 1,
+      locale: asLocale(locale),
+    });
     return doc ? mapStory(doc) : null;
   } catch (error) {
     console.warn("Error fetching story:", error);
@@ -859,7 +915,8 @@ export const getStoryBySlug = cache(async (slug: string): Promise<Story | null> 
 export async function getRelatedPostsFor(
   postId: string,
   categoryIds: string[],
-  explicit: RelatedItemSummary[]
+  explicit: RelatedItemSummary[],
+  locale?: string
 ): Promise<RelatedItemSummary[]> {
   if (explicit.length > 0) return explicit;
   try {
@@ -878,6 +935,7 @@ export async function getRelatedPostsFor(
       limit: 3,
       where: { and: conditions },
       sort: "-publishedAt",
+      locale: asLocale(locale),
     });
     return toRelatedItemSummaries(result.docs, "post");
   } catch (error) {
@@ -957,7 +1015,7 @@ function mapDestination(doc: Doc): Destination {
   };
 }
 
-export const getDestinations = cache(async (): Promise<Destination[]> => {
+export const getDestinations = cache(async (locale?: string): Promise<Destination[]> => {
   try {
     const payload = await getPayloadClient();
     const result = await payload.find({
@@ -966,6 +1024,7 @@ export const getDestinations = cache(async (): Promise<Destination[]> => {
       limit: 100,
       sort: "order",
       where: { status: { equals: "published" } },
+      locale: asLocale(locale),
     });
     return result.docs.map(mapDestination);
   } catch (error) {
@@ -974,16 +1033,25 @@ export const getDestinations = cache(async (): Promise<Destination[]> => {
   }
 });
 
-export const getDestination = cache(async (slug: string): Promise<Destination | null> => {
+/** `slug` isn't localized, so match at DEFAULT_LOCALE first, then load the target locale. */
+export const getDestination = cache(async (slug: string, locale?: string): Promise<Destination | null> => {
   try {
     const payload = await getPayloadClient();
-    const result = await payload.find({
+    const found = await payload.find({
       collection: "destinations",
-      depth: 2,
+      depth: 0,
       limit: 1,
       where: { and: [{ slug: { equals: slug } }, { status: { equals: "published" } }] },
+      locale: DEFAULT_LOCALE,
     });
-    const doc = result.docs[0];
+    const docId = found.docs[0]?.id;
+    if (!docId) return null;
+    const doc = await payload.findByID({
+      collection: "destinations",
+      id: docId,
+      depth: 2,
+      locale: asLocale(locale),
+    });
     return doc ? mapDestination(doc) : null;
   } catch (error) {
     console.warn("Error fetching destination:", error);
@@ -1011,7 +1079,7 @@ function mapFaq(doc: Doc): Faq {
 }
 
 /** General/site-wide FAQs (no `relatedTo` target set). */
-export const getFaqs = cache(async (): Promise<Faq[]> => {
+export const getFaqs = cache(async (locale?: string): Promise<Faq[]> => {
   try {
     const payload = await getPayloadClient();
     const result = await payload.find({
@@ -1020,6 +1088,7 @@ export const getFaqs = cache(async (): Promise<Faq[]> => {
       limit: 200,
       sort: "order",
       where: { status: { equals: "published" } },
+      locale: asLocale(locale),
     });
     // Postgres adapter doesn't support `exists` on polymorphic relationship fields, so filter in JS instead.
     return result.docs.filter((doc) => !doc.relatedTo).map(mapFaq);
@@ -1029,7 +1098,7 @@ export const getFaqs = cache(async (): Promise<Faq[]> => {
   }
 });
 
-export const getFaqsFor = cache(async (relationTo: FaqRelatedToType, targetId: string): Promise<Faq[]> => {
+export const getFaqsFor = cache(async (relationTo: FaqRelatedToType, targetId: string, locale?: string): Promise<Faq[]> => {
   try {
     const payload = await getPayloadClient();
     const result = await payload.find({
@@ -1044,6 +1113,7 @@ export const getFaqsFor = cache(async (relationTo: FaqRelatedToType, targetId: s
           { "relatedTo.value": { equals: targetId } },
         ],
       },
+      locale: asLocale(locale),
     });
     return result.docs.map(mapFaq);
   } catch (error) {

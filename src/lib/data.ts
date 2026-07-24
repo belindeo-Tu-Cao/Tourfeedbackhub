@@ -8,6 +8,7 @@ import {
   type Review,
   type HeroSlide,
 } from "@/lib/types";
+import { locales, defaultLocale } from "@/i18n/routing";
 
 function buildNavigationTree(flatItems: NavigationMenuItem[]): NavigationMenuItem[] {
   const clonedItems = flatItems.map((item) => ({
@@ -79,8 +80,8 @@ export const siteSettings: SiteSettings = {
     tiktok: "https://www.tiktok.com/@yourhandle",
   },
   copyright: "© 2025 Cao Hữu Tú. All rights reserved.",
-  languages: ["en", "it"],
-  defaultLanguage: "en",
+  languages: [...locales],
+  defaultLanguage: defaultLocale,
   primaryColor: "#77B5FE",
   accentColor: "#4682B4",
 };

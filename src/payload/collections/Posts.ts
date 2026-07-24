@@ -25,6 +25,7 @@ export const Posts: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
+      localized: true,
     },
     {
       name: 'slug',
@@ -34,10 +35,12 @@ export const Posts: CollectionConfig = {
     {
       name: 'content',
       type: 'richText',
+      localized: true,
     },
     {
       name: 'excerpt',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'status',
@@ -74,11 +77,6 @@ export const Posts: CollectionConfig = {
       hasMany: true,
     },
     {
-      name: 'locale',
-      type: 'text',
-      defaultValue: 'en',
-    },
-    {
       name: 'scheduledFor',
       type: 'date',
     },
@@ -104,6 +102,7 @@ export const Posts: CollectionConfig = {
     {
       name: 'seo',
       type: 'json',
+      localized: true,
     },
     {
       name: 'relatedPosts',

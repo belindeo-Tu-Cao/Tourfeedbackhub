@@ -4,6 +4,10 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { locales as appLocales, defaultLocale } from '../i18n/routing'
+
+// Keep in sync with src/i18n/routing.ts
+void (appLocales satisfies readonly ['en', 'es', 'it', 'vi'])
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -19,6 +23,9 @@ import { Languages, Nationalities, Provinces, TourTypes } from './collections/Ma
 import { Stories, Slides, NavigationMenus, Mail, SiteSettings, ThemeSettings } from './collections/SiteConfig'
 import { Destinations } from './collections/Destinations'
 import { FAQs } from './collections/FAQs'
+import { Translations } from './collections/Translations'
+import { purgeDatabaseEndpoint } from './endpoints/purgeDatabase'
+import { debugUserRoleEndpoint } from './endpoints/debugUserRole'
 
 export default buildConfig({
   admin: {
@@ -26,6 +33,23 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      actions: [
+        './admin/PurgeDatabaseButton#PurgeDatabaseButton',
+        './admin/ProminentLogout#ProminentLogout',
+      ],
+    },
+  },
+  endpoints: [purgeDatabaseEndpoint, debugUserRoleEndpoint],
+  localization: {
+    locales: [
+      { label: 'English', code: 'en' },
+      { label: 'Español', code: 'es' },
+      { label: 'Italiano', code: 'it' },
+      { label: 'Tiếng Việt', code: 'vi' },
+    ],
+    defaultLocale,
+    fallback: true,
   },
   collections: [
     Users,
@@ -46,6 +70,7 @@ export default buildConfig({
     Stories,
     Destinations,
     FAQs,
+    Translations,
     Slides,
     NavigationMenus,
     SiteSettings,

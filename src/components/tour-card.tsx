@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from '@/i18n/navigation';
 import { CalendarRange, MapPin, Users, Languages, Star } from "lucide-react";
 import {
   Card,

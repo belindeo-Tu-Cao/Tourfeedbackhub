@@ -1,0 +1,5 @@
+{
+  "nav": { "home": "Home", "tours": "Tour", "destinations": "Destinazioni", "blog": "Blog", "stories": "Storie", "faq": "FAQ", "reviews": "Recensioni", "contact": "Contatti" },
+  "common": { "readMore": "Leggi di più", "loading": "Caricamento…", "submit": "Invia", "search": "Cerca" },
+  "footer": { "tagline": "Portfolio professionale di guida turistica" }
+}

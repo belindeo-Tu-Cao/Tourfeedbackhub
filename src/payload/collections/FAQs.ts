@@ -13,11 +13,13 @@ export const FAQs: CollectionConfig = {
       name: 'question',
       type: 'text',
       required: true,
+      localized: true,
     },
     {
       name: 'answer',
       type: 'richText',
       required: true,
+      localized: true,
     },
     {
       name: 'relatedTo',

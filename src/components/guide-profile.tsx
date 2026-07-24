@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -36,16 +36,16 @@ interface GuideProfileProps {
 }
 
 const proficiencyLabels: Record<string, string> = {
-  beginner: 'Beginner',
+  basic: 'Basic',
   intermediate: 'Intermediate',
-  advanced: 'Advanced',
+  fluent: 'Fluent',
   native: 'Native',
 };
 
 const proficiencyColors: Record<string, string> = {
-  beginner: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+  basic: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
   intermediate: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-  advanced: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+  fluent: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
   native: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
 };
 

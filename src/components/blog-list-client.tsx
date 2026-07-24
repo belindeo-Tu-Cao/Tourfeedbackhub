@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import type { BlogListItem, BlogCategory } from '@/lib/blog';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';

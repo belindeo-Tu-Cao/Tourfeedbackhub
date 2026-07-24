@@ -1,0 +1,5 @@
+{
+  "nav": { "home": "Trang chủ", "tours": "Tour", "destinations": "Điểm đến", "blog": "Blog", "stories": "Câu chuyện", "faq": "Hỏi đáp", "reviews": "Đánh giá", "contact": "Liên hệ" },
+  "common": { "readMore": "Xem thêm", "loading": "Đang tải…", "submit": "Gửi", "search": "Tìm kiếm" },
+  "footer": { "tagline": "Hồ sơ hướng dẫn viên chuyên nghiệp" }
+}

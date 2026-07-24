@@ -26,6 +26,7 @@ export const Feedback: CollectionConfig = {
     {
       name: 'message',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'tour',
@@ -72,6 +73,7 @@ export const Feedback: CollectionConfig = {
     {
       name: 'feedbackSummary',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'guide',
@@ -140,6 +142,7 @@ export const Reviews: CollectionConfig = {
     {
       name: 'message',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'tour',
@@ -173,6 +176,7 @@ export const Reviews: CollectionConfig = {
     {
       name: 'summary',
       type: 'textarea',
+      localized: true,
     },
     {
       name: 'reviewType',
