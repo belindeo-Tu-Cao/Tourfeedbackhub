@@ -1027,8 +1027,8 @@ async function seed() {
     },
   ]
   for (const f of faqDefs) {
-    const doc = await ensure('faqs', { question: { equals: f.question } }, f)
-    await copyLocaleBaseline(payload, 'faqs', doc.id)
+    // faqs intentionally not baseline-copied (see LOCALIZED_FIELDS note) — rely on fallback:true
+    await ensure('faqs', { question: { equals: f.question } }, f)
   }
   log(`faqs ready (${faqDefs.length})`)
 
