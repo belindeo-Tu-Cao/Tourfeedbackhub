@@ -1,0 +1,5 @@
+{
+  "nav": { "home": "Home", "tours": "Tours", "destinations": "Destinations", "blog": "Blog", "stories": "Stories", "faq": "FAQ", "reviews": "Reviews", "contact": "Contact" },
+  "common": { "readMore": "Read more", "loading": "Loading…", "submit": "Submit", "search": "Search" },
+  "footer": { "tagline": "Professional tour guide portfolio" }
+}
