@@ -53,3 +53,6 @@ recapcha key
 
 # codegraph local index (machine-specific)
 .codegraph/
+
+# Internal docs / requirements — kept local, not published
+/docs/

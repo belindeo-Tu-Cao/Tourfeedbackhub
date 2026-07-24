@@ -64,10 +64,19 @@ async function copyLocaleBaseline(payload: Payload, collection: string, id: stri
   }
 }
 
-const ADMIN_EMAIL = 'iposntmk@gmail.com'
-const ADMIN_PASSWORD = 'iposntmk@gmail.com'
+// Admin seed credentials come from env — never hardcode real emails/passwords.
+// Set SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD in .env.local (gitignored) to seed the
+// primary admin. Fallbacks are non-sensitive dev placeholders. Seeding is idempotent,
+// so existing admins are never overwritten.
+const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'admin@example.com'
+const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'change-me-in-env'
 
-const EXTRA_ADMINS = [{ email: 'belindeo@gmail.com', password: 'belindeo@gmail.com' }]
+// Extra admins: JSON array in SEED_EXTRA_ADMINS, e.g.
+//   SEED_EXTRA_ADMINS=[{"email":"a@b.com","password":"..."}]
+const EXTRA_ADMINS: Array<{ email: string; password: string }> = process.env
+  .SEED_EXTRA_ADMINS
+  ? JSON.parse(process.env.SEED_EXTRA_ADMINS)
+  : []
 
 async function seed() {
   const payload = await getPayload({ config })
